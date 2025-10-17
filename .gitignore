@@ -1,0 +1,12 @@
+node_modules
+dist
+.env
+
+# iOS / Xcode
+DerivedData/
+*.xcworkspace/xcuserdata
+*.xcodeproj/xcuserdata
+xcuserdata/
+build/
+*.DS_Store
+GIT

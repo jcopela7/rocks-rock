@@ -2,7 +2,7 @@
 import { db } from "../db/index.js";
 import { ascent } from "../db/schema.js";
 import { z } from "zod";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 type UUID = string; // keep simple; you can add a UUID zod later
 
@@ -65,36 +65,11 @@ export type ListAscentsQuery = z.infer<typeof ListAscentsQuery>;
 export async function listAscents(q: ListAscentsQuery) {
   const params = ListAscentsQuery.parse(q);
 
-  // Build a tiny dynamic WHERE
-  const where: any[] = [eq(ascent.userId, params.userId)];
-  if (params.style) where.push(eq(ascent.style, params.style));
-  if (params.routeId) where.push(eq(ascent.routeId, params.routeId));
-  if (params.locationId) where.push(eq(ascent.locationId, params.locationId));
+  const query = db.select().from(ascent).where(eq(ascent.userId, params.userId));
 
-  // Use raw SQL for date ranges (clear & indexed)
-  const sql = `
-    SELECT * FROM ascent
-    WHERE user_id = $1
-      ${params.style ? "AND style = $2" : ""}
-      /* ${params.routeId ? "AND route_id = $3" : ""} */
-      ${params.locationId ? "AND location_id = $4" : ""}
-      ${params.after ? "AND climbed_at >= $5" : ""}
-      ${params.before ? "AND climbed_at <= $6" : ""}
-    ORDER BY climbed_at DESC
-    LIMIT $7
-  `;
+  const rows = await query
+    .orderBy(sql`climbed_at DESC`)
+    .limit(params.limit);
 
-  // For brevity, use `db.execute` here (typed results still work fine)
-  const args = [
-    params.userId,
-    ...(params.style ? [params.style] as const : []),
-    ...(params.routeId ? [params.routeId] as const : []),
-    ...(params.locationId ? [params.locationId] as const : []),
-    ...(params.after ? [params.after] as const : []),
-    ...(params.before ? [params.before] as const : []),
-    params.limit,
-  ];
-
-  const res = await db.execute(sql as string, args as unknown[]);
-  return (res as unknown as { rows: unknown[] }).rows;
+  return rows;
 }

@@ -21,7 +21,7 @@ app.get("/", async () => ({ ok: true, service: "jonrocks-api" }));
 async function start() {
   const port = Number(process.env.PORT) || 3000;
   await migrate(db, { migrationsFolder: "migrations" }); // ensures tables exist
-  await app.listen({ port });
+  await app.listen({ host: "0.0.0.0", port });
   console.log(`🚀 Server running at http://localhost:${port}`);
 }
 

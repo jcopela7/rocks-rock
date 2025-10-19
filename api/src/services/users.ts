@@ -1,7 +1,7 @@
 // src/services/ascents.ts
-import { db } from "../db/index.js";
-import { appUser } from "../db/schema.js";
-import { z } from "zod";
+import { db } from '../db/index.js';
+import { appUser } from '../db/schema.js';
+import { z } from 'zod';
 
 export const CreateUserInput = z.object({
   userId: z.string().uuid(),

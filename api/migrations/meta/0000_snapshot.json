@@ -129,12 +129,8 @@
           "name": "ascent_user_id_app_user_id_fk",
           "tableFrom": "ascent",
           "tableTo": "app_user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -142,12 +138,8 @@
           "name": "ascent_route_id_route_id_fk",
           "tableFrom": "ascent",
           "tableTo": "route",
-          "columnsFrom": [
-            "route_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["route_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -155,12 +147,8 @@
           "name": "ascent_location_id_location_id_fk",
           "tableFrom": "ascent",
           "tableTo": "location",
-          "columnsFrom": [
-            "location_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["location_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -238,12 +226,8 @@
           "name": "location_created_by_app_user_id_fk",
           "tableFrom": "location",
           "tableTo": "app_user",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -326,12 +310,8 @@
           "name": "media_user_id_app_user_id_fk",
           "tableFrom": "media",
           "tableTo": "app_user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -339,12 +319,8 @@
           "name": "media_ascent_id_ascent_id_fk",
           "tableFrom": "media",
           "tableTo": "ascent",
-          "columnsFrom": [
-            "ascent_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["ascent_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -352,12 +328,8 @@
           "name": "media_route_id_route_id_fk",
           "tableFrom": "media",
           "tableTo": "route",
-          "columnsFrom": [
-            "route_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["route_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -447,12 +419,8 @@
           "name": "route_location_id_location_id_fk",
           "tableFrom": "route",
           "tableTo": "location",
-          "columnsFrom": [
-            "location_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["location_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }

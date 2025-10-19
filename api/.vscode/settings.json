@@ -1,11 +1,11 @@
 {
-    "editor.formatOnSave": true,
-    "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": "always"
-    },
-    "eslint.alwaysShowStatus": true,
-    "eslint.format.enable": true,
-    "prettier.requireConfig": true,
-    "prettier.enable": true,
-    "organizeImports.enable": true,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "always"
+  },
+  "eslint.alwaysShowStatus": true,
+  "eslint.format.enable": true,
+  "prettier.requireConfig": true,
+  "prettier.enable": true,
+  "organizeImports.enable": true
 }

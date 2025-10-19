@@ -1,15 +1,15 @@
 // src/services/ascents.ts
-import { db } from "../db/index.js";
-import { location } from "../db/schema.js";
-import { z } from "zod";
+import { db } from '../db/index.js';
+import { location } from '../db/schema.js';
+import { z } from 'zod';
 
 export const CreateLocationInput = z.object({
   id: z.string(),
   name: z.string(),
-  type: z.enum(["gym", "crag"]),
+  type: z.enum(['gym', 'crag']),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
-  createdBy: z.string()
+  createdBy: z.string(),
 });
 
 export type CreateLocationInput = z.infer<typeof CreateLocationInput>;
@@ -33,7 +33,6 @@ export async function createLocation(input: CreateLocationInput) {
 }
 
 export async function listLocations() {
-
   const sql = `
   SELECT * FROM location
   ORDER BY created_at DESC

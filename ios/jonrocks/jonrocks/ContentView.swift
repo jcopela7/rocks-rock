@@ -3,8 +3,6 @@ import Combine
 import PhotosUI
 import Foundation
 
-// MARK: - ViewModel
-
 @MainActor
 final class AscentsVM: ObservableObject {
     @Published var ascents: [AscentDTO] = []
@@ -13,7 +11,7 @@ final class AscentsVM: ObservableObject {
     @Published var imagesByAscent: [UUID: [LocalImageRef]] = [:]
     @Published var searchText: String = ""
 
-    private let api = APIClient()
+    let api = APIClient()
     private let imagesKey = "imagesByAscent.v1"
 
     // demo IDs you seeded
@@ -110,7 +108,108 @@ final class AscentsVM: ObservableObject {
     }
 }
 
-// MARK: - Search Bar Component
+struct AscentFormData {
+    var style: String = "attempt"
+    var attempts: Int = 1
+    var isOutdoor: Bool = false
+    var rating: String = ""
+    var notes: String = ""
+    var climbedAt: Date = Date()
+    
+    var createAscentRequest: CreateAscentRequest {
+        CreateAscentRequest(
+            userId: UUID(uuidString: "00000000-0000-0000-0000-000000000001")!, // demoUser
+            routeId: nil,
+            locationId: UUID(uuidString: "00000000-0000-0000-0000-000000000002")!, // demoLocation
+            style: style,
+            attempts: attempts,
+            isOutdoor: isOutdoor,
+            rating: rating.isEmpty ? nil : Int(rating),
+            notes: notes.isEmpty ? nil : notes,
+            climbedAt: climbedAt
+        )
+    }
+}
+
+struct AddAscentFormView: View {
+    @ObservedObject var viewModel: AscentsVM
+    @Environment(\.dismiss) private var dismiss
+    
+    @State private var formData = AscentFormData()
+    @State private var isSubmitting = false
+    
+    private let styleOptions = ["attempt", "send", "flash", "onsight", "redpoint"]
+    
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Climb Details") {
+                    Picker("Style", selection: $formData.style) {
+                        ForEach(styleOptions, id: \.self) { style in
+                            Text(style.capitalized).tag(style)
+                        }
+                    }
+                    
+                    Stepper("Attempts: \(formData.attempts)", value: $formData.attempts, in: 1...20)
+                }
+                
+                Section("Location") {
+                    Toggle("Outdoor Climbing", isOn: $formData.isOutdoor)
+                }
+                
+                Section("Rating") {
+                    TextField("Grade (e.g., 5.10a, V4)", text: $formData.rating)
+                        .textInputAutocapitalization(.never)
+                }
+                
+                Section("Notes") {
+                    TextEditor(text: $formData.notes)
+                        .frame(minHeight: 80)
+                }
+                
+                Section("Date") {
+                    DatePicker("Climb Date", selection: $formData.climbedAt, displayedComponents: [.date, .hourAndMinute])
+                }
+            }
+            .navigationTitle("Add Ascent")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Save") {
+                        Task {
+                            await submitForm()
+                        }
+                    }
+                    .disabled(isSubmitting)
+                }
+            }
+        }
+    }
+    
+    private func submitForm() async {
+        isSubmitting = true
+        defer { isSubmitting = false }
+        
+        do {
+            let request = formData.createAscentRequest
+            let created = try await viewModel.api.createAscent(request)
+            await MainActor.run {
+                viewModel.ascents.insert(created, at: 0)
+                viewModel.error = nil
+                dismiss()
+            }
+        } catch {
+            await MainActor.run {
+                viewModel.error = error.localizedDescription
+            }
+        }
+    }
+}
 
 struct SearchBar: View {
     @Binding var text: String
@@ -134,12 +233,11 @@ struct SearchBar: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
-        .background(Color(.systemGray6))
+        .background(Color(.white))
         .cornerRadius(10)
     }
 }
 
-// MARK: - View
 struct ContentView: View {
     @State private var selectedTab = 0
     
@@ -160,8 +258,6 @@ struct ContentView: View {
         }
     }
 }
-
-// MARK: - Progress View
 
 struct ProgressView: View {
     var body: some View {
@@ -185,13 +281,12 @@ struct ProgressView: View {
     }
 }
 
-// MARK: - Activity Logging View
-
 struct ActivityLoggingView: View {
     @StateObject private var vm = AscentsVM()
 
     @State private var ascentToDelete: AscentDTO?
     @State private var showingDeleteAlert = false
+    @State private var showingAddForm = false
 
     @State private var pickingForAscent: AscentDTO?
     @State private var selectedItem: PhotosPickerItem?
@@ -257,7 +352,7 @@ struct ActivityLoggingView: View {
                     Button("Reload") { Task { await vm.load() } }
                 }
                 ToolbarItem(placement: .primaryAction) {
-                    Button("Add") { Task { await vm.addAttempt() } }
+                    Button("Add") { showingAddForm = true }
                 }
             }
             .task { await vm.load() }
@@ -277,6 +372,9 @@ struct ActivityLoggingView: View {
             // Handle the picked photo once PhotosPicker selection changes
             .onChange(of: selectedItem) { _, newItem in
                 Task { await handlePickedItem(newItem) }
+            }
+            .sheet(isPresented: $showingAddForm) {
+                AddAscentFormView(viewModel: vm)
             }
         }
     }

@@ -1,5 +1,5 @@
 //
-//  jonrocksApp.swift
+//  JonrocksApp.swift
 //  jonrocks
 //
 //  Created by Jonathan Cope on 2025-10-18.

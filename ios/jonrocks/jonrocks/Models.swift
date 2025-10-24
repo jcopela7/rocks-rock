@@ -13,7 +13,7 @@ struct UserDTO: Codable, Identifiable {
 struct LocationDTO: Codable, Identifiable {
     let id: UUID
     let name: String
-    let type: String      // "gym" | "crag"
+    let type: String // "gym" | "crag"
     let latitude: Double?
     let longitude: Double?
 }
@@ -43,7 +43,6 @@ struct CreateAscentRequest: Encodable {
     let climbedAt: Date
 }
 
-struct DeleteAscentRequest:Encodable {
+struct DeleteAscentRequest: Encodable {
     let id: UUID
 }
-

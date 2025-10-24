@@ -2,7 +2,7 @@ import UIKit
 
 struct LocalImageRef: Codable, Hashable, Identifiable {
     let id: UUID
-    let fileName: String  // e.g., "<uuid>.jpg"
+    let fileName: String // e.g., "<uuid>.jpg"
     var fileURL: URL { LocalImageStore.imagesDir.appendingPathComponent(fileName) }
 }
 

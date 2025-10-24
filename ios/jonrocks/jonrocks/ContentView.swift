@@ -1,7 +1,7 @@
-import SwiftUI
 import Combine
-import PhotosUI
 import Foundation
+import PhotosUI
+import SwiftUI
 
 @MainActor
 final class AscentsVM: ObservableObject {
@@ -72,8 +72,9 @@ final class AscentsVM: ObservableObject {
 
     private func loadImageRefs() {
         if let data = UserDefaults.standard.data(forKey: imagesKey),
-           let map = try? JSONDecoder().decode([UUID: [LocalImageRef]].self, from: data) {
-            self.imagesByAscent = map
+           let map = try? JSONDecoder().decode([UUID: [LocalImageRef]].self, from: data)
+        {
+            imagesByAscent = map
         }
     }
 
@@ -94,9 +95,9 @@ final class AscentsVM: ObservableObject {
             self.error = "Save image failed: \(error.localizedDescription)"
         }
     }
-    
+
     // MARK: Search functionality
-    
+
     var filteredAscents: [AscentDTO] {
         if searchText.isEmpty {
             return ascents
@@ -114,8 +115,8 @@ struct AscentFormData {
     var isOutdoor: Bool = false
     var rating: String = ""
     var notes: String = ""
-    var climbedAt: Date = Date()
-    
+    var climbedAt: Date = .init()
+
     var createAscentRequest: CreateAscentRequest {
         CreateAscentRequest(
             userId: UUID(uuidString: "00000000-0000-0000-0000-000000000001")!, // demoUser
@@ -134,12 +135,12 @@ struct AscentFormData {
 struct AddAscentFormView: View {
     @ObservedObject var viewModel: AscentsVM
     @Environment(\.dismiss) private var dismiss
-    
+
     @State private var formData = AscentFormData()
     @State private var isSubmitting = false
-    
+
     private let styleOptions = ["attempt", "send", "flash", "onsight", "redpoint"]
-    
+
     var body: some View {
         NavigationStack {
             Form {
@@ -149,24 +150,24 @@ struct AddAscentFormView: View {
                             Text(style.capitalized).tag(style)
                         }
                     }
-                    
-                    Stepper("Attempts: \(formData.attempts)", value: $formData.attempts, in: 1...20)
+
+                    Stepper("Attempts: \(formData.attempts)", value: $formData.attempts, in: 1 ... 20)
                 }
-                
+
                 Section("Location") {
                     Toggle("Outdoor Climbing", isOn: $formData.isOutdoor)
                 }
-                
+
                 Section("Rating") {
                     TextField("Grade (e.g., 5.10a, V4)", text: $formData.rating)
                         .textInputAutocapitalization(.never)
                 }
-                
+
                 Section("Notes") {
                     TextEditor(text: $formData.notes)
                         .frame(minHeight: 80)
                 }
-                
+
                 Section("Date") {
                     DatePicker("Climb Date", selection: $formData.climbedAt, displayedComponents: [.date, .hourAndMinute])
                 }
@@ -190,11 +191,11 @@ struct AddAscentFormView: View {
             }
         }
     }
-    
+
     private func submitForm() async {
         isSubmitting = true
         defer { isSubmitting = false }
-        
+
         do {
             let request = formData.createAscentRequest
             let created = try await viewModel.api.createAscent(request)
@@ -211,17 +212,73 @@ struct AddAscentFormView: View {
     }
 }
 
+struct AscentRowView: View {
+    let ascent: AscentDTO
+    @ObservedObject var viewModel: AscentsVM
+    @Binding var selectedItem: PhotosPickerItem?
+    @Binding var pickingForAscent: AscentDTO?
+    @Binding var ascentToDelete: AscentDTO?
+    @Binding var showingDeleteAlert: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            ascentHeader
+            ascentImage
+            ascentDetails
+        }
+        .padding(.vertical, 4)
+        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+            Button("Delete", role: .destructive) {
+                ascentToDelete = ascent
+                showingDeleteAlert = true
+            }
+        }
+    }
+
+    private var ascentHeader: some View {
+        HStack {
+            Text("\(ascent.style.capitalized) • Attempts \(ascent.attempts)")
+                .font(.headline)
+            Spacer()
+        }
+    }
+
+    @ViewBuilder
+    private var ascentImage: some View {
+        if let ref = viewModel.imagesByAscent[ascent.id]?.first,
+           let ui = LocalImageStore.load(ref)
+        {
+            Image(uiImage: ui)
+                .resizable()
+                .scaledToFill()
+                .frame(height: 120)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .clipped()
+        }
+    }
+
+    private var ascentDetails: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(ascent.notes ?? "")
+                .font(.body)
+                .foregroundStyle(.secondary)
+            Text(ascent.climbedAt.formatted(date: .abbreviated, time: .shortened))
+                .foregroundStyle(.secondary)
+        }
+    }
+}
+
 struct SearchBar: View {
     @Binding var text: String
-    
+
     var body: some View {
         HStack {
             Image(systemName: "magnifyingglass")
                 .foregroundColor(.gray)
-            
+
             TextField("Search by style...", text: $text)
                 .textFieldStyle(PlainTextFieldStyle())
-            
+
             if !text.isEmpty {
                 Button(action: {
                     text = ""
@@ -238,159 +295,164 @@ struct SearchBar: View {
     }
 }
 
-struct ContentView: View {
-    @State private var selectedTab = 0
-    
+struct AppHeader: View {
+    let title: String
+    let onAddTap: () -> Void
+
     var body: some View {
-        VStack(spacing: 0) {
-            Picker("Tab Selection", selection: $selectedTab) {
-                Text("Progress").tag(0)
-                Text("Activity").tag(1)
-            }
-            .pickerStyle(SegmentedPickerStyle())
-            .padding()
-            
-            if selectedTab == 0 {
-                ProgressView()
-            } else {
-                ActivityLoggingView()
+        HStack {
+            Text(title)
+                .font(.largeTitle)
+                .fontWeight(.bold)
+            Spacer()
+            Button(action: onAddTap) {
+                Label("Add", systemImage: "plus")
+                    .fontWeight(.semibold)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 6)
+                    .background(Color(UIColor.systemBlue))
+                    .clipShape(Capsule())
+                    .foregroundColor(.white)
             }
         }
+        .padding(.horizontal, 16)
+        .padding(.top, 8)
+        .padding(.bottom, 8)
     }
 }
 
 struct ProgressView: View {
     var body: some View {
-        NavigationStack {
-            VStack {
-                Text("Progress Tracking")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .padding()
-                
-                Text("Your climbing progress and statistics will appear here.")
-                    .font(.body)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding()
-                
-                Spacer()
-            }
-            .navigationTitle("Progress")
+        VStack {
+            Text("Your climbing progress and statistics will appear here.")
+                .font(.body)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
         }
     }
 }
 
 struct ActivityLoggingView: View {
-    @StateObject private var vm = AscentsVM()
+    @ObservedObject var vm: AscentsVM
 
     @State private var ascentToDelete: AscentDTO?
     @State private var showingDeleteAlert = false
-    @State private var showingAddForm = false
 
     @State private var pickingForAscent: AscentDTO?
     @State private var selectedItem: PhotosPickerItem?
 
     var body: some View {
+        VStack(spacing: 8) {
+            SearchBar(text: $vm.searchText)
+                .padding(.horizontal, 16)
+                .padding(.top, 8)
+            List(vm.filteredAscents) { ascent in
+                AscentRowView(
+                    ascent: ascent,
+                    viewModel: vm,
+                    selectedItem: $selectedItem,
+                    pickingForAscent: $pickingForAscent,
+                    ascentToDelete: $ascentToDelete,
+                    showingDeleteAlert: $showingDeleteAlert
+                )
+                // iOS 17+: trim default side gutters
+                .listRowSeparator(.visible)
+            }
+            .listStyle(.plain)
+            .contentMargins(.horizontal, 12) // iOS 17
+        }
+        .overlay(alignment: .center) {
+            loadingOverlay
+        }
+        .task { await vm.load() }
+        .alert("Delete Ascent", isPresented: $showingDeleteAlert) {
+            deleteAlertContent
+        } message: {
+            deleteAlertMessage
+        }
+    }
+
+    // MARK: - Sub-expressions
+
+    private var searchBar: some View {
+        SearchBar(text: $vm.searchText)
+            .padding(.horizontal)
+            .padding(.top, 8)
+    }
+
+    private var ascentsList: some View {
+        List(vm.filteredAscents) { ascent in
+            AscentRowView(
+                ascent: ascent,
+                viewModel: vm,
+                selectedItem: $selectedItem,
+                pickingForAscent: $pickingForAscent,
+                ascentToDelete: $ascentToDelete,
+                showingDeleteAlert: $showingDeleteAlert
+            )
+        }
+    }
+
+    private var loadingOverlay: some View {
+        Group {
+            if vm.loading { ProgressView() }
+            if let e = vm.error {
+                Text(e).foregroundStyle(.red).padding()
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var deleteAlertContent: some View {
+        Button("Cancel", role: .cancel) { ascentToDelete = nil }
+        Button("Delete", role: .destructive) {
+            if let ascent = ascentToDelete {
+                Task { await vm.deleteAscent(ascent) }
+            }
+            ascentToDelete = nil
+        }
+    }
+
+    @ViewBuilder
+    private var deleteAlertMessage: some View {
+        if let ascent = ascentToDelete {
+            Text("Are you sure you want to delete this \(ascent.style) ascent? This action cannot be undone.")
+        }
+    }
+}
+
+struct ContentView: View {
+    @State private var selectedTab = 1
+    @StateObject private var vm = AscentsVM()
+    @State private var showingAddForm = false
+
+    var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                // Add search bar
-                SearchBar(text: $vm.searchText)
-                    .padding(.horizontal)
-                    .padding(.top, 8)
-                
-                List(vm.filteredAscents) { a in
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Text("\(a.style.capitalized) • Attempts \(a.attempts)")
-                            .font(.headline)
-                        Spacer()
-                        PhotosPicker(selection: $selectedItem, matching: .images) {
-                            Image(systemName: "camera.fill")
-                                .imageScale(.medium)
-                                .padding(6)
-                        }
-                        // Remember which ascent we're attaching to
-                        .onTapGesture { pickingForAscent = a }
-                    }
-
-                    if let ref = vm.imagesByAscent[a.id]?.first,
-                       let ui = LocalImageStore.load(ref) {
-                        Image(uiImage: ui)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(height: 120)
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
-                            .clipped()
-                    }
-
-                    Text(a.id.uuidString)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-
-                    Text(a.climbedAt.formatted(date: .abbreviated, time: .shortened))
-                        .foregroundStyle(.secondary)
+            VStack(spacing: 12) {
+                AppHeader(title: "You") {
+                    showingAddForm = true
                 }
-                .padding(.vertical, 4)
-                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                    Button("Delete", role: .destructive) {
-                        ascentToDelete = a
-                        showingDeleteAlert = true
+                Picker("Tab Selection", selection: $selectedTab) {
+                    Text("Progress").tag(0)
+                    Text("Activity").tag(1)
+                }
+                .pickerStyle(SegmentedPickerStyle())
+                .padding(.horizontal, 16)
+                Group {
+                    if selectedTab == 0 {
+                        ProgressView() // no NavigationStack inside
+                            .padding(.horizontal, 16)
+                            .padding(.top, 8)
+                    } else {
+                        ActivityLoggingView(vm: vm) // no NavigationStack inside
                     }
                 }
-            }
-            }
-            .overlay(alignment: .center) {
-                if vm.loading { ProgressView() }
-                if let e = vm.error {
-                    Text(e).foregroundStyle(.red).padding()
-                }
-            }
-            .navigationTitle("Activity Log")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Reload") { Task { await vm.load() } }
-                }
-                ToolbarItem(placement: .primaryAction) {
-                    Button("Add") { showingAddForm = true }
-                }
-            }
-            .task { await vm.load() }
-            .alert("Delete Ascent", isPresented: $showingDeleteAlert) {
-                Button("Cancel", role: .cancel) { ascentToDelete = nil }
-                Button("Delete", role: .destructive) {
-                    if let ascent = ascentToDelete {
-                        Task { await vm.deleteAscent(ascent) }
-                    }
-                    ascentToDelete = nil
-                }
-            } message: {
-                if let ascent = ascentToDelete {
-                    Text("Are you sure you want to delete this \(ascent.style) ascent? This action cannot be undone.")
-                }
-            }
-            // Handle the picked photo once PhotosPicker selection changes
-            .onChange(of: selectedItem) { _, newItem in
-                Task { await handlePickedItem(newItem) }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             }
             .sheet(isPresented: $showingAddForm) {
                 AddAscentFormView(viewModel: vm)
             }
         }
-    }
-
-    private func handlePickedItem(_ item: PhotosPickerItem?) async {
-        guard let item, let ascent = pickingForAscent else { return }
-        do {
-            if let data = try await item.loadTransferable(type: Data.self),
-               let image = UIImage(data: data) {
-                vm.addLocalImage(image, to: ascent.id)
-            }
-        } catch {
-            vm.error = "Import failed: \(error.localizedDescription)"
-        }
-        pickingForAscent = nil
-        selectedItem = nil
     }
 }
 

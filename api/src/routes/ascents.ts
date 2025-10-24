@@ -26,10 +26,10 @@ export async function ascentRoutes(app: FastifyInstance) {
 
   app.get('/ascnet/:id', async (req, reply) => {
     const { id } = z.object({ id: z.string() }).parse(req.params);
-    const ascent = await getAscentDetail(id)
-    if (!ascent) return reply.code(404).send({error: 'Not Found'});
-    return {data: ascent};
-  })
+    const ascent = await getAscentDetail(id);
+    if (!ascent) return reply.code(404).send({ error: 'Not Found' });
+    return { data: ascent };
+  });
 
   app.delete('/ascent/:id', async (req, reply) => {
     const { id } = z.object({ id: z.string().uuid() }).parse(req.params);

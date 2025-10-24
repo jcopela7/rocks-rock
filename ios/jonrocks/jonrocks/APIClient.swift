@@ -1,6 +1,5 @@
 import Foundation
 
-
 enum APIError: Error, LocalizedError {
     case badStatus(Int, String?)
     case invalidURL
@@ -9,10 +8,10 @@ enum APIError: Error, LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .badStatus(let code, let msg): return "HTTP \(code): \(msg ?? "")"
+        case let .badStatus(code, msg): return "HTTP \(code): \(msg ?? "")"
         case .invalidURL: return "Invalid URL"
-        case .decode(let err): return "Decode error: \(err)"
-        case .other(let err): return err.localizedDescription
+        case let .decode(err): return "Decode error: \(err)"
+        case let .other(err): return err.localizedDescription
         }
     }
 }
@@ -32,7 +31,7 @@ final class APIClient {
 
     // MARK: - Endpoints
 
-    func listAscents(userId: UUID, limit: Int = 20) async throws -> [AscentDTO] {
+    func listAscents(userId: UUID, limit _: Int = 20) async throws -> [AscentDTO] {
         let env: APIListEnvelope<[AscentDTO]> = try await helpers.get(
             "ascent", // <- plural
             query: [

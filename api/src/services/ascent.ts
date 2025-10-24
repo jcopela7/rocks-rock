@@ -103,14 +103,10 @@ export async function listAscents(body: ListAscentsQueryType) {
 }
 
 export async function getAscentDetail(id: string) {
-  const query = db
-    .select()
-    .from(ascent)
-    .where(eq(ascent.id, id!))
-    .orderBy(desc(ascent.climbedAt));
+  const query = db.select().from(ascent).where(eq(ascent.id, id!)).orderBy(desc(ascent.climbedAt));
   const rows = await query;
   return rows;
-};
+}
 
 export async function deleteAscent(id: string) {
   const [row] = await db.delete(ascent).where(eq(ascent.id, id)).returning();

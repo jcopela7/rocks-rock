@@ -2,7 +2,6 @@ import SwiftUI
 import Combine
 import PhotosUI
 import Foundation
-import UIKit
 
 // MARK: - ViewModel
 
@@ -12,6 +11,7 @@ final class AscentsVM: ObservableObject {
     @Published var loading: Bool = false
     @Published var error: String? = nil
     @Published var imagesByAscent: [UUID: [LocalImageRef]] = [:]
+    @Published var searchText: String = ""
 
     private let api = APIClient()
     private let imagesKey = "imagesByAscent.v1"
@@ -96,11 +96,98 @@ final class AscentsVM: ObservableObject {
             self.error = "Save image failed: \(error.localizedDescription)"
         }
     }
+    
+    // MARK: Search functionality
+    
+    var filteredAscents: [AscentDTO] {
+        if searchText.isEmpty {
+            return ascents
+        } else {
+            return ascents.filter { ascent in
+                ascent.style.localizedCaseInsensitiveContains(searchText)
+            }
+        }
+    }
+}
+
+// MARK: - Search Bar Component
+
+struct SearchBar: View {
+    @Binding var text: String
+    
+    var body: some View {
+        HStack {
+            Image(systemName: "magnifyingglass")
+                .foregroundColor(.gray)
+            
+            TextField("Search by style...", text: $text)
+                .textFieldStyle(PlainTextFieldStyle())
+            
+            if !text.isEmpty {
+                Button(action: {
+                    text = ""
+                }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(.gray)
+                }
+            }
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(Color(.systemGray6))
+        .cornerRadius(10)
+    }
 }
 
 // MARK: - View
-
 struct ContentView: View {
+    @State private var selectedTab = 0
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            Picker("Tab Selection", selection: $selectedTab) {
+                Text("Progress").tag(0)
+                Text("Activity").tag(1)
+            }
+            .pickerStyle(SegmentedPickerStyle())
+            .padding()
+            
+            if selectedTab == 0 {
+                ProgressView()
+            } else {
+                ActivityLoggingView()
+            }
+        }
+    }
+}
+
+// MARK: - Progress View
+
+struct ProgressView: View {
+    var body: some View {
+        NavigationStack {
+            VStack {
+                Text("Progress Tracking")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .padding()
+                
+                Text("Your climbing progress and statistics will appear here.")
+                    .font(.body)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding()
+                
+                Spacer()
+            }
+            .navigationTitle("Progress")
+        }
+    }
+}
+
+// MARK: - Activity Logging View
+
+struct ActivityLoggingView: View {
     @StateObject private var vm = AscentsVM()
 
     @State private var ascentToDelete: AscentDTO?
@@ -111,7 +198,13 @@ struct ContentView: View {
 
     var body: some View {
         NavigationStack {
-            List(vm.ascents) { a in
+            VStack(spacing: 0) {
+                // Add search bar
+                SearchBar(text: $vm.searchText)
+                    .padding(.horizontal)
+                    .padding(.top, 8)
+                
+                List(vm.filteredAscents) { a in
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
                         Text("\(a.style.capitalized) • Attempts \(a.attempts)")
@@ -122,7 +215,7 @@ struct ContentView: View {
                                 .imageScale(.medium)
                                 .padding(6)
                         }
-                        // Remember which ascent we’re attaching to
+                        // Remember which ascent we're attaching to
                         .onTapGesture { pickingForAscent = a }
                     }
 
@@ -151,13 +244,14 @@ struct ContentView: View {
                     }
                 }
             }
+            }
             .overlay(alignment: .center) {
                 if vm.loading { ProgressView() }
                 if let e = vm.error {
                     Text(e).foregroundStyle(.red).padding()
                 }
             }
-            .navigationTitle("Ascents")
+            .navigationTitle("Activity Log")
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Reload") { Task { await vm.load() } }

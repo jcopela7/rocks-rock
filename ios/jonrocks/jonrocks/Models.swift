@@ -43,4 +43,7 @@ struct CreateAscentRequest: Encodable {
     let climbedAt: Date
 }
 
+struct DeleteAscentRequest:Encodable {
+    let id: UUID
+}
 

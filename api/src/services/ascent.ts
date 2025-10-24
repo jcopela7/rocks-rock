@@ -1,5 +1,5 @@
 // src/services/ascents.ts
-import { eq, sql } from 'drizzle-orm';
+import { and, desc, eq, gte, lte } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../db/index.js';
 import { ascent } from '../db/schema.js';
@@ -24,9 +24,9 @@ export const CreateAscentInput = z
     { message: 'Either routeId or locationId is required.' }
   );
 
-export type CreateAscentInput = z.infer<typeof CreateAscentInput>;
+export type CreateAscentInputType = z.infer<typeof CreateAscentInput>;
 
-export async function createAscent(input: CreateAscentInput) {
+export async function createAscent(input: CreateAscentInputType) {
   const data = CreateAscentInput.parse(input);
 
   // If both provided, we accept it (route + location). If only routeId is given,
@@ -53,6 +53,7 @@ export async function createAscent(input: CreateAscentInput) {
 
 /** Simple query helper: fetch latest ascents with optional filters */
 export const ListAscentsQuery = z.object({
+  id: z.string().optional(),
   userId: z.string(),
   limit: z.number().int().min(1).max(100).default(20),
   after: z.coerce.date().optional(), // fetch ascents after this date
@@ -60,19 +61,56 @@ export const ListAscentsQuery = z.object({
   style: z.enum(['attempt', 'send', 'flash', 'onsight', 'project']).optional(),
   routeId: z.string().uuid().optional(),
   locationId: z.string().uuid().optional(),
+  isOutdoor: z.boolean().optional(),
+  minRating: z.number().optional(),
+  maxRating: z.number().optional(),
 });
 
-export type ListAscentsQuery = z.infer<typeof ListAscentsQuery>;
+export type ListAscentsQueryType = z.infer<typeof ListAscentsQuery>;
 
-export async function listAscents(body: ListAscentsQuery) {
+export async function listAscents(body: ListAscentsQueryType) {
   const params = ListAscentsQuery.parse(body);
 
-  const query = db.select().from(ascent).where(eq(ascent.userId, params.userId));
+  const conditions = [eq(ascent.userId, params.userId)];
 
-  const rows = await query.orderBy(sql`climbed_at DESC`).limit(params.limit);
+  if (params.id) {
+    conditions.push(eq(ascent.id, params.id));
+  }
+  if (params.after) {
+    conditions.push(gte(ascent.climbedAt, params.after));
+  }
+  if (params.before) {
+    conditions.push(lte(ascent.climbedAt, params.before));
+  }
+  if (params.style) {
+    conditions.push(eq(ascent.style, params.style));
+  }
+  if (params.minRating) {
+    conditions.push(gte(ascent.rating, params.minRating));
+  }
+  if (params.maxRating) {
+    conditions.push(lte(ascent.rating, params.maxRating));
+  }
 
+  const query = db
+    .select()
+    .from(ascent)
+    .where(and(...conditions))
+    .orderBy(desc(ascent.climbedAt))
+    .limit(params.limit);
+  const rows = await query;
   return rows;
 }
+
+export async function getAscentDetail(id: string) {
+  const query = db
+    .select()
+    .from(ascent)
+    .where(eq(ascent.id, id!))
+    .orderBy(desc(ascent.climbedAt));
+  const rows = await query;
+  return rows;
+};
 
 export async function deleteAscent(id: string) {
   const [row] = await db.delete(ascent).where(eq(ascent.id, id)).returning();

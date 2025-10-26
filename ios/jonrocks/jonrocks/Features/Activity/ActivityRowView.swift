@@ -28,6 +28,7 @@ struct ActivityRowView: View {
         HStack {
             Text("\(ascent.style.capitalized) • Attempts \(ascent.attempts)")
                 .font(.headline)
+                .foregroundColor(Color.theme.accent)
             Spacer()
         }
     }

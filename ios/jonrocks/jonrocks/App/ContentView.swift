@@ -174,7 +174,7 @@ struct AppHeader: View {
                     .fontWeight(.semibold)
                     .padding(.horizontal, 14)
                     .padding(.vertical, 6)
-                    .background(Color(UIColor.systemBlue))
+                    .background(Color.theme.accent)
                     .clipShape(Capsule())
                     .foregroundColor(.white)
             }
@@ -287,6 +287,13 @@ struct ContentView: View {
     @State private var selectedTab = 1
     @StateObject private var vm = AscentsVM()
     @State private var showingAddForm = false
+    
+    init(){
+        UISegmentedControl.appearance().selectedSegmentTintColor = UIColor(Color.theme.accent)
+        UISegmentedControl.appearance().setTitleTextAttributes([.foregroundColor : UIColor.white], for: .selected)
+        UISegmentedControl.appearance().layer.cornerRadius = 2
+        UISegmentedControl.appearance().clipsToBounds = true
+    }
 
     var body: some View {
         NavigationStack {
@@ -299,6 +306,7 @@ struct ContentView: View {
                     Text("Activity").tag(1)
                 }
                 .pickerStyle(SegmentedPickerStyle())
+                .tint(.orange)
                 .padding(.horizontal, 16)
                 Group {
                     if selectedTab == 0 {

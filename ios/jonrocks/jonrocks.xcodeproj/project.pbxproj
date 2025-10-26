@@ -11,10 +11,10 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		56F7EA6D2EA3F19000CB50F3 /* Exceptions for "jonrocks" folder in "jonrocks" target */ = {
+		56F7EAA62EAC2FEC00CB50F3 /* Exceptions for "jonrocks" folder in "jonrocks" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Info.plist,
+				Resources/Info.plist,
 			);
 			target = 56F7EA422EA3E69D00CB50F3 /* jonrocks */;
 		};
@@ -24,7 +24,7 @@
 		56F7EA452EA3E69D00CB50F3 /* jonrocks */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				56F7EA6D2EA3F19000CB50F3 /* Exceptions for "jonrocks" folder in "jonrocks" target */,
+				56F7EAA62EAC2FEC00CB50F3 /* Exceptions for "jonrocks" folder in "jonrocks" target */,
 			);
 			path = jonrocks;
 			sourceTree = "<group>";
@@ -275,7 +275,7 @@
 				DEVELOPMENT_TEAM = 4M326785P5;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = jonrocks/Info.plist;
+				INFOPLIST_FILE = jonrocks/Resources/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -310,7 +310,7 @@
 				DEVELOPMENT_TEAM = 4M326785P5;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = jonrocks/Info.plist;
+				INFOPLIST_FILE = jonrocks/Resources/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

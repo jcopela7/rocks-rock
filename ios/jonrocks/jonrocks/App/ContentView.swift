@@ -284,13 +284,13 @@ struct ActivityLoggingView: View {
 }
 
 struct ContentView: View {
-    @State private var selectedTab = 1
+    @State private var selected = "Activity"
     @StateObject private var vm = AscentsVM()
     @State private var showingAddForm = false
-    
-    init(){
+
+    init() {
         UISegmentedControl.appearance().selectedSegmentTintColor = UIColor(Color.theme.accent)
-        UISegmentedControl.appearance().setTitleTextAttributes([.foregroundColor : UIColor.white], for: .selected)
+        UISegmentedControl.appearance().setTitleTextAttributes([.foregroundColor: UIColor.white], for: .selected)
         UISegmentedControl.appearance().layer.cornerRadius = 2
         UISegmentedControl.appearance().clipsToBounds = true
     }
@@ -301,20 +301,18 @@ struct ContentView: View {
                 AppHeader(title: "You") {
                     showingAddForm = true
                 }
-                Picker("Tab Selection", selection: $selectedTab) {
-                    Text("Progress").tag(0)
-                    Text("Activity").tag(1)
-                }
-                .pickerStyle(SegmentedPickerStyle())
-                .tint(.orange)
+                SegmentedPicker(
+                    selection: $selected,
+                    segments: ["Progress", "Activity"]
+                )
                 .padding(.horizontal, 16)
                 Group {
-                    if selectedTab == 0 {
-                        ProgressView() // no NavigationStack inside
+                    if selected == "Progress" {
+                        ProgressView()
                             .padding(.horizontal, 16)
                             .padding(.top, 8)
                     } else {
-                        ActivityLoggingView(vm: vm) // no NavigationStack inside
+                        ActivityLoggingView(vm: vm)
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)

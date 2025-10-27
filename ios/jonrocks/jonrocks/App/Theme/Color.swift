@@ -1,9 +1,10 @@
 import SwiftUI
 
 extension Color {
-    struct raw {
+    enum raw {
         // MARK: Slate
-        static let slate50  = Color(hex: "#F8FAFC")
+
+        static let slate50 = Color(hex: "#F8FAFC")
         static let slate100 = Color(hex: "#F1F5F9")
         static let slate200 = Color(hex: "#E2E8F0")
         static let slate300 = Color(hex: "#CBD5E1")
@@ -15,7 +16,8 @@ extension Color {
         static let slate900 = Color(hex: "#0F172A")
 
         // MARK: Gray
-        static let gray50  = Color(hex: "#F9FAFB")
+
+        static let gray50 = Color(hex: "#F9FAFB")
         static let gray100 = Color(hex: "#F3F4F6")
         static let gray200 = Color(hex: "#E5E7EB")
         static let gray300 = Color(hex: "#D1D5DB")
@@ -27,7 +29,8 @@ extension Color {
         static let gray900 = Color(hex: "#111827")
 
         // MARK: Zinc
-        static let zinc50  = Color(hex: "#FAFAFA")
+
+        static let zinc50 = Color(hex: "#FAFAFA")
         static let zinc100 = Color(hex: "#F4F4F5")
         static let zinc200 = Color(hex: "#E4E4E7")
         static let zinc300 = Color(hex: "#D4D4D8")
@@ -39,7 +42,8 @@ extension Color {
         static let zinc900 = Color(hex: "#18181B")
 
         // MARK: Neutral
-        static let neutral50  = Color(hex: "#FAFAFA")
+
+        static let neutral50 = Color(hex: "#FAFAFA")
         static let neutral100 = Color(hex: "#F5F5F5")
         static let neutral200 = Color(hex: "#E5E5E5")
         static let neutral300 = Color(hex: "#D4D4D4")
@@ -51,7 +55,8 @@ extension Color {
         static let neutral900 = Color(hex: "#171717")
 
         // MARK: Stone
-        static let stone50  = Color(hex: "#FAFAF9")
+
+        static let stone50 = Color(hex: "#FAFAF9")
         static let stone100 = Color(hex: "#F5F5F4")
         static let stone200 = Color(hex: "#E7E5E4")
         static let stone300 = Color(hex: "#D6D3D1")
@@ -63,7 +68,8 @@ extension Color {
         static let stone900 = Color(hex: "#1C1917")
 
         // MARK: Red
-        static let red50  = Color(hex: "#FEF2F2")
+
+        static let red50 = Color(hex: "#FEF2F2")
         static let red100 = Color(hex: "#FEE2E2")
         static let red200 = Color(hex: "#FECACA")
         static let red300 = Color(hex: "#FCA5A5")
@@ -75,7 +81,8 @@ extension Color {
         static let red900 = Color(hex: "#7F1D1D")
 
         // MARK: Orange
-        static let orange50  = Color(hex: "#FFF7ED")
+
+        static let orange50 = Color(hex: "#FFF7ED")
         static let orange100 = Color(hex: "#FFEDD5")
         static let orange200 = Color(hex: "#FED7AA")
         static let orange300 = Color(hex: "#FDBA74")
@@ -87,7 +94,8 @@ extension Color {
         static let orange900 = Color(hex: "#7C2D12")
 
         // MARK: Amber
-        static let amber50  = Color(hex: "#FFFBEB")
+
+        static let amber50 = Color(hex: "#FFFBEB")
         static let amber100 = Color(hex: "#FEF3C7")
         static let amber200 = Color(hex: "#FDE68A")
         static let amber300 = Color(hex: "#FCD34D")
@@ -99,7 +107,8 @@ extension Color {
         static let amber900 = Color(hex: "#78350F")
 
         // MARK: Yellow
-        static let yellow50  = Color(hex: "#FEFCE8")
+
+        static let yellow50 = Color(hex: "#FEFCE8")
         static let yellow100 = Color(hex: "#FEF9C3")
         static let yellow200 = Color(hex: "#FEF08A")
         static let yellow300 = Color(hex: "#FDE047")
@@ -111,7 +120,8 @@ extension Color {
         static let yellow900 = Color(hex: "#713F12")
 
         // MARK: Lime
-        static let lime50  = Color(hex: "#F7FEE7")
+
+        static let lime50 = Color(hex: "#F7FEE7")
         static let lime100 = Color(hex: "#ECFCCB")
         static let lime200 = Color(hex: "#D9F99D")
         static let lime300 = Color(hex: "#BEF264")
@@ -123,7 +133,8 @@ extension Color {
         static let lime900 = Color(hex: "#365314")
 
         // MARK: Green
-        static let green50  = Color(hex: "#F0FDF4")
+
+        static let green50 = Color(hex: "#F0FDF4")
         static let green100 = Color(hex: "#DCFCE7")
         static let green200 = Color(hex: "#BBF7D0")
         static let green300 = Color(hex: "#86EFAC")
@@ -135,7 +146,8 @@ extension Color {
         static let green900 = Color(hex: "#14532D")
 
         // MARK: Emerald
-        static let emerald50  = Color(hex: "#ECFDF5")
+
+        static let emerald50 = Color(hex: "#ECFDF5")
         static let emerald100 = Color(hex: "#D1FAE5")
         static let emerald200 = Color(hex: "#A7F3D0")
         static let emerald300 = Color(hex: "#6EE7B7")
@@ -147,7 +159,8 @@ extension Color {
         static let emerald900 = Color(hex: "#064E3B")
 
         // MARK: Teal
-        static let teal50  = Color(hex: "#F0FDFA")
+
+        static let teal50 = Color(hex: "#F0FDFA")
         static let teal100 = Color(hex: "#CCFBF1")
         static let teal200 = Color(hex: "#99F6E4")
         static let teal300 = Color(hex: "#5EEAD4")
@@ -159,7 +172,8 @@ extension Color {
         static let teal900 = Color(hex: "#134E4A")
 
         // MARK: Cyan
-        static let cyan50  = Color(hex: "#ECFEFF")
+
+        static let cyan50 = Color(hex: "#ECFEFF")
         static let cyan100 = Color(hex: "#CFFAFE")
         static let cyan200 = Color(hex: "#A5F3FC")
         static let cyan300 = Color(hex: "#67E8F9")
@@ -171,7 +185,8 @@ extension Color {
         static let cyan900 = Color(hex: "#164E63")
 
         // MARK: Sky
-        static let sky50  = Color(hex: "#F0F9FF")
+
+        static let sky50 = Color(hex: "#F0F9FF")
         static let sky100 = Color(hex: "#E0F2FE")
         static let sky200 = Color(hex: "#BAE6FD")
         static let sky300 = Color(hex: "#7DD3FC")
@@ -183,7 +198,8 @@ extension Color {
         static let sky900 = Color(hex: "#0C4A6E")
 
         // MARK: Blue
-        static let blue50  = Color(hex: "#EFF6FF")
+
+        static let blue50 = Color(hex: "#EFF6FF")
         static let blue100 = Color(hex: "#DBEAFE")
         static let blue200 = Color(hex: "#BFDBFE")
         static let blue300 = Color(hex: "#93C5FD")
@@ -195,7 +211,8 @@ extension Color {
         static let blue900 = Color(hex: "#1E3A8A")
 
         // MARK: Indigo
-        static let indigo50  = Color(hex: "#EEF2FF")
+
+        static let indigo50 = Color(hex: "#EEF2FF")
         static let indigo100 = Color(hex: "#E0E7FF")
         static let indigo200 = Color(hex: "#C7D2FE")
         static let indigo300 = Color(hex: "#A5B4FC")
@@ -207,7 +224,8 @@ extension Color {
         static let indigo900 = Color(hex: "#312E81")
 
         // MARK: Violet
-        static let violet50  = Color(hex: "#F5F3FF")
+
+        static let violet50 = Color(hex: "#F5F3FF")
         static let violet100 = Color(hex: "#EDE9FE")
         static let violet200 = Color(hex: "#DDD6FE")
         static let violet300 = Color(hex: "#C4B5FD")
@@ -219,7 +237,8 @@ extension Color {
         static let violet900 = Color(hex: "#4C1D95")
 
         // MARK: Purple
-        static let purple50  = Color(hex: "#FAF5FF")
+
+        static let purple50 = Color(hex: "#FAF5FF")
         static let purple100 = Color(hex: "#F3E8FF")
         static let purple200 = Color(hex: "#E9D5FF")
         static let purple300 = Color(hex: "#D8B4FE")
@@ -231,7 +250,8 @@ extension Color {
         static let purple900 = Color(hex: "#581C87")
 
         // MARK: Fuchsia
-        static let fuchsia50  = Color(hex: "#FDF4FF")
+
+        static let fuchsia50 = Color(hex: "#FDF4FF")
         static let fuchsia100 = Color(hex: "#FAE8FF")
         static let fuchsia200 = Color(hex: "#F5D0FE")
         static let fuchsia300 = Color(hex: "#F0ABFC")
@@ -243,7 +263,8 @@ extension Color {
         static let fuchsia900 = Color(hex: "#701A75")
 
         // MARK: Pink
-        static let pink50  = Color(hex: "#FDF2F8")
+
+        static let pink50 = Color(hex: "#FDF2F8")
         static let pink100 = Color(hex: "#FCE7F3")
         static let pink200 = Color(hex: "#FBCFE8")
         static let pink300 = Color(hex: "#F9A8D4")
@@ -255,7 +276,8 @@ extension Color {
         static let pink900 = Color(hex: "#831843")
 
         // MARK: Rose
-        static let rose50  = Color(hex: "#FFF1F2")
+
+        static let rose50 = Color(hex: "#FFF1F2")
         static let rose100 = Color(hex: "#FFE4E6")
         static let rose200 = Color(hex: "#FECDD3")
         static let rose300 = Color(hex: "#FDA4AF")
@@ -280,6 +302,6 @@ extension Color {
         case 8: (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
         default: (a, r, g, b) = (255, 0, 0, 0)
         }
-        self.init(.sRGB, red: Double(r)/255, green: Double(g)/255, blue: Double(b)/255, opacity: Double(a)/255)
+        self.init(.sRGB, red: Double(r) / 255, green: Double(g) / 255, blue: Double(b) / 255, opacity: Double(a) / 255)
     }
 }

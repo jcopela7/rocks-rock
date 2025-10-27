@@ -1,8 +1,9 @@
 import SwiftUI
 
 extension Color {
-    struct theme {
+    enum theme {
         static let background = Color.raw.slate50
+        static let card = Color.raw.slate100
         static let textPrimary = Color.raw.slate900
         static let textSecondary = Color.raw.slate500
         static let accent = Color.raw.blue600

@@ -1,5 +1,5 @@
-import SwiftUI
 import PhotosUI
+import SwiftUI
 
 struct ActivityRowView: View {
     let ascent: AscentDTO
@@ -36,7 +36,8 @@ struct ActivityRowView: View {
     @ViewBuilder
     private var ascentImage: some View {
         if let ref = viewModel.imagesByAscent[ascent.id]?.first,
-           let ui = LocalImageStore.load(ref) {
+           let ui = LocalImageStore.load(ref)
+        {
             Image(uiImage: ui)
                 .resizable()
                 .scaledToFill()
@@ -61,4 +62,3 @@ struct ActivityRowView: View {
 #Preview {
     ContentView()
 }
-

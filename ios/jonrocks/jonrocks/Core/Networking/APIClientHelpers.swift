@@ -1,5 +1,5 @@
 //
-//  Helpers.swift
+//  APIClientHelpers.swift
 //  jonrocks
 //
 //  Created by Jonathan Cope on 2025-10-21.

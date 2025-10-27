@@ -225,6 +225,7 @@ struct ActivityLoggingView: View {
             .listStyle(.plain)
             .contentMargins(.horizontal, 12) // iOS 17
         }
+        .background(Color.raw.slate100)
         .overlay(alignment: .center) {
             loadingOverlay
         }
@@ -308,9 +309,7 @@ struct ContentView: View {
                 .padding(.horizontal, 16)
                 Group {
                     if selected == "Progress" {
-                        ProgressView()
-                            .padding(.horizontal, 16)
-                            .padding(.top, 8)
+                        ProgressViewTab()
                     } else {
                         ActivityLoggingView(vm: vm)
                     }

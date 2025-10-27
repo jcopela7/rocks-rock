@@ -72,7 +72,6 @@ struct SegmentedPicker<T: Hashable>: View {
                     }
                 }
             }
-            .background(backgroundColor)
         }
     }
 }

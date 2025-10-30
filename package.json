@@ -1,4 +1,10 @@
 {
+  "name": "jonrocks-monorepo",
+  "private": true,
+  "workspaces": [
+    "api",
+    "web"
+  ],
   "devDependencies": {
     "prettier": "^3.6.2"
   },

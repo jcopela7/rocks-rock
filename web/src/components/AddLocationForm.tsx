@@ -1,4 +1,4 @@
-import { Input, Modal, Select, Spacer } from "@geist-ui/core";
+import { Input, Modal, Select } from "@geist-ui/core";
 import { useState } from "react";
 import type { CreateLocationInput } from "../api/Locations";
 import { useCreateLocation } from "../api_controllers/useLocations";
@@ -65,7 +65,7 @@ export default function AddLocationForm({ open, setOpen, onSuccess }: Props) {
         <form onSubmit={handleSubmit}>
           {/* @ts-expect-error Geist Input typing is overly strict here */}
           <Input
-            label="Name"
+            label="Location Name"
             id="location-name"
             name="name"
             htmlType="text"
@@ -74,8 +74,6 @@ export default function AddLocationForm({ open, setOpen, onSuccess }: Props) {
             onChange={(e) => handleInputChange("name", e.target.value)}
             required
           />
-
-          <Spacer h={1} />
           {/* @ts-expect-error Geist Select typing is overly strict here */}
           <Select
             placeholder="Select location type"

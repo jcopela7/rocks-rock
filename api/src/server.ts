@@ -7,6 +7,7 @@ import { ZodError } from 'zod';
 import { db } from './db/index.js';
 import { ascentRoutes } from './routes/ascents.js';
 import { locationRoutes } from './routes/location.js';
+import { routeRoutes } from './routes/routes.js';
 import { userRoutes } from './routes/user.js';
 dotenv.config();
 
@@ -15,6 +16,7 @@ app.register(cors, { origin: '*' });
 app.register(ascentRoutes, { prefix: '/api/v1' });
 app.register(userRoutes, { prefix: '/api/v1' });
 app.register(locationRoutes, { prefix: '/api/v1' });
+app.register(routeRoutes, { prefix: '/api/v1' });
 app.get('/', async () => ({ ok: true, service: 'jonrocks-api' }));
 
 async function start() {

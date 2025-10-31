@@ -1,6 +1,7 @@
 import { CssBaseline, GeistProvider, Spacer, Text } from "@geist-ui/core";
 import "./App.css";
 import LocationsTable from "./components/LocationsTable";
+import RoutesTable from "./components/RoutesTable";
 
 function App() {
   return (
@@ -11,6 +12,8 @@ function App() {
         <Text p>Manage your climbing locations and routes</Text>
         <Spacer h={2} />
         <LocationsTable />
+        <Spacer h={1.5} />
+        <RoutesTable />
       </div>
     </GeistProvider>
   );

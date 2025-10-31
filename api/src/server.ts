@@ -6,8 +6,8 @@ import Fastify from 'fastify';
 import { ZodError } from 'zod';
 import { db } from './db/index.js';
 import { ascentRoutes } from './routes/ascents.js';
-import { userRoutes } from './routes/user.js';
 import { locationRoutes } from './routes/location.js';
+import { userRoutes } from './routes/user.js';
 dotenv.config();
 
 const app = Fastify();

@@ -11,5 +11,6 @@
   "[swift]": {
     "editor.defaultFormatter": "nicklockwood.swiftformat",
     "editor.formatOnSave": true
-  }
+  },
+  "sweetpad.build.xcodeWorkspacePath": "ios/jonrocks/jonrocks.xcodeproj/project.xcworkspace"
 }

@@ -1,0 +1,123 @@
+//
+//  ActivityLoggingView.swift
+//  jonrocks
+//
+//  Created by Jonathan Cope on 2025-11-14.
+//
+import SwiftUI
+import PhotosUI
+
+struct SearchBar: View {
+    @Binding var text: String
+
+    var body: some View {
+        HStack {
+            Image(systemName: "magnifyingglass")
+                .foregroundColor(.gray)
+
+            TextField("Search by style...", text: $text)
+                .textFieldStyle(PlainTextFieldStyle())
+
+            if !text.isEmpty {
+                Button(action: {
+                    text = ""
+                }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(.gray)
+                }
+            }
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(Color(.white))
+        .cornerRadius(10)
+    }
+}
+
+struct ActivityLoggingView: View {
+    @ObservedObject var vm: AscentsVM
+
+    @State private var ascentToDelete: AscentDTO?
+    @State private var showingDeleteAlert = false
+
+    @State private var pickingForAscent: AscentDTO?
+    @State private var selectedItem: PhotosPickerItem?
+
+    var body: some View {
+        VStack(spacing: 8) {
+            SearchBar(text: $vm.searchText)
+                .padding(.horizontal, 16)
+                .padding(.top, 8)
+            List(vm.filteredAscents) { ascent in
+                ActivityRowView(
+                    ascent: ascent,
+                    viewModel: vm,
+                    selectedItem: $selectedItem,
+                    pickingForAscent: $pickingForAscent,
+                    ascentToDelete: $ascentToDelete,
+                    showingDeleteAlert: $showingDeleteAlert
+                )
+                // iOS 17+: trim default side gutters
+                .listRowSeparator(.visible)
+            }
+            .listStyle(.plain)
+            .contentMargins(.horizontal, 12) // iOS 17
+        }
+        .background(Color.raw.slate100)
+        .overlay(alignment: .center) {
+            loadingOverlay
+        }
+        .task { await vm.load() }
+        .alert("Delete Ascent", isPresented: $showingDeleteAlert) {
+            deleteAlertContent
+        } message: {
+            deleteAlertMessage
+        }
+    }
+
+    private var searchBar: some View {
+        SearchBar(text: $vm.searchText)
+            .padding(.horizontal)
+            .padding(.top, 8)
+    }
+
+    private var ascentsList: some View {
+        List(vm.filteredAscents) { ascent in
+            ActivityRowView(
+                ascent: ascent,
+                viewModel: vm,
+                selectedItem: $selectedItem,
+                pickingForAscent: $pickingForAscent,
+                ascentToDelete: $ascentToDelete,
+                showingDeleteAlert: $showingDeleteAlert
+            )
+        }
+    }
+
+    private var loadingOverlay: some View {
+        Group {
+            if vm.loading { ProgressView() }
+            if let e = vm.error {
+                Text(e).foregroundStyle(.red).padding()
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var deleteAlertContent: some View {
+        Button("Cancel", role: .cancel) { ascentToDelete = nil }
+        Button("Delete", role: .destructive) {
+            if let ascent = ascentToDelete {
+                Task { await vm.deleteAscent(ascent) }
+            }
+            ascentToDelete = nil
+        }
+    }
+
+    @ViewBuilder
+    private var deleteAlertMessage: some View {
+        if let ascent = ascentToDelete {
+            Text("Are you sure you want to delete this \(ascent.style) ascent? This action cannot be undone.")
+        }
+    }
+}

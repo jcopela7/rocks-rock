@@ -18,6 +18,19 @@ struct LocationDTO: Codable, Identifiable {
     let longitude: Double?
 }
 
+struct RouteDTO: Codable, Identifiable {
+    let id: UUID
+    let locationId: UUID
+    let name: String?
+    let discipline: String // "boulder" | "sport" | "trad"
+    let gradeSystem: String // "V" | "YDS" | "Font"
+    let gradeValue: String
+    let gradeRank: Int
+    let color: String?
+    let createdAt: Date?
+    let updatedAt: Date?
+}
+
 struct AscentDTO: Codable, Identifiable {
     let id: UUID
     let userId: UUID

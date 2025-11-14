@@ -12,6 +12,15 @@ struct AddActivityFormView: View {
     var body: some View {
         NavigationStack {
             Form {
+                Section("Route") {
+                    Picker("Route", selection: $formData.routeId) {
+                        Text("None").tag(UUID?.none)
+                        ForEach(viewModel.routes, id: \.id) { route in
+                            Text(routeName(for: route)).tag(UUID?.some(route.id))
+                        }
+                    }
+                }
+                
                 Section("Climb Details") {
                     Picker("Style", selection: $formData.style) {
                         ForEach(styleOptions, id: \.self) { style in
@@ -58,6 +67,16 @@ struct AddActivityFormView: View {
                 }
             }
         }
+        .task {
+            await viewModel.loadRoutes()
+        }
+    }
+    
+    private func routeName(for route: RouteDTO) -> String {
+        if let name = route.name, !name.isEmpty {
+            return "\(name) (\(route.gradeValue))"
+        }
+        return route.gradeValue
     }
 
     private func submitForm() async {

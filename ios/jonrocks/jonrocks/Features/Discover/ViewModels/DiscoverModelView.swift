@@ -9,8 +9,16 @@ final class DiscoverVM: ObservableObject {
     @Published var locations: [LocationDTO] = []
     @Published var loading: Bool = false
     @Published var error: String? = nil
+    @Published var selectedFilterType: String? = nil // nil = all, "gym" or "crag"
 
     let api = APIClient()
+    
+    var filteredLocations: [LocationDTO] {
+        guard let filterType = selectedFilterType else {
+            return locations
+        }
+        return locations.filter { $0.type == filterType }
+    }
 
 
 

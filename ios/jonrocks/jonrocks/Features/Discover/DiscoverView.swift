@@ -69,6 +69,7 @@ struct DiscoverView: View {
                         }
                         .listStyle(.plain)
                         .contentMargins(.horizontal, 12)
+                        .background(Color.theme.card)
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -85,24 +86,21 @@ struct LocationRowView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack {
+            VStack(alignment: .leading, spacing: 8) {
                 Text(location.name)
                     .font(.headline)
                     .foregroundColor(Color.theme.accent)
-                Spacer()
                 Text(location.type.capitalized)
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.theme.textSecondary)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 4)
-                    .background(Color(.systemGray5))
-                    .clipShape(Capsule())
-            }
-            
-            if let lat = location.latitude, let lon = location.longitude {
-                Text(String(format: "%.4f, %.4f", lat, lon))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .background(Color.theme.background)
+                    .cornerRadius(8)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.raw.slate500, lineWidth: 1)
+                    )
             }
         }
         .padding(.vertical, 4)

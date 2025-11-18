@@ -62,8 +62,10 @@ struct DiscoverView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                     } else {
                         List(discoverVM.filteredLocations) { location in
-                            LocationRowView(location: location)
-                                .listRowSeparator(.visible)
+                            NavigationLink(destination: LocationDetailView(location: location)) {
+                                LocationRowView(location: location)
+                            }
+                            .listRowSeparator(.visible)
                         }
                         .listStyle(.plain)
                         .contentMargins(.horizontal, 12)

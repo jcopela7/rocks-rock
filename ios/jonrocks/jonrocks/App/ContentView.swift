@@ -5,7 +5,7 @@ import SwiftUI
 
 struct AppHeader: View {
     let title: String
-    let onAddTap: () -> Void
+    let onAddTap: (() -> Void)?
 
     var body: some View {
         HStack {
@@ -13,14 +13,16 @@ struct AppHeader: View {
                 .font(.largeTitle)
                 .fontWeight(.bold)
             Spacer()
-            Button(action: onAddTap) {
-                Label("Add", systemImage: "plus")
-                    .fontWeight(.semibold)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 6)
-                    .background(Color.theme.accent)
-                    .clipShape(Capsule())
-                    .foregroundColor(.white)
+            if let onAddTap = onAddTap {
+                Button(action: onAddTap) {
+                    Label("Add", systemImage: "plus")
+                        .fontWeight(.semibold)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 6)
+                        .background(Color.theme.accent)
+                        .clipShape(Capsule())
+                        .foregroundColor(.white)
+                }
             }
         }
         .padding(.horizontal, 16)

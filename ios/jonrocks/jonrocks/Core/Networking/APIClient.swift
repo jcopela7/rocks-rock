@@ -52,7 +52,7 @@ final class APIClient {
     }
 
     func listLocations() async throws -> [LocationDTO] {
-        let env: APIListEnvelope<[LocationDTO]> = try await helpers.get("locations")
+        let env: APIListEnvelope<[LocationDTO]> = try await helpers.get("location")
         return env.data
     }
 

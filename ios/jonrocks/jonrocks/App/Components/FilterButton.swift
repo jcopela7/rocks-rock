@@ -22,8 +22,12 @@ struct FilterButton: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
-            .background(isActive ? Color.theme.accent : Color(.systemGray5))
-            .clipShape(Capsule())
+            .background(isActive ? Color.theme.accent : Color.raw.slate50)
+            .cornerRadius(8)
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(isActive ? Color.theme.accent : Color.raw.slate500, lineWidth: 1)
+            )
         }
     }
 }

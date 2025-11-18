@@ -1,5 +1,8 @@
 # jonrocks Monorepo
 
+## What is it
+A app built for climbers by climbers. Strava for rock climbing
+
 ## Folders
 
 - `api/` — Node.js + Fastify + Drizzle backend

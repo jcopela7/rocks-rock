@@ -31,23 +31,13 @@ final class AscentsVM: ObservableObject {
 
     // MARK: API
 
-    func load() async {
+    func loadAscents() async {
         loading = true; defer { loading = false }
         do {
             ascents = try await api.listAscents(userId: demoUser)
             error = nil
         } catch {
             print("Backend error in load(): \(error)")
-            self.error = error.localizedDescription
-        }
-    }
-    
-    func loadRoutes() async {
-        do {
-            routes = try await api.listRoutes()
-            error = nil
-        } catch {
-            print("Backend error in loadRoutes(): \(error)")
             self.error = error.localizedDescription
         }
     }

@@ -41,40 +41,22 @@ struct ProgressView: View {
 }
 
 struct ContentView: View {
-    @State private var selected = "Activity"
-    @StateObject private var vm = AscentsVM()
-    @State private var showingAddForm = false
-
-    init() {
-        UISegmentedControl.appearance().selectedSegmentTintColor = UIColor(Color.theme.accent)
-        UISegmentedControl.appearance().setTitleTextAttributes([.foregroundColor: UIColor.white], for: .selected)
-        UISegmentedControl.appearance().layer.cornerRadius = 2
-        UISegmentedControl.appearance().clipsToBounds = true
-    }
-
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 12) {
-                AppHeader(title: "You") {
-                    showingAddForm = true
+        TabView {
+            DiscoverView()
+                .tabItem {
+                    Label("Discover", systemImage: "magnifyingglass")
                 }
-                SegmentedPicker(
-                    selection: $selected,
-                    segments: ["Progress", "Activity"]
-                )
-                .padding(.horizontal, 16)
-                Group {
-                    if selected == "Progress" {
-                        ProgressViewTab()
-                    } else {
-                        ActivityLoggingView(vm: vm)
-                    }
+            
+            AddView()
+                .tabItem {
+                    Label("Add", systemImage: "plus.circle")
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            }
-            .sheet(isPresented: $showingAddForm) {
-                AddActivityFormView(viewModel: vm)
-            }
+            
+            YouView()
+                .tabItem {
+                    Label("You", systemImage: "person")
+                }
         }
     }
 }

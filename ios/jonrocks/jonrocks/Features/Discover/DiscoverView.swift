@@ -7,6 +7,36 @@ struct DiscoverView: View {
         NavigationStack {
             VStack(spacing: 12) {
                 AppHeader(title: "Discover", onAddTap: nil)
+                HStack(spacing: 12) {
+                    FilterButton(
+                        title: "Gym",
+                        icon: "figure.climbing",
+                        isActive: discoverVM.selectedFilterType == "gym",
+                        action: {
+                            if discoverVM.selectedFilterType == "gym" {
+                                discoverVM.selectedFilterType = nil
+                            } else {
+                                discoverVM.selectedFilterType = "gym"
+                            }
+                        }
+                    )
+                    
+                    FilterButton(
+                        title: "Crag",
+                        icon: "mountain.2",
+                        isActive: discoverVM.selectedFilterType == "crag",
+                        action: {
+                            if discoverVM.selectedFilterType == "crag" {
+                                discoverVM.selectedFilterType = nil
+                            } else {
+                                discoverVM.selectedFilterType = "crag"
+                            }
+                        }
+                    )
+                    
+                    Spacer()
+                }
+                .padding(.horizontal, 16)
                 
                 Group {
                     if discoverVM.loading {
@@ -23,7 +53,7 @@ struct DiscoverView: View {
                                 .padding()
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    } else if discoverVM.locations.isEmpty {
+                    } else if discoverVM.filteredLocations.isEmpty {
                         VStack {
                             Text("No locations available")
                                 .font(.body)
@@ -31,7 +61,7 @@ struct DiscoverView: View {
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                     } else {
-                        List(discoverVM.locations) { location in
+                        List(discoverVM.filteredLocations) { location in
                             LocationRowView(location: location)
                                 .listRowSeparator(.visible)
                         }

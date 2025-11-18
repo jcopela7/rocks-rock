@@ -35,7 +35,7 @@ struct SearchBar: View {
 }
 
 struct ActivityLoggingView: View {
-    @ObservedObject var vm: AscentsVM
+    @ObservedObject var ascentsVM: AscentsVM
 
     @State private var ascentToDelete: AscentDTO?
     @State private var showingDeleteAlert = false
@@ -45,13 +45,13 @@ struct ActivityLoggingView: View {
 
     var body: some View {
         VStack(spacing: 8) {
-            SearchBar(text: $vm.searchText)
+            SearchBar(text: $ascentsVM.searchText)
                 .padding(.horizontal, 16)
                 .padding(.top, 8)
-            List(vm.filteredAscents) { ascent in
+            List(ascentsVM.filteredAscents) { ascent in
                 ActivityRowView(
                     ascent: ascent,
-                    viewModel: vm,
+                    viewModel: ascentsVM,
                     selectedItem: $selectedItem,
                     pickingForAscent: $pickingForAscent,
                     ascentToDelete: $ascentToDelete,
@@ -67,7 +67,7 @@ struct ActivityLoggingView: View {
         .overlay(alignment: .center) {
             loadingOverlay
         }
-        .task { await vm.load() }
+        .task { await ascentsVM.loadAscents() }
         .alert("Delete Ascent", isPresented: $showingDeleteAlert) {
             deleteAlertContent
         } message: {
@@ -76,16 +76,16 @@ struct ActivityLoggingView: View {
     }
 
     private var searchBar: some View {
-        SearchBar(text: $vm.searchText)
+        SearchBar(text: $ascentsVM.searchText)
             .padding(.horizontal)
             .padding(.top, 8)
     }
 
     private var ascentsList: some View {
-        List(vm.filteredAscents) { ascent in
+        List(ascentsVM.filteredAscents) { ascent in
             ActivityRowView(
                 ascent: ascent,
-                viewModel: vm,
+                viewModel: ascentsVM,
                 selectedItem: $selectedItem,
                 pickingForAscent: $pickingForAscent,
                 ascentToDelete: $ascentToDelete,
@@ -96,8 +96,8 @@ struct ActivityLoggingView: View {
 
     private var loadingOverlay: some View {
         Group {
-            if vm.loading { ProgressView() }
-            if let e = vm.error {
+            if ascentsVM.loading { ProgressView() }
+            if let e = ascentsVM.error {
                 Text(e).foregroundStyle(.red).padding()
             }
         }
@@ -108,7 +108,7 @@ struct ActivityLoggingView: View {
         Button("Cancel", role: .cancel) { ascentToDelete = nil }
         Button("Delete", role: .destructive) {
             if let ascent = ascentToDelete {
-                Task { await vm.deleteAscent(ascent) }
+                Task { await ascentsVM.deleteAscent(ascent) }
             }
             ascentToDelete = nil
         }

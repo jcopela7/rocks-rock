@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct AddActivityFormView: View {
-    @ObservedObject var viewModel: AscentsVM
+    @ObservedObject var ascentsVM: AscentsVM
+    @ObservedObject var discoverVM: DiscoverVM
     @Environment(\.dismiss) private var dismiss
 
     @State private var formData = AscentFormData()
@@ -15,7 +16,7 @@ struct AddActivityFormView: View {
                 Section("Route") {
                     Picker("Route", selection: $formData.routeId) {
                         Text("None").tag(UUID?.none)
-                        ForEach(viewModel.routes, id: \.id) { route in
+                        ForEach(discoverVM.routes, id: \.id) { route in
                             Text(routeName(for: route)).tag(UUID?.some(route.id))
                         }
                     }
@@ -68,7 +69,7 @@ struct AddActivityFormView: View {
             }
         }
         .task {
-            await viewModel.loadRoutes()
+            await discoverVM.loadRoutes()
         }
     }
     
@@ -85,15 +86,15 @@ struct AddActivityFormView: View {
 
         do {
             let request = formData.createAscentRequest
-            let created = try await viewModel.api.createAscent(request)
+            let created = try await ascentsVM.api.createAscent(request)
             await MainActor.run {
-                viewModel.ascents.insert(created, at: 0)
-                viewModel.error = nil
+                ascentsVM.ascents.insert(created, at: 0)
+                ascentsVM.error = nil
                 dismiss()
             }
         } catch {
             await MainActor.run {
-                viewModel.error = error.localizedDescription
+                ascentsVM.error = error.localizedDescription
             }
         }
     }

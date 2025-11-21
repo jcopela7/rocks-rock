@@ -12,9 +12,12 @@ struct FilterButton: View {
         Button(action: action) {
             HStack {
                 if let icon = icon {
-                    Image(systemName: icon)
+                    Image(icon)
+                        .renderingMode(.template)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 24, height: 24)
                         .foregroundColor(isActive ? .white : Color.theme.textSecondary)
-                        .frame(width: 20, height: 20)
                 }
                 Text(title) 
                     .fontWeight(.semibold)

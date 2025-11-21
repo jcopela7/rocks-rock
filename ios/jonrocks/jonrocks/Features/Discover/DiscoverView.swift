@@ -10,7 +10,7 @@ struct DiscoverView: View {
                 HStack(spacing: 12) {
                     FilterButton(
                         title: "Gym",
-                        icon: "figure.climbing",
+                        icon: "crashpadIcon",
                         isActive: discoverVM.selectedFilterType == "gym",
                         action: {
                             if discoverVM.selectedFilterType == "gym" {
@@ -23,7 +23,7 @@ struct DiscoverView: View {
                     
                     FilterButton(
                         title: "Crag",
-                        icon: "mountain.2",
+                        icon: "camIcon",
                         isActive: discoverVM.selectedFilterType == "crag",
                         action: {
                             if discoverVM.selectedFilterType == "crag" {

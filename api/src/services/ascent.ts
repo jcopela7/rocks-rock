@@ -9,20 +9,14 @@ type UUID = string; // keep simple; you can add a UUID zod later
 export const CreateAscentInput = z
   .object({
     userId: z.string(),
-    // routeId: z.string().optional(),
+    routeId: z.string().optional(),
     locationId: z.string().optional(),
-    style: z.enum(['attempt', 'send', 'flash', 'onsight', 'project']),
+    style: z.enum(['attempt', 'send', 'flash', 'onsight', 'redpoint']),
     attempts: z.number().int().min(1).default(1),
-    isOutdoor: z.boolean().default(false),
     rating: z.number().int().min(1).max(5).optional(),
     notes: z.string().max(10_000).optional(),
-    climbedAt: z.coerce.date(), // accepts ISO string
-  })
-  .refine(
-    // (v) => Boolean(v.routeId) || Boolean(v.locationId),
-    (v) => Boolean(v.locationId),
-    { message: 'Either routeId or locationId is required.' }
-  );
+    climbedAt: z.coerce.date(),
+  });
 
 export type CreateAscentInputType = z.infer<typeof CreateAscentInput>;
 
@@ -37,11 +31,10 @@ export async function createAscent(input: CreateAscentInputType) {
     .values({
       id: crypto.randomUUID(),
       userId: data.userId,
-      // routeId: data.routeId ?? null,
+      routeId: data.routeId ?? null,
       locationId: data.locationId ?? null,
       style: data.style,
       attempts: data.attempts,
-      isOutdoor: data.isOutdoor,
       rating: data.rating ?? null,
       notes: data.notes ?? null,
       climbedAt: data.climbedAt,

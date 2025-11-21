@@ -1,7 +1,7 @@
 // src/services/ascents.ts
+import { z } from 'zod';
 import { db } from '../db/index.js';
 import { location } from '../db/schema.js';
-import { z } from 'zod';
 
 export const CreateLocationInput = z.object({
   id: z.string(),
@@ -10,6 +10,7 @@ export const CreateLocationInput = z.object({
   latitude: z.number().optional(),
   longitude: z.number().optional(),
   createdBy: z.string(),
+  description: z.string().optional(),
 });
 
 export type CreateLocationInput = z.infer<typeof CreateLocationInput>;
@@ -26,6 +27,7 @@ export async function createLocation(input: CreateLocationInput) {
       latitude: data.latitude,
       longitude: data.longitude,
       createdBy: data.createdBy,
+      description: data.description ?? null,
     })
     .returning();
 

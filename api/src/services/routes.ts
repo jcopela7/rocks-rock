@@ -12,7 +12,7 @@ export const CreateRouteInput = z.object({
   gradeSystem: z.enum(['V', 'YDS', 'Font']),
   gradeValue: z.string(),
   gradeRank: z.number().int(),
-  color: z.string().optional(),
+  description: z.string().optional(),
 });
 
 export type CreateRouteInput = z.infer<typeof CreateRouteInput>;
@@ -24,7 +24,7 @@ export const UpdateRouteInput = z.object({
   gradeSystem: z.enum(['V', 'YDS', 'Font']).optional(),
   gradeValue: z.string().optional(),
   gradeRank: z.number().int().optional(),
-  color: z.string().optional(),
+  description: z.string().optional(),
 });
 
 export type UpdateRouteInput = z.infer<typeof UpdateRouteInput>;
@@ -42,7 +42,7 @@ export async function createRoute(input: CreateRouteInput) {
       gradeSystem: data.gradeSystem,
       gradeValue: data.gradeValue,
       gradeRank: data.gradeRank,
-      color: data.color ?? null,
+      description: data.description ?? null,
     })
     .returning();
 

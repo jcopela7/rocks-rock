@@ -1,8 +1,8 @@
 // src/services/ascents.ts
-import { and, desc, eq, gte, lte } from 'drizzle-orm';
+import { and, desc, eq, getTableColumns, gte, lte } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../db/index.js';
-import { ascent } from '../db/schema.js';
+import { ascent, location, route } from '../db/schema.js';
 
 type UUID = string; // keep simple; you can add a UUID zod later
 
@@ -86,8 +86,14 @@ export async function listAscents(body: ListAscentsQueryType) {
   }
 
   const query = db
-    .select()
+    .select({
+      ...getTableColumns(ascent),
+      routeName: route.name,
+      locationName: location.name,
+    })
     .from(ascent)
+    .leftJoin(route, eq(ascent.routeId, route.id))
+    .leftJoin(location, eq(ascent.locationId, location.id))
     .where(and(...conditions))
     .orderBy(desc(ascent.climbedAt))
     .limit(params.limit);

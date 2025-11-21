@@ -37,7 +37,9 @@ struct AscentDTO: Codable, Identifiable {
     let id: UUID
     let userId: UUID
     let routeId: UUID?
+    let routeName: String?
     let locationId: UUID?
+    let locationName: String?
     let style: String
     let attempts: Int
     let rating: Int?

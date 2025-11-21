@@ -12,8 +12,20 @@ struct ActivityRowView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             ascentHeader
+            HStack(alignment: .center, spacing: 4) {
+                ascentLocation
+                ascentMetadata
+            }
             ascentImage
+            Spacer()
             ascentDetails
+            Spacer()
+            HStack(alignment: .center, spacing: 32) {
+                ascentMetric(label: "Grade", value: "V5" ?? "")
+                ascentMetric(label: "Attempts", value: String(ascent.attempts))
+                ascentMetric(label: "Rating", value: String(Int(ascent.rating ?? 0)))
+            }
+            Spacer()
         }
         .padding(.vertical, 4)
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
@@ -26,10 +38,40 @@ struct ActivityRowView: View {
 
     private var ascentHeader: some View {
         HStack {
-            Text("\(ascent.locationName ?? "") • \(ascent.routeName ?? "")")
+            Text("\(ascent.routeName ?? "")")
                 .font(.headline)
                 .foregroundColor(Color.theme.accent)
             Spacer()
+        }
+    }
+
+    private var ascentLocation: some View {
+        HStack(spacing: 4) {
+            Image("crashpadIcon")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 20, height: 20)
+                .foregroundColor(.secondary)
+            Text("\(ascent.locationName ?? "")")
+                .font(.subheadline)
+                .foregroundColor(Color.theme.textPrimary)
+        }
+    }
+
+        private var ascentMetadata: some View {
+            Text("• \(ascent.climbedAt.formatted(date: .abbreviated, time: .shortened))")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+    }
+
+    private func ascentMetric(label: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(label)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Text(value)
+                .font(.body)
+                .foregroundStyle(Color.theme.textPrimary)
         }
     }
 
@@ -48,15 +90,10 @@ struct ActivityRowView: View {
     }
 
     private var ascentDetails: some View {
-        VStack(alignment: .leading, spacing: 4) {
             Text(ascent.notes ?? "")
                 .font(.body)
                 .foregroundStyle(.secondary)
-
-            Text(ascent.climbedAt.formatted(date: .abbreviated, time: .shortened))
-                .foregroundStyle(.secondary)
         }
-    }
 }
 
 #Preview {

@@ -26,7 +26,7 @@ struct ActivityRowView: View {
 
     private var ascentHeader: some View {
         HStack {
-            Text("\(ascent.style.capitalized) • Attempts \(ascent.attempts)")
+            Text("\(ascent.locationName ?? "") • \(ascent.routeName ?? "")")
                 .font(.headline)
                 .foregroundColor(Color.theme.accent)
             Spacer()

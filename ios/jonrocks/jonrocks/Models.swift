@@ -14,6 +14,7 @@ struct LocationDTO: Codable, Identifiable {
     let id: UUID
     let name: String
     let type: String // "gym" | "crag"
+    let description: String?
     let latitude: Double?
     let longitude: Double?
 }
@@ -23,6 +24,7 @@ struct RouteDTO: Codable, Identifiable {
     let locationId: UUID
     let name: String?
     let discipline: String // "boulder" | "sport" | "trad"
+    let description: String?
     let gradeSystem: String // "V" | "YDS" | "Font"
     let gradeValue: String
     let gradeRank: Int
@@ -38,7 +40,6 @@ struct AscentDTO: Codable, Identifiable {
     let locationId: UUID?
     let style: String
     let attempts: Int
-    let isOutdoor: Bool
     let rating: Int?
     let notes: String?
     let climbedAt: Date
@@ -50,7 +51,6 @@ struct CreateAscentRequest: Encodable {
     let locationId: UUID?
     let style: String
     let attempts: Int
-    let isOutdoor: Bool
     let rating: Int?
     let notes: String?
     let climbedAt: Date

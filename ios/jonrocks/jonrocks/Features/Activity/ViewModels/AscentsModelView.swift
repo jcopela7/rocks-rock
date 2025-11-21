@@ -50,7 +50,6 @@ final class AscentsVM: ObservableObject {
                 locationId: demoLocation,
                 style: "attempt",
                 attempts: 1,
-                isOutdoor: false,
                 rating: nil,
                 notes: "Logged from iOS",
                 climbedAt: Date()
@@ -120,7 +119,6 @@ struct AscentFormData {
     var routeId: UUID? = nil
     var style: String = "attempt"
     var attempts: Int = 1
-    var isOutdoor: Bool = false
     var rating: String = ""
     var notes: String = ""
     var climbedAt: Date = .init()
@@ -132,7 +130,6 @@ struct AscentFormData {
             locationId: UUID(uuidString: "00000000-0000-0000-0000-000000000002")!, // demoLocation
             style: style,
             attempts: attempts,
-            isOutdoor: isOutdoor,
             rating: rating.isEmpty ? nil : Int(rating),
             notes: notes.isEmpty ? nil : notes,
             climbedAt: climbedAt

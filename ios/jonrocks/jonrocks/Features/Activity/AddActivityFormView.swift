@@ -32,10 +32,6 @@ struct AddActivityFormView: View {
                     Stepper("Attempts: \(formData.attempts)", value: $formData.attempts, in: 1 ... 20)
                 }
 
-                Section("Location") {
-                    Toggle("Outdoor Climbing", isOn: $formData.isOutdoor)
-                }
-
                 Section("Rating") {
                     TextField("Grade (e.g., 5.10a, V4)", text: $formData.rating)
                         .textInputAutocapitalization(.never)

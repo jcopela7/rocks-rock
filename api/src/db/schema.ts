@@ -1,12 +1,11 @@
 // src/db/schema.ts
 import {
-  pgTable,
-  uuid,
-  text,
-  integer,
-  timestamp,
-  boolean,
   doublePrecision,
+  integer,
+  pgTable,
+  text,
+  timestamp,
+  uuid
 } from 'drizzle-orm/pg-core';
 
 /** Core user profile mirrored from your auth provider */
@@ -21,6 +20,7 @@ export const location = pgTable('location', {
   id: uuid('id').primaryKey(),
   name: text('name').notNull(),
   type: text('type').notNull(), // 'gym' | 'crag'
+  description: text('description'),
   latitude: doublePrecision('latitude'),
   longitude: doublePrecision('longitude'),
   createdBy: uuid('created_by').references(() => appUser.id),
@@ -36,11 +36,11 @@ export const route = pgTable('route', {
     .references(() => location.id)
     .notNull(),
   name: text('name'),
-  discipline: text('discipline').notNull(), // 'boulder' | 'sport' | 'trad' | 'toprope'
+  discipline: text('discipline').notNull(), // 'boulder' | 'sport' | 'trad' | 'board
+  description: text('description'),
   gradeSystem: text('grade_system').notNull(), // 'V' | 'YDS' | 'Font'
-  gradeValue: text('grade_value').notNull(), // 'V5' | '5.12a'
+  gradeValue: text('grade_value').notNull(), // 'V5' | '5.12a' | 8a+
   gradeRank: integer('grade_rank').notNull(), // numeric for filters
-  color: text('color'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
   deletedAt: timestamp('deleted_at', { withTimezone: true }),
@@ -64,7 +64,6 @@ export const ascent = pgTable('ascent', {
 
   style: text('style').notNull(), // 'attempt' | 'send' | 'flash' | 'onsight' | 'project'
   attempts: integer('attempts').default(1),
-  isOutdoor: boolean('is_outdoor').default(false),
   rating: integer('rating'),
   notes: text('notes'),
 

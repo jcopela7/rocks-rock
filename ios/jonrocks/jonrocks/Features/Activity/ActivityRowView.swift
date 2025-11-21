@@ -23,7 +23,7 @@ struct ActivityRowView: View {
             HStack(alignment: .center, spacing: 32) {
                 ascentMetric(label: "Grade", value: "V5" ?? "")
                 ascentMetric(label: "Attempts", value: String(ascent.attempts))
-                ascentMetric(label: "Rating", value: String(Int(ascent.rating ?? 0)))
+                ascentMetric(label: "Stars", value: String(Int(ascent.rating ?? 0)))
             }
             Spacer()
         }

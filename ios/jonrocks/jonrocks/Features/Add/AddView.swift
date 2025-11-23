@@ -40,7 +40,6 @@ struct AddView: View {
                         isActive: selectedFilter == .board,
                         action: { selectedFilter = .board }
                     )
-                    
                     Spacer()
                 }
                 .padding(.horizontal, 16)

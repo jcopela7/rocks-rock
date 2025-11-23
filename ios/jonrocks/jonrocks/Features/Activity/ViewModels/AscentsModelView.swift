@@ -109,7 +109,7 @@ final class AscentsVM: ObservableObject {
             return ascents
         } else {
             return ascents.filter { ascent in
-                ascent.style.localizedCaseInsensitiveContains(searchText)
+                ascent.routeName?.localizedCaseInsensitiveContains(searchText) ?? false
             }
         }
     }

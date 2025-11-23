@@ -15,7 +15,7 @@ struct SearchBar: View {
             Image(systemName: "magnifyingglass")
                 .foregroundColor(.gray)
 
-            TextField("Search by style...", text: $text)
+            TextField("Search by route name...", text: $text)
                 .textFieldStyle(PlainTextFieldStyle())
 
             if !text.isEmpty {

@@ -56,6 +56,21 @@ final class APIClient {
         return env.data
     }
 
+    func getCountOfAscentsGroupByLocation(userId: UUID) async throws -> [CountOfAscentsByLocationDTO] {
+        let env: APIListEnvelope<[CountOfAscentsByLocationDTO]> = try await helpers.get("ascent/count/location", query: [
+            .init(name: "userId", value: userId.uuidString),
+        ])
+        return env.data
+    }
+
+    func getCountOfAscentsByGrade(userId: UUID, discipline: String) async throws -> [CountOfAscentsByGradeDTO] {
+        let env: APIListEnvelope<[CountOfAscentsByGradeDTO]> = try await helpers.get("ascent/count/grade", query: [
+            .init(name: "userId", value: userId.uuidString),
+            .init(name: "discipline", value: discipline),
+        ])
+        return env.data
+    }
+
     func listUsers() async throws -> [UserDTO] {
         let env: APIListEnvelope<[UserDTO]> = try await helpers.get("users")
         return env.data

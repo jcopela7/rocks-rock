@@ -20,7 +20,7 @@ export type CreateRouteInput = z.infer<typeof CreateRouteInput>;
 export const UpdateRouteInput = z.object({
   locationId: z.string().optional(),
   name: z.string().optional(),
-  discipline: z.enum(['boulder', 'sport', 'trad']).optional(),
+  discipline: z.enum(['boulder', 'sport', 'trad', 'board']).optional(),
   gradeSystem: z.enum(['V', 'YDS', 'Font']).optional(),
   gradeValue: z.string().optional(),
   gradeRank: z.number().int().optional(),

@@ -6,6 +6,10 @@ import {
   CreateAscentInput,
   deleteAscent,
   getAscentDetail,
+  getCountOfAscentsByGrade,
+  GetCountOfAscentsByGradeQuery,
+  GetCountOfAscentsByLocationQuery,
+  getCountOfAscentsGroupByLocation,
   listAscents,
   ListAscentsQuery,
 } from '../services/ascent.js';
@@ -22,6 +26,18 @@ export async function ascentRoutes(app: FastifyInstance) {
     const query = ListAscentsQuery.parse(req.query);
     const rows = await listAscents(query);
     return { data: rows };
+  });
+
+  app.get('/ascent/count/grade', async (req) => {
+    const query = GetCountOfAscentsByGradeQuery.parse(req.query);
+    const count = await getCountOfAscentsByGrade(query);
+    return { data: count };
+  });
+
+  app.get('/ascent/count/location', async (req) => {
+    const query = GetCountOfAscentsByLocationQuery.parse(req.query);
+    const count = await getCountOfAscentsGroupByLocation(query);
+    return { data: count };
   });
 
   app.get('/ascnet/:id', async (req, reply) => {

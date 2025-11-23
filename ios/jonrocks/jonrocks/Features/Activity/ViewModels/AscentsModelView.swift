@@ -12,6 +12,8 @@ import SwiftUI
 @MainActor
 final class AscentsVM: ObservableObject {
     @Published var ascents: [AscentDTO] = []
+    @Published var ascentsByLocation: [CountOfAscentsByLocationDTO] = []
+    @Published var ascentsByGrade: [CountOfAscentsByGradeDTO] = []
     @Published var routes: [RouteDTO] = []
     @Published var loading: Bool = false
     @Published var error: String? = nil
@@ -70,6 +72,30 @@ final class AscentsVM: ObservableObject {
             error = nil
         } catch {
             print("Backend error in deleteAscent(): \(error)")
+            self.error = error.localizedDescription
+        }
+    }
+
+    func loadCountOfAscentsGroupByLocation() async {
+        loading = true; defer { loading = false }
+        do {
+            let count = try await api.getCountOfAscentsGroupByLocation(userId: demoUser)
+            ascentsByLocation = count
+            error = nil        
+        } catch {
+            print("Backend error in loadCountOfAscentsGroupByLocation(): \(error)")
+            self.error = error.localizedDescription
+        }
+    }
+
+    func loadCountOfAscentsByGrade(discipline: String) async {
+        loading = true; defer { loading = false }
+        do {
+            let count = try await api.getCountOfAscentsByGrade(userId: demoUser, discipline: discipline)
+            ascentsByGrade = count
+            error = nil
+        } catch {
+            print("Backend error in loadCountOfAscentsByGrade(): \(error)")
             self.error = error.localizedDescription
         }
     }

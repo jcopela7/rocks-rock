@@ -26,7 +26,7 @@ struct YouView: View {
                 .padding(.horizontal, 16)
                 Group {
                     if selected == "Progress" {
-                        ProgressViewTab()
+                        ProgressViewTab(viewModel: ascentsVM)
                     } else {
                         ActivityLoggingView(ascentsVM: ascentsVM)
                     }

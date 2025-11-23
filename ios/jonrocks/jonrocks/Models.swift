@@ -47,6 +47,19 @@ struct AscentDTO: Codable, Identifiable {
     let climbedAt: Date
 }
 
+struct CountOfAscentsByLocationDTO: Codable {
+    let locationName: String
+    let totalAscents: Int
+}
+
+struct CountOfAscentsByGradeDTO: Codable {
+    let routeDiscipline: String
+    let gradeSystem: String
+    let gradeValue: String
+    let gradeRank: Int
+    let totalAscents: Int
+}
+
 struct CreateAscentRequest: Encodable {
     let userId: UUID
     let routeId: UUID?

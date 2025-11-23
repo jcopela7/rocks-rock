@@ -1,5 +1,5 @@
 // src/services/ascents.ts
-import { and, desc, eq, getTableColumns, gte, lte } from 'drizzle-orm';
+import { and, count, desc, eq, getTableColumns, gte, lte } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../db/index.js';
 import { ascent, location, route } from '../db/schema.js';
@@ -89,6 +89,7 @@ export async function listAscents(body: ListAscentsQueryType) {
     .select({
       ...getTableColumns(ascent),
       routeName: route.name,
+      routeDiscipline: route.discipline,
       locationName: location.name,
     })
     .from(ascent)
@@ -102,7 +103,59 @@ export async function listAscents(body: ListAscentsQueryType) {
 }
 
 export async function getAscentDetail(id: string) {
-  const query = db.select().from(ascent).where(eq(ascent.id, id!)).orderBy(desc(ascent.climbedAt));
+  const query = db
+   .select({
+    ...getTableColumns(ascent),
+    routeName: route.name,
+    routeDiscipline: route.discipline,
+    locationName: location.name,
+   }).from(ascent)
+   .leftJoin(route, eq(ascent.routeId, route.id))
+   .leftJoin(location, eq(ascent.locationId, location.id))
+   .where(eq(ascent.id, id!))
+   .orderBy(desc(ascent.climbedAt));
+  const rows = await query;
+  return rows;
+}
+
+export const GetCountOfAscentsByLocationQuery = z.object({
+  userId: z.string(),
+});
+export type GetCountOfAscentsByLocationQueryType = z.infer<typeof GetCountOfAscentsByLocationQuery>;
+
+export async function getCountOfAscentsGroupByLocation(body: GetCountOfAscentsByLocationQueryType) {
+  const query = db
+  .select({
+    locationName: location.name,
+    totalAscents: count(ascent.id),
+  }).from(ascent)
+  .leftJoin(location, eq(ascent.locationId, location.id))
+  .where(eq(ascent.userId, body.userId))
+  .groupBy(location.name);
+
+  const rows = await query;
+  return rows;
+}
+
+export const GetCountOfAscentsByGradeQuery = z.object({
+  userId: z.string(),
+  discipline: z.enum(['boulder', 'sport', 'trad', 'board']),
+});
+export type GetCountOfAscentsByGradeQueryType = z.infer<typeof GetCountOfAscentsByGradeQuery>;
+
+export async function getCountOfAscentsByGrade(body: GetCountOfAscentsByGradeQueryType) {
+  const query = db
+  .select({
+    routeDiscipline: route.discipline,
+    gradeSystem: route.gradeSystem,
+    gradeValue: route.gradeValue,
+    gradeRank: route.gradeRank,
+    totalAscents: count(ascent.id),
+  }).from(ascent)
+  .leftJoin(route, eq(ascent.routeId, route.id))
+  .where(and(eq(ascent.userId, body.userId), eq(route.discipline, body.discipline)))
+  .groupBy(route.discipline, route.gradeSystem, route.gradeValue, route.gradeRank);
+
   const rows = await query;
   return rows;
 }

@@ -23,7 +23,7 @@ struct ActivityRowView: View {
             HStack(alignment: .center, spacing: 32) {
                 ascentMetric(label: "Grade", value: "V5" ?? "")
                 ascentMetric(label: "Attempts", value: String(ascent.attempts))
-                ascentMetric(label: "Stars", value: String(Int(ascent.rating ?? 0)))
+                ascentRating(label: "Stars", value: Int(ascent.rating ?? 0))
             }
             Spacer()
         }
@@ -58,10 +58,10 @@ struct ActivityRowView: View {
         }
     }
 
-        private var ascentMetadata: some View {
-            Text("• \(ascent.climbedAt.formatted(date: .abbreviated, time: .shortened))")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+    private var ascentMetadata: some View {
+        Text("• \(ascent.climbedAt.formatted(date: .abbreviated, time: .shortened))")
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
     }
 
     private func ascentMetric(label: String, value: String) -> some View {
@@ -72,6 +72,26 @@ struct ActivityRowView: View {
             Text(value)
                 .font(.body)
                 .foregroundStyle(Color.theme.textPrimary)
+        }
+    }
+
+    private func ascentRating(label: String, value: Int) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(label)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            if value > 0 {
+            HStack(spacing: 2) {
+                ForEach(0..<value, id: \.self) { _ in
+                    Image(systemName: "star.fill")
+                        .foregroundColor(.yellow)
+                }
+            }
+            } else {
+            Text("0")
+                .font(.body)
+                .foregroundStyle(Color.theme.textPrimary)
+            }
         }
     }
 

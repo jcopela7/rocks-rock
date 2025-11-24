@@ -81,16 +81,16 @@ struct ActivityRowView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
             if value > 0 {
-            HStack(spacing: 2) {
-                ForEach(0..<value, id: \.self) { _ in
-                    Image(systemName: "star.fill")
-                        .foregroundColor(.yellow)
+                HStack(spacing: 2) {
+                    ForEach(0 ..< value, id: \.self) { _ in
+                        Image(systemName: "star.fill")
+                            .foregroundColor(.yellow)
+                    }
                 }
-            }
             } else {
-            Text("0")
-                .font(.body)
-                .foregroundStyle(Color.theme.textPrimary)
+                Text("0")
+                    .font(.body)
+                    .foregroundStyle(Color.theme.textPrimary)
             }
         }
     }
@@ -101,22 +101,22 @@ struct ActivityRowView: View {
            let ui = LocalImageStore.load(ref)
         {
             VStack {
-            Image(uiImage: ui)
-                .resizable()
-                .scaledToFill()
-                .frame(height: 240)
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-                .clipped()
+                Image(uiImage: ui)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(height: 240)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .clipped()
             }
             .padding(.top, 8)
         }
     }
 
     private var ascentDetails: some View {
-            Text(ascent.notes ?? "")
-                .font(.body)
-                .foregroundStyle(.secondary)
-        }
+        Text(ascent.notes ?? "")
+            .font(.body)
+            .foregroundStyle(.secondary)
+    }
 }
 
 #Preview {

@@ -49,12 +49,12 @@ struct ContentView: View {
                 .tabItem {
                     Label("Discover", systemImage: "magnifyingglass")
                 }
-            
+
             AddView()
                 .tabItem {
                     Label("Add", systemImage: "plus.circle")
                 }
-            
+
             YouView()
                 .tabItem {
                     Label("You", systemImage: "person")

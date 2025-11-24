@@ -43,4 +43,3 @@ struct YouView: View {
 #Preview {
     YouView()
 }
-

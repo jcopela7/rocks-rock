@@ -5,8 +5,6 @@ struct FilterButton: View {
     let icon: String?
     let isActive: Bool
     let action: () -> Void
-    
-
 
     var body: some View {
         Button(action: action) {
@@ -19,7 +17,7 @@ struct FilterButton: View {
                         .frame(width: 24, height: 24)
                         .foregroundColor(isActive ? .white : Color.theme.textSecondary)
                 }
-                Text(title) 
+                Text(title)
                     .fontWeight(.semibold)
                     .foregroundColor(isActive ? .white : Color.theme.textSecondary)
             }

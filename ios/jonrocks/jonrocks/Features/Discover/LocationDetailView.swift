@@ -5,7 +5,7 @@ import SwiftUI
 struct LocationDetailView: View {
     let location: LocationDTO
     @StateObject private var viewModel = LocationDetailViewModel()
-    
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
@@ -15,7 +15,7 @@ struct LocationDetailView: View {
                         .font(.largeTitle)
                         .fontWeight(.bold)
                         .foregroundColor(Color.theme.accent)
-                    
+
                     HStack {
                         Text(location.type.capitalized)
                             .font(.subheadline)
@@ -25,10 +25,10 @@ struct LocationDetailView: View {
                             .padding(.vertical, 6)
                             .background(Color(.systemGray5))
                             .clipShape(Capsule())
-                        
+
                         Spacer()
                     }
-                    
+
                     if let lat = location.latitude, let lon = location.longitude {
                         HStack {
                             Image(systemName: "mappin.circle.fill")
@@ -42,17 +42,17 @@ struct LocationDetailView: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 8)
-                
+
                 Divider()
                     .padding(.horizontal, 16)
-                
+
                 // Routes Section
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Routes")
                         .font(.title2)
                         .fontWeight(.bold)
                         .padding(.horizontal, 16)
-                    
+
                     if viewModel.loading {
                         ProgressView()
                             .frame(maxWidth: .infinity)
@@ -95,7 +95,7 @@ struct LocationDetailView: View {
 
 struct RouteRowView: View {
     let route: RouteDTO
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
@@ -114,7 +114,7 @@ struct RouteRowView: View {
                     .fontWeight(.semibold)
                     .foregroundColor(Color.theme.accent)
             }
-            
+
             HStack(spacing: 12) {
                 Text(route.discipline.capitalized)
                     .font(.subheadline)
@@ -123,7 +123,7 @@ struct RouteRowView: View {
                     .padding(.vertical, 4)
                     .background(Color(.systemGray6))
                     .clipShape(Capsule())
-                
+
                 Text(route.gradeSystem)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
@@ -131,7 +131,7 @@ struct RouteRowView: View {
                     .padding(.vertical, 4)
                     .background(Color(.systemGray6))
                     .clipShape(Capsule())
-                
+
                 if let color = route.color, !color.isEmpty {
                     Text(color)
                         .font(.subheadline)
@@ -155,13 +155,13 @@ final class LocationDetailViewModel: ObservableObject {
     @Published var routes: [RouteDTO] = []
     @Published var loading: Bool = false
     @Published var error: String? = nil
-    
+
     let api = APIClient()
-    
+
     func loadRoutes(for locationId: UUID) async {
         loading = true
         error = nil
-        
+
         do {
             let allRoutes = try await api.listRoutes()
             routes = allRoutes.filter { $0.locationId == locationId }
@@ -173,4 +173,3 @@ final class LocationDetailViewModel: ObservableObject {
         }
     }
 }
-

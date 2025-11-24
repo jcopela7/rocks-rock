@@ -3,16 +3,16 @@ import SwiftUI
 struct BoulderingClimbForm: View {
     @ObservedObject var discoverVM: DiscoverVM
     @ObservedObject var ascentsVM: AscentsVM
-    
+
     @State private var selectedLocationId: UUID? = nil
     @State private var selectedRouteId: UUID? = nil
     @State private var notes: String = ""
     @State private var attempts: Int = 1
     @State private var starts: Int = 0
-    @State private var dateClimbed: Date = Date()
+    @State private var dateClimbed: Date = .init()
     @State private var isSubmitting = false
     @State private var error: String? = nil
-    
+
     var filteredRoutes: [RouteDTO] {
         let boulderRoutes = discoverVM.routes.filter { $0.discipline == "boulder" }
         guard let locationId = selectedLocationId else {
@@ -20,7 +20,7 @@ struct BoulderingClimbForm: View {
         }
         return boulderRoutes.filter { $0.locationId == locationId }
     }
-    
+
     var body: some View {
         NavigationStack {
             Form {
@@ -35,7 +35,7 @@ struct BoulderingClimbForm: View {
                         selectedRouteId = nil
                     }
                 }
-                
+
                 Section("Route") {
                     Picker("Route", selection: $selectedRouteId) {
                         Text("Select a route").tag(UUID?.none)
@@ -44,27 +44,27 @@ struct BoulderingClimbForm: View {
                         }
                     }
                 }
-                
+
                 Section("Notes") {
                     TextEditor(text: $notes)
                         .frame(minHeight: 80)
                 }
-                
+
                 Section("Attempts") {
-                    Stepper("Attempts: \(attempts)", value: $attempts, in: 1...100)
+                    Stepper("Attempts: \(attempts)", value: $attempts, in: 1 ... 100)
                 }
-                
+
                 Section("Starts") {
-                    Stepper("Starts: \(starts)", value: $starts, in: 0...5)
+                    Stepper("Starts: \(starts)", value: $starts, in: 0 ... 5)
                     Text("Rating based on number of starts")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
-                
+
                 Section("Date Climbed") {
                     DatePicker("Date Climbed", selection: $dateClimbed, displayedComponents: [.date])
                 }
-                
+
                 if let error = error {
                     Section {
                         Text(error)
@@ -90,25 +90,25 @@ struct BoulderingClimbForm: View {
             }
         }
     }
-    
+
     private func routeName(for route: RouteDTO) -> String {
         if let name = route.name, !name.isEmpty {
             return "\(name) (\(route.gradeValue))"
         }
         return route.gradeValue
     }
-    
+
     private func submitForm() async {
         isSubmitting = true
         defer { isSubmitting = false }
-        
+
         error = nil
-        
+
         guard let locationId = selectedLocationId else {
             error = "Please select a location"
             return
         }
-        
+
         do {
             let request = CreateAscentRequest(
                 userId: ascentsVM.demoUser,
@@ -120,12 +120,12 @@ struct BoulderingClimbForm: View {
                 notes: notes.isEmpty ? nil : notes,
                 climbedAt: dateClimbed
             )
-            
+
             let created = try await ascentsVM.api.createAscent(request)
             await MainActor.run {
                 ascentsVM.ascents.insert(created, at: 0)
                 ascentsVM.error = nil
-                
+
                 // Reset form
                 selectedLocationId = nil
                 selectedRouteId = nil
@@ -141,4 +141,3 @@ struct BoulderingClimbForm: View {
         }
     }
 }
-

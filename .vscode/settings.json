@@ -1,15 +1,53 @@
 {
+  // Enable format on save for all files
   "editor.formatOnSave": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "always",
-    "source.organizeImports": "always",
-    "source.removeUnusedImports": "always"
+    "source.fixAll.eslint": "explicit"
   },
-  "eslint.alwaysShowStatus": true,
-  "eslint.format.enable": true,
+
+  // Swift files - format on save
   "[swift]": {
-    "editor.defaultFormatter": "nicklockwood.swiftformat",
     "editor.formatOnSave": true
-  }
+  },
+
+  // TypeScript and JavaScript - use Prettier
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+
+  // Run on Save extension configuration for Swift files
+  "emeraldwalk.RunOnSave": {
+    "commands": [
+      {
+        "match": "\\.swift$",
+        "cmd": "swiftformat ${file}",
+        "runIn": "terminal"
+      }
+    ]
+  },
+
+  // Prettier configuration
+  "prettier.enable": true,
+  "prettier.requireConfig": false
 }

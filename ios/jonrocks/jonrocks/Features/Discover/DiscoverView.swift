@@ -2,7 +2,7 @@ import SwiftUI
 
 struct DiscoverView: View {
     @StateObject private var discoverVM = DiscoverVM()
-    
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 12) {
@@ -20,7 +20,7 @@ struct DiscoverView: View {
                             }
                         }
                     )
-                    
+
                     FilterButton(
                         title: "Crag",
                         icon: "camIcon",
@@ -33,11 +33,11 @@ struct DiscoverView: View {
                             }
                         }
                     )
-                    
+
                     Spacer()
                 }
                 .padding(.horizontal, 16)
-                
+
                 Group {
                     if discoverVM.loading {
                         ProgressView()
@@ -83,7 +83,7 @@ struct DiscoverView: View {
 
 struct LocationRowView: View {
     let location: LocationDTO
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             VStack(alignment: .leading, spacing: 8) {
@@ -110,4 +110,3 @@ struct LocationRowView: View {
 #Preview {
     DiscoverView()
 }
-

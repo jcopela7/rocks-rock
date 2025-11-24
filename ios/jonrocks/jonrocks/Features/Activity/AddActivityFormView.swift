@@ -21,7 +21,7 @@ struct AddActivityFormView: View {
                         }
                     }
                 }
-                
+
                 Section("Climb Details") {
                     Picker("Style", selection: $formData.style) {
                         ForEach(styleOptions, id: \.self) { style in
@@ -68,7 +68,7 @@ struct AddActivityFormView: View {
             await discoverVM.loadRoutes()
         }
     }
-    
+
     private func routeName(for route: RouteDTO) -> String {
         if let name = route.name, !name.isEmpty {
             return "\(name) (\(route.gradeValue))"

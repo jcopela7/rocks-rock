@@ -81,7 +81,7 @@ final class AscentsVM: ObservableObject {
         do {
             let count = try await api.getCountOfAscentsGroupByLocation(userId: demoUser)
             ascentsByLocation = count
-            error = nil        
+            error = nil
         } catch {
             print("Backend error in loadCountOfAscentsGroupByLocation(): \(error)")
             self.error = error.localizedDescription

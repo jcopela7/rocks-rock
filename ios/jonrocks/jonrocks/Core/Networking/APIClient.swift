@@ -75,7 +75,7 @@ final class APIClient {
         let env: APIListEnvelope<[UserDTO]> = try await helpers.get("users")
         return env.data
     }
-    
+
     func listRoutes() async throws -> [RouteDTO] {
         let env: APIListEnvelope<[RouteDTO]> = try await helpers.get("route")
         return env.data

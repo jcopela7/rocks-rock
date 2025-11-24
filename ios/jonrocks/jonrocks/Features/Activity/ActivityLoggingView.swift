@@ -4,8 +4,8 @@
 //
 //  Created by Jonathan Cope on 2025-11-14.
 //
-import SwiftUI
 import PhotosUI
+import SwiftUI
 
 struct SearchBar: View {
     @Binding var text: String

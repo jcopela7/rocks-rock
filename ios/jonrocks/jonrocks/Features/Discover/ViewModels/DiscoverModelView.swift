@@ -12,7 +12,7 @@ final class DiscoverVM: ObservableObject {
     @Published var selectedFilterType: String? = nil // nil = all, "gym" or "crag"
 
     let api = APIClient()
-    
+
     var filteredLocations: [LocationDTO] {
         guard let filterType = selectedFilterType else {
             return locations
@@ -20,12 +20,10 @@ final class DiscoverVM: ObservableObject {
         return locations.filter { $0.type == filterType }
     }
 
-
-
     func loadRoutes() async {
         do {
             routes = try await api.listRoutes()
-        error = nil
+            error = nil
         } catch {
             print("Backend error in loadRoutes(): \(error)")
             self.error = error.localizedDescription

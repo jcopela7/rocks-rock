@@ -5,8 +5,6 @@ struct FilterIconButton: View {
     let title: String?
     let isActive: Bool
     let action: () -> Void
-    
-
 
     var body: some View {
         VStack {
@@ -26,7 +24,7 @@ struct FilterIconButton: View {
                 .clipShape(Circle())
                 .overlay(
                     Circle()
-                        .stroke(isActive ? Color.raw.blue100: Color.raw.slate500, lineWidth: 1)
+                        .stroke(isActive ? Color.raw.blue100 : Color.raw.slate500, lineWidth: 1)
                 )
             }
             if let title = title {

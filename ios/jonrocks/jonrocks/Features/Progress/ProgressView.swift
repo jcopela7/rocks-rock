@@ -1,13 +1,6 @@
 import SwiftUI
 import Charts
 
-struct CragGradeSends: Identifiable, Hashable {
-    let id = UUID()
-    let crag: String
-    let vGrade: String   // e.g., "V2", "V5"
-    let sends: Int
-}
-
 struct ProgressViewTab: View {
     @ObservedObject var viewModel: AscentsVM
 
@@ -16,33 +9,13 @@ struct ProgressViewTab: View {
 
     var body: some View {
             VStack(alignment: .leading, spacing: 12) {
-                    Text("V-grade Sends (Bouldering)")
-                        .font(.headline)
-                        .foregroundColor(Color.theme.accent)
-
-                    Chart(viewModel.ascentsByGrade, id: \.gradeValue) { row in
-                        BarMark(
-                            x: .value("Grade", row.gradeValue),
-                            y: .value("Sends", row.totalAscents)
-                        )
-                        .foregroundStyle(Color.theme.accent)
-                    }
-                    .chartLegend(position: .bottom, alignment: .leading)
-                    .chartXAxisLabel("Grade")
-                    .chartYAxisLabel("Sends")
-                    .chartXScale(domain: gradeOrder)
-                    .frame(height: 280)
-                    .padding(.top, 8)
-
-                    Spacer()
+                    SendsByGradeView(viewModel: viewModel)
+                    .background(Color.raw.slate100)
                 }
-            .padding(.horizontal, 16)
+            .listRowSeparator(.visible)
+            .contentMargins(.horizontal, 16)
+            .padding(.top, 8)
             .background(Color.raw.slate100)
-            .onAppear {
-                Task {
-                    await viewModel.loadCountOfAscentsByGrade(discipline: "boulder")
-                }
-            }
     }
 }
 

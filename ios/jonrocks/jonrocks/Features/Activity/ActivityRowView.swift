@@ -16,7 +16,6 @@ struct ActivityRowView: View {
                 ascentLocation
                 ascentMetadata
             }
-            ascentImage
             Spacer()
             ascentDetails
             Spacer()
@@ -25,6 +24,7 @@ struct ActivityRowView: View {
                 ascentMetric(label: "Attempts", value: String(ascent.attempts))
                 ascentRating(label: "Stars", value: Int(ascent.rating ?? 0))
             }
+            ascentImage
             Spacer()
         }
         .padding(.vertical, 4)
@@ -100,12 +100,15 @@ struct ActivityRowView: View {
         if let ref = viewModel.imagesByAscent[ascent.id]?.first,
            let ui = LocalImageStore.load(ref)
         {
+            VStack {
             Image(uiImage: ui)
                 .resizable()
                 .scaledToFill()
-                .frame(height: 120)
+                .frame(height: 240)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
                 .clipped()
+            }
+            .padding(.top, 8)
         }
     }
 

@@ -3,14 +3,16 @@ import SwiftUI
 
 struct SendsByGradeView: View {
     @ObservedObject var viewModel: AscentsVM
+    var discipline: String
 
     // Optional: consistent ordering
-    private let gradeOrder: [String] = ["V0", "V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "V10"]
+    private let boulderingGradeOrder: [String] = ["V0", "V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "V10"]
+    private let sportGradeOrder: [String] = ["5.5", "5.6", "5.7", "5.8", "5.9", "5.10", "5.11", "5.12", "5.13", "5.14", "5.15"]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("V-grade Sends (Bouldering)")
+                Text("\(discipline.capitalized) Sends")
                     .font(.headline)
                     .foregroundColor(Color.theme.accent)
                 Spacer()
@@ -29,7 +31,7 @@ struct SendsByGradeView: View {
             }
             .chartLegend(position: .bottom, alignment: .leading)
             .chartYAxisLabel("Sends")
-            .chartXScale(domain: gradeOrder)
+            .chartXScale(domain: discipline == "boulder" || discipline == "board" ? boulderingGradeOrder : sportGradeOrder)
             .chartXAxis {
                 AxisMarks { _ in
                     AxisGridLine(stroke: StrokeStyle(lineWidth: 0))
@@ -44,17 +46,12 @@ struct SendsByGradeView: View {
                     AxisValueLabel()
                 }
             }
-            .frame(height: 280)
+            .frame(height: 200)
             .padding(.horizontal, 8)
             Spacer()
         }
         .padding(.horizontal, 16)
         .background(.white)
-        .onAppear {
-            Task {
-                await viewModel.loadCountOfAscentsByGrade(discipline: "boulder")
-            }
-        }
     }
 
     private func ascentMetric(label: String, value: String) -> some View {

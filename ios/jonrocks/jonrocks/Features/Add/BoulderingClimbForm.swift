@@ -8,7 +8,7 @@ struct BoulderingClimbForm: View {
     @State private var selectedRouteId: UUID? = nil
     @State private var notes: String = ""
     @State private var attempts: Int = 1
-    @State private var starts: Int = 0
+    @State private var stars: Int = 0
     @State private var dateClimbed: Date = .init()
     @State private var isSubmitting = false
     @State private var error: String? = nil
@@ -54,11 +54,8 @@ struct BoulderingClimbForm: View {
                     Stepper("Attempts: \(attempts)", value: $attempts, in: 1 ... 100)
                 }
 
-                Section("Starts") {
-                    Stepper("Starts: \(starts)", value: $starts, in: 0 ... 5)
-                    Text("Rating based on number of starts")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                Section("Stars") {
+                    Stepper("Stars: \(stars)", value: $stars, in: 0 ... 5)
                 }
 
                 Section("Date Climbed") {
@@ -71,21 +68,40 @@ struct BoulderingClimbForm: View {
                             .foregroundColor(.red)
                     }
                 }
+                
+                HStack(spacing: 12) {
+                        Button(action: { clearForm() }) {
+                            Text("Cancel")
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 12)
+                                .background(Color.theme.textSecondary)
+                                .foregroundColor(.white)
+                                .font(.headline)
+                                .cornerRadius(4)
+                                .contentShape(Rectangle())
+                        }
+                        .disabled(isSubmitting)
+                        Button(action: {
+                            Task { await submitForm() }
+                        }) {
+                            Text("Save")
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 12)
+                                .background(Color.theme.accent)
+                                .foregroundColor(.white)
+                                .font(.headline)
+                                .cornerRadius(4)
+                                .contentShape(Rectangle())
+                        }
+                        .disabled(isSubmitting || selectedLocationId == nil) // fully rectangular
+                    }
+                    .background(Color.theme.card)
             }
+            .listStyle(.plain)
             .onAppear {
                 Task {
                     await discoverVM.loadLocations()
                     await discoverVM.loadRoutes()
-                }
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Save") {
-                        Task {
-                            await submitForm()
-                        }
-                    }
-                    .disabled(isSubmitting || selectedLocationId == nil)
                 }
             }
         }
@@ -96,6 +112,16 @@ struct BoulderingClimbForm: View {
             return "\(name) (\(route.gradeValue))"
         }
         return route.gradeValue
+    }
+
+    private func clearForm() {
+        selectedLocationId = nil
+        selectedRouteId = nil
+        notes = ""
+        attempts = 1
+        stars = 0
+        dateClimbed = Date()
+        error = nil
     }
 
     private func submitForm() async {
@@ -116,7 +142,7 @@ struct BoulderingClimbForm: View {
                 locationId: locationId,
                 style: "attempt",
                 attempts: attempts,
-                rating: starts > 0 ? starts : nil,
+                rating: stars > 0 ? stars : nil,
                 notes: notes.isEmpty ? nil : notes,
                 climbedAt: dateClimbed
             )
@@ -125,14 +151,7 @@ struct BoulderingClimbForm: View {
             await MainActor.run {
                 ascentsVM.ascents.insert(created, at: 0)
                 ascentsVM.error = nil
-
-                // Reset form
-                selectedLocationId = nil
-                selectedRouteId = nil
-                notes = ""
-                attempts = 1
-                starts = 0
-                dateClimbed = Date()
+                clearForm()
             }
         } catch let err {
             await MainActor.run {

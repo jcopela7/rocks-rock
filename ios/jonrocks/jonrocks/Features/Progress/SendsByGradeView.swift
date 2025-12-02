@@ -30,7 +30,6 @@ struct SendsByGradeView: View {
                 .foregroundStyle(Color.theme.accent)
             }
             .chartLegend(position: .bottom, alignment: .leading)
-            .chartYAxisLabel("Sends")
             .chartXScale(domain: discipline == "boulder" || discipline == "board" ? boulderingGradeOrder : sportGradeOrder)
             .chartXAxis {
                 AxisMarks { _ in
@@ -40,10 +39,11 @@ struct SendsByGradeView: View {
                 }
             }
             .chartYAxis {
-                AxisMarks { _ in
+                AxisMarks(values: .automatic) {
                     AxisGridLine(stroke: StrokeStyle(lineWidth: 1))
                     AxisTick()
                     AxisValueLabel()
+                    .foregroundStyle(Color.theme.textPrimary)
                 }
             }
             .frame(height: 200)

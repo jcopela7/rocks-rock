@@ -163,23 +163,3 @@ struct DayCell: View {
     }
 }
 
-#Preview {
-    let sampleAscents = [
-        AscentDTO(
-            id: UUID(),
-            userId: UUID(),
-            routeId: nil,
-            routeName: "Test Route",
-            locationId: nil,
-            locationName: "Test Location",
-            style: "send",
-            attempts: 1,
-            rating: 5,
-            notes: nil,
-            climbedAt: Date()
-        )
-    ]
-    
-    ClimbingCalendarView(month: Date(), ascents: sampleAscents)
-}
-

@@ -70,17 +70,6 @@ struct BoulderingClimbForm: View {
                 }
                 
                 HStack(spacing: 12) {
-                        Button(action: { clearForm() }) {
-                            Text("Cancel")
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 12)
-                                .background(Color.theme.textSecondary)
-                                .foregroundColor(.white)
-                                .font(.headline)
-                                .cornerRadius(4)
-                                .contentShape(Rectangle())
-                        }
-                        .disabled(isSubmitting)
                         Button(action: {
                             Task { await submitForm() }
                         }) {

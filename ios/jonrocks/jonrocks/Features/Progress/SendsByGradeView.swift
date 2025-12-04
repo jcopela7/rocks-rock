@@ -43,7 +43,7 @@ struct SendsByGradeView: View {
                     AxisGridLine(stroke: StrokeStyle(lineWidth: 1))
                     AxisTick()
                     AxisValueLabel()
-                    .foregroundStyle(Color.theme.textPrimary)
+                        .foregroundStyle(Color.theme.textPrimary)
                 }
             }
             .frame(height: 200)

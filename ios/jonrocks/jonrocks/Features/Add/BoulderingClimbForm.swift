@@ -12,6 +12,7 @@ struct BoulderingClimbForm: View {
     @State private var dateClimbed: Date = .init()
     @State private var isSubmitting = false
     @State private var error: String? = nil
+    @State private var showingSearchModal = false
 
     var filteredRoutes: [RouteDTO] {
         let boulderRoutes = discoverVM.routes.filter { $0.discipline == "boulder" }
@@ -25,10 +26,16 @@ struct BoulderingClimbForm: View {
         NavigationStack {
             Form {
                 Section("Location") {
-                    Picker("Location", selection: $selectedLocationId) {
-                        Text("Select a location").tag(UUID?.none)
-                        ForEach(discoverVM.locations, id: \.id) { location in
-                            Text(location.name).tag(UUID?.some(location.id))
+                    Button(action: {
+                        showingSearchModal = true
+                    }) {
+                        HStack {
+                            Text(selectedLocationName)
+                                .foregroundColor(selectedLocationId == nil ? .secondary : .primary)
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .foregroundColor(.secondary)
+                                .font(.caption)
                         }
                     }
                     .onChange(of: selectedLocationId) {
@@ -37,12 +44,19 @@ struct BoulderingClimbForm: View {
                 }
 
                 Section("Route") {
-                    Picker("Route", selection: $selectedRouteId) {
-                        Text("Select a route").tag(UUID?.none)
-                        ForEach(filteredRoutes, id: \.id) { route in
-                            Text(routeName(for: route)).tag(UUID?.some(route.id))
+                    Button(action: {
+                        showingSearchModal = true
+                    }) {
+                        HStack {
+                            Text(selectedRouteName)
+                                .foregroundColor(selectedRouteId == nil ? .secondary : .primary)
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .foregroundColor(.secondary)
+                                .font(.caption)
                         }
                     }
+                    .disabled(selectedLocationId == nil)
                 }
 
                 Section("Notes") {
@@ -88,6 +102,16 @@ struct BoulderingClimbForm: View {
                 .listRowBackground(Color.clear)
             }
             .listStyle(.plain)
+            .sheet(isPresented: $showingSearchModal) {
+                LocationRouteSearchModal(
+                    discoverVM: discoverVM,
+                    selectedLocationId: $selectedLocationId,
+                    selectedRouteId: $selectedRouteId,
+                    isPresented: $showingSearchModal,
+                    filteredRoutes: filteredRoutes,
+                    routeNameFormatter: routeName(for:)
+                )
+            }
             .onAppear {
                 Task {
                     await discoverVM.loadLocations()
@@ -95,6 +119,22 @@ struct BoulderingClimbForm: View {
                 }
             }
         }
+    }
+    
+    private var selectedLocationName: String {
+        guard let locationId = selectedLocationId,
+              let location = discoverVM.locations.first(where: { $0.id == locationId }) else {
+            return "Select a location"
+        }
+        return location.name
+    }
+    
+    private var selectedRouteName: String {
+        guard let routeId = selectedRouteId,
+              let route = filteredRoutes.first(where: { $0.id == routeId }) else {
+            return "Select a route"
+        }
+        return routeName(for: route)
     }
 
     private func routeName(for route: RouteDTO) -> String {

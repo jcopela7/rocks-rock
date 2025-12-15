@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		563B7B312EE1F9630015539E /* Auth0 in Frameworks */ = {isa = PBXBuildFile; productRef = 563B7B302EE1F9630015539E /* Auth0 */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		56F7EA432EA3E69D00CB50F3 /* jonrocks.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = jonrocks.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				563B7B312EE1F9630015539E /* Auth0 in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +83,7 @@
 			);
 			name = jonrocks;
 			packageProductDependencies = (
+				563B7B302EE1F9630015539E /* Auth0 */,
 			);
 			productName = jonrocks;
 			productReference = 56F7EA432EA3E69D00CB50F3 /* jonrocks.app */;
@@ -107,6 +113,9 @@
 			);
 			mainGroup = 56F7EA3A2EA3E69D00CB50F3;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				563B7B2F2EE1F9630015539E /* XCRemoteSwiftPackageReference "Auth0" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 56F7EA442EA3E69D00CB50F3 /* Products */;
 			projectDirPath = "";
@@ -355,6 +364,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		563B7B2F2EE1F9630015539E /* XCRemoteSwiftPackageReference "Auth0" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/auth0/Auth0.swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.15.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		563B7B302EE1F9630015539E /* Auth0 */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 563B7B2F2EE1F9630015539E /* XCRemoteSwiftPackageReference "Auth0" */;
+			productName = Auth0;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 56F7EA3B2EA3E69D00CB50F3 /* Project object */;
 }

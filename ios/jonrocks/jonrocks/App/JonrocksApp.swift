@@ -9,9 +9,24 @@ import SwiftUI
 
 @main
 struct jonrocksApp: App {
+    @StateObject private var authService = AuthenticationService()
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            Group {
+                if authService.isLoading {
+                    LoadingView()
+                } else if authService.isAuthenticated {
+                    ContentView()
+                } else {
+                    UnauthenticatedView(authService: authService)
+                }
+            }
+            .onOpenURL { url in
+                // Auth0 will handle the callback URL automatically
+                // This ensures the app responds to the callback
+                _ = url
+            }
         }
     }
 }

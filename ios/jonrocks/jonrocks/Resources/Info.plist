@@ -9,5 +9,14 @@
 	</dict>
 	<key>API_BASE_URL</key>
 	<string>$(API_BASE_URL)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>Personal.jonrocks</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

@@ -6,6 +6,7 @@ import Combine
 class AuthenticationService: ObservableObject {
     @Published var isAuthenticated = false
     @Published var user: UserInfo?
+    @Published var accessToken: String?
     @Published var isLoading = false
     @Published var errorMessage: String?
     
@@ -28,10 +29,12 @@ class AuthenticationService: ObservableObject {
         
         guard let credentials = try? await credentialsManager.credentials() else {
             isAuthenticated = false
+            accessToken = nil
             return
         }
         
         isAuthenticated = true
+        accessToken = credentials.accessToken
         // Get user info using the access token
         await fetchUserInfo(accessToken: credentials.accessToken)
     }
@@ -50,17 +53,27 @@ class AuthenticationService: ObservableObject {
         defer { isLoading = false }
         
         do {
-            let credentials = try await Auth0
+            var webAuth = Auth0
                 .webAuth(clientId: clientId, domain: domain)
                 .scope("openid profile email offline_access")
-                .start()
+            
+            // Add audience if configured (required for API authentication)
+            if let audience = AuthConfig.audience {
+                webAuth = webAuth.audience(audience)
+            }
+            
+            let credentials = try await webAuth.start()
             
             _ = credentialsManager.store(credentials: credentials)
             isAuthenticated = true
+            accessToken = credentials.accessToken
+            print("✅ Login successful, access token length: \(credentials.accessToken.count)")
             // Get user info using the access token
             await fetchUserInfo(accessToken: credentials.accessToken)
         } catch {
             errorMessage = "Login failed: \(error.localizedDescription)"
+            accessToken = nil
+            print("❌ Login error: \(error.localizedDescription)")
         }
     }
     
@@ -73,6 +86,7 @@ class AuthenticationService: ObservableObject {
             _ = credentialsManager.clear()
             isAuthenticated = false
             user = nil
+            accessToken = nil
         } catch {
             errorMessage = "Logout failed: \(error.localizedDescription)"
         }

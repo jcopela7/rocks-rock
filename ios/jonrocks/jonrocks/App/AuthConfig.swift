@@ -20,6 +20,17 @@ enum AuthConfig {
         }
         return domain
     }()
+    
+    static var audience: String? = {
+        guard let path = Bundle.main.path(forResource: "Auth", ofType: "plist"),
+              let plist = NSDictionary(contentsOfFile: path),
+              let audience = plist["Audience"] as? String
+        else {
+            // Audience is optional - if not set, Auth0 will use default
+            return nil
+        }
+        return audience
+    }()
 }
 
 

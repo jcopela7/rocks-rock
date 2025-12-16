@@ -11,16 +11,62 @@ final class DiscoverVM: ObservableObject {
     @Published var error: String? = nil
     @Published var selectedFilterType: String? = nil // nil = all, "gym" or "crag"
 
-    let api = APIClient()
+    var api: APIClient
+    private let authService: AuthenticationService
+    private var cancellables = Set<AnyCancellable>()
+
+    init(authService: AuthenticationService) {
+        self.authService = authService
+        // Initialize API client with access token (may be nil initially)
+        self.api = APIClient(accessToken: authService.accessToken)
+        
+        // Update API client when access token changes
+        authService.$accessToken
+            .sink { [weak self] token in
+                guard let self = self else { return }
+                print("🔄 DiscoverVM: Updating API client with new token: \(token != nil ? "present" : "nil")")
+                self.api = APIClient(accessToken: token)
+            }
+            .store(in: &cancellables)
+    }
 
     var filteredLocations: [LocationDTO] {
-        guard let filterType = selectedFilterType else {
-            return locations
+        let result: [LocationDTO]
+        if let filterType = selectedFilterType {
+            result = locations.filter { $0.type == filterType }
+            print("🔍 filteredLocations: Filter '\(filterType)', returning \(result.count) of \(locations.count) locations")
+        } else {
+            result = locations
+            print("🔍 filteredLocations: No filter, returning all \(result.count) locations (locations array has \(locations.count))")
         }
-        return locations.filter { $0.type == filterType }
+        return result
     }
 
     func loadRoutes() async {
+        // Ensure we have a token before making the request
+        if authService.accessToken == nil {
+            print("⏳ Waiting for access token...")
+            // Wait for token to become available (with timeout)
+            for _ in 0..<10 {
+                try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+                if authService.accessToken != nil {
+                    break
+                }
+            }
+        }
+        
+        // Ensure API client has the latest token
+        if let token = authService.accessToken {
+            self.api = APIClient(accessToken: token)
+        }
+        
+        // Double-check we have a token
+        guard authService.accessToken != nil else {
+            self.error = "Authentication required. Please log in."
+            print("❌ No access token available for loadRoutes()")
+            return
+        }
+        
         do {
             routes = try await api.listRoutes()
             error = nil
@@ -31,12 +77,54 @@ final class DiscoverVM: ObservableObject {
     }
 
     func loadLocations() async {
+        loading = true
+        defer { loading = false }
+        
+        // Ensure we have a token before making the request
+        if authService.accessToken == nil {
+            print("⏳ Waiting for access token...")
+            // Wait for token to become available (with timeout)
+            for _ in 0..<10 {
+                try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+                if authService.accessToken != nil {
+                    break
+                }
+            }
+        }
+        
+        // Ensure API client has the latest token
+        if let token = authService.accessToken {
+            self.api = APIClient(accessToken: token)
+        }
+        
+        // Double-check we have a token
+        guard authService.accessToken != nil else {
+            self.error = "Authentication required. Please log in."
+            print("❌ No access token available for loadLocations()")
+            return
+        }
+        
         do {
-            locations = try await api.listLocations()
+            print("📡 Making API call to listLocations()...")
+            print("📡 API client token present: \(authService.accessToken != nil ? "YES" : "NO")")
+            let loadedLocations = try await api.listLocations()
+            print("✅ API call successful! Loaded \(loadedLocations.count) locations")
+            if loadedLocations.isEmpty {
+                print("⚠️ API returned empty array - no locations in database")
+            } else {
+                print("📋 Location names: \(loadedLocations.map { $0.name }.joined(separator: ", "))")
+            }
+            locations = loadedLocations
             error = nil
+            print("✅ Updated locations array, count: \(locations.count)")
         } catch {
-            print("Backend error in loadLocations(): \(error)")
-            self.error = error.localizedDescription
+            print("❌ Backend error in loadLocations(): \(error)")
+            print("❌ Error type: \(type(of: error))")
+            print("❌ Error details: \(String(describing: error))")
+            if let apiError = error as? APIError {
+                print("❌ API Error: \(apiError.errorDescription ?? "unknown")")
+            }
+            locations = [] // Clear locations on error
         }
     }
 }

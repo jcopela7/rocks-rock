@@ -167,7 +167,6 @@ struct BoulderingClimbForm: View {
 
         do {
             let request = CreateAscentRequest(
-                userId: ascentsVM.demoUser,
                 routeId: selectedRouteId,
                 locationId: locationId,
                 style: "attempt",

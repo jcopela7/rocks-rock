@@ -1,10 +1,11 @@
 import SwiftUI
 
 struct AddView: View {
-    @StateObject private var discoverVM = DiscoverVM()
-    @StateObject private var ascentsVM = AscentsVM()
+    @EnvironmentObject var authService: AuthenticationService
+    @State private var discoverVM: DiscoverVM?
+    @State private var ascentsVM: AscentsVM?
     @State private var selectedFilter: ClimbFilter = .boulder
-
+    
     enum ClimbFilter {
         case boulder
         case trad
@@ -45,7 +46,7 @@ struct AddView: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
 
-            if selectedFilter == .boulder {
+            if selectedFilter == .boulder, let ascentsVM = ascentsVM, let discoverVM = discoverVM {
                 BoulderingClimbForm(
                     discoverVM: discoverVM,
                     ascentsVM: ascentsVM
@@ -56,6 +57,14 @@ struct AddView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(Color.theme.background)
+        .onAppear {
+            if discoverVM == nil {
+                discoverVM = DiscoverVM(authService: authService)
+            }
+            if ascentsVM == nil {
+                ascentsVM = AscentsVM(authService: authService)
+            }
+        }
     }
 }
 

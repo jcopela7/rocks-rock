@@ -2,8 +2,8 @@ import SwiftUI
 
 struct YouView: View {
     @State private var selected = "Activity"
-    @StateObject private var ascentsVM = AscentsVM()
-    @StateObject private var discoverVM = DiscoverVM()
+    @State private var ascentsVM: AscentsVM?
+    @State private var discoverVM: DiscoverVM?
     @EnvironmentObject var authService: AuthenticationService
 
     init() {
@@ -27,13 +27,25 @@ struct YouView: View {
                 )
                 .padding(.horizontal, 16)
                 Group {
-                    if selected == "Progress" {
-                        ProgressViewTab(viewModel: ascentsVM)
+                    if let ascentsVM = ascentsVM {
+                        if selected == "Progress" {
+                            ProgressViewTab(viewModel: ascentsVM)
+                        } else {
+                            ActivityLoggingView(ascentsVM: ascentsVM)
+                        }
                     } else {
-                        ActivityLoggingView(ascentsVM: ascentsVM)
+                        ProgressView()
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            }
+        }
+        .onAppear {
+            if discoverVM == nil {
+                discoverVM = DiscoverVM(authService: authService)
+            }
+            if ascentsVM == nil {
+                ascentsVM = AscentsVM(authService: authService)
             }
         }
     }

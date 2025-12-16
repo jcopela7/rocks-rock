@@ -24,18 +24,18 @@ final class APIClient {
         self.helpers = helpers
     }
 
-    // Convenience initializer to pass base/session without managing extra stored properties
-    convenience init(base: URL = AppConfig.apiBaseURL, session: URLSession = .shared) {
-        self.init(helpers: APIClientHelpers(base: base, session: session))
+    // Convenience initializer to pass base/session/accessToken without managing extra stored properties
+    convenience init(base: URL = AppConfig.apiBaseURL, session: URLSession = .shared, accessToken: String? = nil) {
+        self.init(helpers: APIClientHelpers(base: base, session: session, accessToken: accessToken))
     }
 
     // MARK: - Endpoints
 
-    func listAscents(userId: UUID, limit _: Int = 20) async throws -> [AscentDTO] {
+    func listAscents(limit: Int = 20) async throws -> [AscentDTO] {
         let env: APIListEnvelope<[AscentDTO]> = try await helpers.get(
             "ascent", // <- plural
             query: [
-                .init(name: "userId", value: userId.uuidString),
+                .init(name: "limit", value: String(limit)),
             ]
         )
         return env.data
@@ -56,16 +56,13 @@ final class APIClient {
         return env.data
     }
 
-    func getCountOfAscentsGroupByLocation(userId: UUID) async throws -> [CountOfAscentsByLocationDTO] {
-        let env: APIListEnvelope<[CountOfAscentsByLocationDTO]> = try await helpers.get("ascent/count/location", query: [
-            .init(name: "userId", value: userId.uuidString),
-        ])
+    func getCountOfAscentsGroupByLocation() async throws -> [CountOfAscentsByLocationDTO] {
+        let env: APIListEnvelope<[CountOfAscentsByLocationDTO]> = try await helpers.get("ascent/count/location")
         return env.data
     }
 
-    func getCountOfAscentsByGrade(userId: UUID, discipline: String) async throws -> [CountOfAscentsByGradeDTO] {
+    func getCountOfAscentsByGrade(discipline: String) async throws -> [CountOfAscentsByGradeDTO] {
         let env: APIListEnvelope<[CountOfAscentsByGradeDTO]> = try await helpers.get("ascent/count/grade", query: [
-            .init(name: "userId", value: userId.uuidString),
             .init(name: "discipline", value: discipline),
         ])
         return env.data

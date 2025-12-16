@@ -6,5 +6,7 @@
 	<string>Aas6NZygHZ1G5oSVyqnMwIOen5TCj8nc</string>
 	<key>Domain</key>
 	<string>dev-tf5cl0bxeufaqrds.us.auth0.com</string>
+	<key>Audience</key>
+	<string>estel-api</string>
 </dict>
 </plist>

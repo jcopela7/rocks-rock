@@ -61,7 +61,6 @@ struct CountOfAscentsByGradeDTO: Codable {
 }
 
 struct CreateAscentRequest: Encodable {
-    let userId: UUID
     let routeId: UUID?
     let locationId: UUID?
     let style: String

@@ -20,15 +20,25 @@ final class AscentsVM: ObservableObject {
     @Published var imagesByAscent: [UUID: [LocalImageRef]] = [:]
     @Published var searchText: String = ""
 
-    let api = APIClient()
+    var api: APIClient
     private let imagesKey = "imagesByAscent.v1"
+    private let authService: AuthenticationService
+    private var cancellables = Set<AnyCancellable>()
 
-    // demo IDs you seeded
-    let demoUser = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
-    let demoLocation = UUID(uuidString: "00000000-0000-0000-0000-000000000002")!
-
-    init() {
+    init(authService: AuthenticationService) {
+        self.authService = authService
+        // Initialize API client with access token (may be nil initially)
+        self.api = APIClient(accessToken: authService.accessToken)
         loadImageRefs()
+        
+        // Update API client when access token changes
+        authService.$accessToken
+            .sink { [weak self] token in
+                guard let self = self else { return }
+                print("🔄 Updating API client with new token: \(token != nil ? "present" : "nil")")
+                self.api = APIClient(accessToken: token)
+            }
+            .store(in: &cancellables)
     }
 
     // MARK: API
@@ -36,7 +46,7 @@ final class AscentsVM: ObservableObject {
     func loadAscents() async {
         loading = true; defer { loading = false }
         do {
-            ascents = try await api.listAscents(userId: demoUser)
+            ascents = try await api.listAscents()
             error = nil
         } catch {
             print("Backend error in load(): \(error)")
@@ -47,9 +57,8 @@ final class AscentsVM: ObservableObject {
     func addAttempt() async {
         do {
             let req = CreateAscentRequest(
-                userId: demoUser,
                 routeId: nil,
-                locationId: demoLocation,
+                locationId: nil, // You may want to set this based on user selection
                 style: "attempt",
                 attempts: 1,
                 rating: nil,
@@ -79,7 +88,7 @@ final class AscentsVM: ObservableObject {
     func loadCountOfAscentsGroupByLocation() async {
         loading = true; defer { loading = false }
         do {
-            let count = try await api.getCountOfAscentsGroupByLocation(userId: demoUser)
+            let count = try await api.getCountOfAscentsGroupByLocation()
             ascentsByLocation = count
             error = nil
         } catch {
@@ -91,7 +100,7 @@ final class AscentsVM: ObservableObject {
     func loadCountOfAscentsByGrade(discipline: String) async {
         loading = true; defer { loading = false }
         do {
-            let count = try await api.getCountOfAscentsByGrade(userId: demoUser, discipline: discipline)
+            let count = try await api.getCountOfAscentsByGrade(discipline: discipline)
             ascentsByGrade = count
             error = nil
         } catch {
@@ -143,6 +152,7 @@ final class AscentsVM: ObservableObject {
 
 struct AscentFormData {
     var routeId: UUID? = nil
+    var locationId: UUID? = nil
     var style: String = "attempt"
     var attempts: Int = 1
     var rating: String = ""
@@ -151,9 +161,8 @@ struct AscentFormData {
 
     var createAscentRequest: CreateAscentRequest {
         CreateAscentRequest(
-            userId: UUID(uuidString: "00000000-0000-0000-0000-000000000001")!, // demoUser
             routeId: routeId,
-            locationId: UUID(uuidString: "00000000-0000-0000-0000-000000000002")!, // demoLocation
+            locationId: locationId,
             style: style,
             attempts: attempts,
             rating: rating.isEmpty ? nil : Int(rating),

@@ -18,6 +18,7 @@ struct jonrocksApp: App {
                     LoadingView()
                 } else if authService.isAuthenticated {
                     ContentView()
+                        .environmentObject(authService)
                 } else {
                     UnauthenticatedView(authService: authService)
                 }

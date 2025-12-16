@@ -30,11 +30,13 @@ class AuthenticationService: ObservableObject {
         guard let credentials = try? await credentialsManager.credentials() else {
             isAuthenticated = false
             accessToken = nil
+            APIClient.shared.updateToken(nil)
             return
         }
         
         isAuthenticated = true
         accessToken = credentials.accessToken
+        APIClient.shared.updateToken(credentials.accessToken)
         // Get user info using the access token
         await fetchUserInfo(accessToken: credentials.accessToken)
     }
@@ -67,12 +69,14 @@ class AuthenticationService: ObservableObject {
             _ = credentialsManager.store(credentials: credentials)
             isAuthenticated = true
             accessToken = credentials.accessToken
+            APIClient.shared.updateToken(credentials.accessToken)
             print("✅ Login successful, access token length: \(credentials.accessToken.count)")
             // Get user info using the access token
             await fetchUserInfo(accessToken: credentials.accessToken)
         } catch {
             errorMessage = "Login failed: \(error.localizedDescription)"
             accessToken = nil
+            APIClient.shared.updateToken(nil)
             print("❌ Login error: \(error.localizedDescription)")
         }
     }
@@ -87,6 +91,7 @@ class AuthenticationService: ObservableObject {
             isAuthenticated = false
             user = nil
             accessToken = nil
+            APIClient.shared.updateToken(nil)
         } catch {
             errorMessage = "Logout failed: \(error.localizedDescription)"
         }

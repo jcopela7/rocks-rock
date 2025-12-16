@@ -23,22 +23,11 @@ final class AscentsVM: ObservableObject {
     var api: APIClient
     private let imagesKey = "imagesByAscent.v1"
     private let authService: AuthenticationService
-    private var cancellables = Set<AnyCancellable>()
 
     init(authService: AuthenticationService) {
         self.authService = authService
-        // Initialize API client with access token (may be nil initially)
-        self.api = APIClient(accessToken: authService.accessToken)
+        self.api = APIClient.shared
         loadImageRefs()
-        
-        // Update API client when access token changes
-        authService.$accessToken
-            .sink { [weak self] token in
-                guard let self = self else { return }
-                print("🔄 Updating API client with new token: \(token != nil ? "present" : "nil")")
-                self.api = APIClient(accessToken: token)
-            }
-            .store(in: &cancellables)
     }
 
     // MARK: API

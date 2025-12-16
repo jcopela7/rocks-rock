@@ -12,12 +12,10 @@ final class APIClientHelpers {
     private let session: URLSession
     private let enc: JSONEncoder
     private let dec: JSONDecoder
-    private let accessToken: String?
 
-    init(base: URL = AppConfig.apiBaseURL, session: URLSession = .shared, accessToken: String? = nil) {
+    init(base: URL = AppConfig.apiBaseURL, session: URLSession = .shared) {
         self.base = base
         self.session = session
-        self.accessToken = accessToken
 
         enc = JSONEncoder()
         enc.dateEncodingStrategy = .iso8601
@@ -26,25 +24,19 @@ final class APIClientHelpers {
         dec.dateDecodingStrategy = .iso8601
     }
     
-    private func addAuthHeader(to request: inout URLRequest) {
-        if let token = accessToken {
-            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-            print("🔑 Adding Authorization header with token (length: \(token.count))")
-        } else {
-            let endpoint = request.url?.path ?? "unknown"
-            let method = request.httpMethod ?? "GET"
-            print("⚠️ No access token available for request: \(method) \(endpoint)")
-        }
+    private func addAuthHeader(to request: inout URLRequest, token: String) {
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        print("🔑 Adding Authorization header with token (length: \(token.count))")
     }
 
-    func get<T: Decodable>(_ path: String, query: [URLQueryItem] = []) async throws -> T {
+    func get<T: Decodable>(_ path: String, query: [URLQueryItem] = [], token: String) async throws -> T {
         var comps = URLComponents(url: base.appendingPathComponent(path), resolvingAgainstBaseURL: false)!
         if !query.isEmpty { comps.queryItems = query }
         guard let url = comps.url else { throw APIError.invalidURL }
         
         print("🌐 GET \(url.path)")
         var req = URLRequest(url: url)
-        addAuthHeader(to: &req)
+        addAuthHeader(to: &req, token: token)
 
         let (data, resp) = try await session.data(for: req)
         let http = resp as? HTTPURLResponse
@@ -73,13 +65,13 @@ final class APIClientHelpers {
         }
     }
 
-    func post<Body: Encodable, T: Decodable>(_ path: String, body: Body) async throws -> T {
+    func post<Body: Encodable, T: Decodable>(_ path: String, body: Body, token: String) async throws -> T {
         let url = base.appendingPathComponent(path)
         var req = URLRequest(url: url)
         req.httpMethod = "POST"
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
         req.httpBody = try enc.encode(body)
-        addAuthHeader(to: &req)
+        addAuthHeader(to: &req, token: token)
 
         let (data, resp) = try await session.data(for: req)
         guard let http = resp as? HTTPURLResponse, (200 ..< 300).contains(http.statusCode) else {
@@ -90,11 +82,11 @@ final class APIClientHelpers {
         catch { throw APIError.decode(error) }
     }
 
-    func delete<T: Decodable>(_ path: String, body: Encodable? = nil) async throws -> T {
+    func delete<T: Decodable>(_ path: String, body: Encodable? = nil, token: String) async throws -> T {
         let url = base.appendingPathComponent(path)
         var req = URLRequest(url: url)
         req.httpMethod = "DELETE"
-        addAuthHeader(to: &req)
+        addAuthHeader(to: &req, token: token)
 
         if let body = body {
             req.httpBody = try enc.encode(body)

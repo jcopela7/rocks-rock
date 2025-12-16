@@ -17,17 +17,7 @@ final class DiscoverVM: ObservableObject {
 
     init(authService: AuthenticationService) {
         self.authService = authService
-        // Initialize API client with access token (may be nil initially)
-        self.api = APIClient(accessToken: authService.accessToken)
-        
-        // Update API client when access token changes
-        authService.$accessToken
-            .sink { [weak self] token in
-                guard let self = self else { return }
-                print("🔄 DiscoverVM: Updating API client with new token: \(token != nil ? "present" : "nil")")
-                self.api = APIClient(accessToken: token)
-            }
-            .store(in: &cancellables)
+        self.api = APIClient.shared
     }
 
     var filteredLocations: [LocationDTO] {
@@ -43,33 +33,15 @@ final class DiscoverVM: ObservableObject {
     }
 
     func loadRoutes() async {
-        // Ensure we have a token before making the request
-        if authService.accessToken == nil {
-            print("⏳ Waiting for access token...")
-            // Wait for token to become available (with timeout)
-            for _ in 0..<10 {
-                try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
-                if authService.accessToken != nil {
-                    break
-                }
-            }
-        }
-        
-        // Ensure API client has the latest token
-        if let token = authService.accessToken {
-            self.api = APIClient(accessToken: token)
-        }
-        
-        // Double-check we have a token
-        guard authService.accessToken != nil else {
-            self.error = "Authentication required. Please log in."
-            print("❌ No access token available for loadRoutes()")
-            return
-        }
-        
         do {
             routes = try await api.listRoutes()
             error = nil
+        } catch let apiError as APIError {
+            if case .missingAccessToken = apiError {
+                self.error = "Authentication required. Please log in."
+            } else {
+                self.error = apiError.errorDescription
+            }
         } catch {
             print("Backend error in loadRoutes(): \(error)")
             self.error = error.localizedDescription
@@ -80,34 +52,16 @@ final class DiscoverVM: ObservableObject {
         loading = true
         defer { loading = false }
         
-        // Ensure we have a token before making the request
-        if authService.accessToken == nil {
-            print("⏳ Waiting for access token...")
-            // Wait for token to become available (with timeout)
-            for _ in 0..<10 {
-                try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
-                if authService.accessToken != nil {
-                    break
-                }
-            }
-        }
-        
-        // Ensure API client has the latest token
-        if let token = authService.accessToken {
-            self.api = APIClient(accessToken: token)
-        }
-        
-        // Double-check we have a token
-        guard authService.accessToken != nil else {
-            self.error = "Authentication required. Please log in."
-            print("❌ No access token available for loadLocations()")
-            return
-        }
-        
         do {
             let loadedLocations = try await api.listLocations()
             locations = loadedLocations
             error = nil
+        } catch let apiError as APIError {
+            if case .missingAccessToken = apiError {
+                self.error = "Authentication required. Please log in."
+            } else {
+                self.error = apiError.errorDescription
+            }
         } catch {
             print("❌ Backend error in loadLocations(): \(error)")
             print("❌ Error type: \(type(of: error))")
@@ -121,28 +75,19 @@ final class DiscoverVM: ObservableObject {
 
      func loadFilteredRoutesByLocation(for locationId: UUID) async {
 
-        if authService.accessToken == nil {
-            print("⏳ Waiting for access token...")
-            // Wait for token to become available (with timeout)
-            for _ in 0..<10 {
-                try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
-                if authService.accessToken != nil {
-                    break
-                }
-            }
-        }
-
-        // Ensure API client has the latest token
-        if let token = authService.accessToken {
-            self.api = APIClient(accessToken: token)
-        }
-
         loading = true
         error = nil
 
         do {
             let allRoutes = try await api.listRoutes()
             routes = allRoutes.filter { $0.locationId == locationId }
+            loading = false
+        } catch let apiError as APIError {
+            if case .missingAccessToken = apiError {
+                self.error = "Authentication required. Please log in."
+            } else {
+                self.error = apiError.errorDescription
+            }
             loading = false
         } catch {
             print("Error loading routes: \(error)")

@@ -11,6 +11,7 @@ import {
 /** Core user profile mirrored from your auth provider */
 export const appUser = pgTable('app_user', {
   id: uuid('id').primaryKey(), // use your auth/user UUID
+  auth0Sub: text('auth0_sub').unique(), // Auth0 sub claim (e.g., "auth0|...") - nullable for legacy users
   displayName: text('display_name').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });

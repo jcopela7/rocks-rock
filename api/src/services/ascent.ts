@@ -8,7 +8,6 @@ type UUID = string; // keep simple; you can add a UUID zod later
 
 export const CreateAscentInput = z
   .object({
-    userId: z.string(),
     routeId: z.string().optional(),
     locationId: z.string().optional(),
     style: z.enum(['attempt', 'send', 'flash', 'onsight', 'redpoint']),
@@ -20,7 +19,7 @@ export const CreateAscentInput = z
 
 export type CreateAscentInputType = z.infer<typeof CreateAscentInput>;
 
-export async function createAscent(input: CreateAscentInputType) {
+export async function createAscent(input: CreateAscentInputType, userId: string) {
   const data = CreateAscentInput.parse(input);
 
   // If both provided, we accept it (route + location). If only routeId is given,
@@ -30,7 +29,7 @@ export async function createAscent(input: CreateAscentInputType) {
     .insert(ascent)
     .values({
       id: crypto.randomUUID(),
-      userId: data.userId,
+      userId: userId,
       routeId: data.routeId ?? null,
       locationId: data.locationId ?? null,
       style: data.style,
@@ -47,8 +46,7 @@ export async function createAscent(input: CreateAscentInputType) {
 /** Simple query helper: fetch latest ascents with optional filters */
 export const ListAscentsQuery = z.object({
   id: z.string().optional(),
-  userId: z.string(),
-  limit: z.number().int().min(1).max(100).default(20),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
   after: z.coerce.date().optional(), // fetch ascents after this date
   before: z.coerce.date().optional(), // or before this date
   style: z.enum(['attempt', 'send', 'flash', 'onsight', 'project']).optional(),
@@ -61,10 +59,10 @@ export const ListAscentsQuery = z.object({
 
 export type ListAscentsQueryType = z.infer<typeof ListAscentsQuery>;
 
-export async function listAscents(body: ListAscentsQueryType) {
+export async function listAscents(body: ListAscentsQueryType, userId: string) {
   const params = ListAscentsQuery.parse(body);
 
-  const conditions = [eq(ascent.userId, params.userId)];
+  const conditions = [eq(ascent.userId, userId)];
 
   if (params.id) {
     conditions.push(eq(ascent.id, params.id));
@@ -102,7 +100,7 @@ export async function listAscents(body: ListAscentsQueryType) {
   return rows;
 }
 
-export async function getAscentDetail(id: string) {
+export async function getAscentDetail(id: string, userId: string) {
   const query = db
    .select({
     ...getTableColumns(ascent),
@@ -112,25 +110,23 @@ export async function getAscentDetail(id: string) {
    }).from(ascent)
    .leftJoin(route, eq(ascent.routeId, route.id))
    .leftJoin(location, eq(ascent.locationId, location.id))
-   .where(eq(ascent.id, id!))
+   .where(and(eq(ascent.id, id!), eq(ascent.userId, userId)))
    .orderBy(desc(ascent.climbedAt));
   const rows = await query;
-  return rows;
+  return rows[0] || null;
 }
 
-export const GetCountOfAscentsByLocationQuery = z.object({
-  userId: z.string(),
-});
+export const GetCountOfAscentsByLocationQuery = z.object({});
 export type GetCountOfAscentsByLocationQueryType = z.infer<typeof GetCountOfAscentsByLocationQuery>;
 
-export async function getCountOfAscentsGroupByLocation(body: GetCountOfAscentsByLocationQueryType) {
+export async function getCountOfAscentsGroupByLocation(userId: string) {
   const query = db
   .select({
     locationName: location.name,
     totalAscents: count(ascent.id),
   }).from(ascent)
   .leftJoin(location, eq(ascent.locationId, location.id))
-  .where(eq(ascent.userId, body.userId))
+  .where(eq(ascent.userId, userId))
   .groupBy(location.name);
 
   const rows = await query;
@@ -138,12 +134,11 @@ export async function getCountOfAscentsGroupByLocation(body: GetCountOfAscentsBy
 }
 
 export const GetCountOfAscentsByGradeQuery = z.object({
-  userId: z.string(),
   discipline: z.enum(['boulder', 'sport', 'trad', 'board']),
 });
 export type GetCountOfAscentsByGradeQueryType = z.infer<typeof GetCountOfAscentsByGradeQuery>;
 
-export async function getCountOfAscentsByGrade(body: GetCountOfAscentsByGradeQueryType) {
+export async function getCountOfAscentsByGrade(body: GetCountOfAscentsByGradeQueryType, userId: string) {
   const query = db
   .select({
     routeDiscipline: route.discipline,
@@ -153,14 +148,17 @@ export async function getCountOfAscentsByGrade(body: GetCountOfAscentsByGradeQue
     totalAscents: count(ascent.id),
   }).from(ascent)
   .leftJoin(route, eq(ascent.routeId, route.id))
-  .where(and(eq(ascent.userId, body.userId), eq(route.discipline, body.discipline)))
+  .where(and(eq(ascent.userId, userId), eq(route.discipline, body.discipline)))
   .groupBy(route.discipline, route.gradeSystem, route.gradeValue, route.gradeRank);
 
   const rows = await query;
   return rows;
 }
 
-export async function deleteAscent(id: string) {
-  const [row] = await db.delete(ascent).where(eq(ascent.id, id)).returning();
-  return row;
+export async function deleteAscent(id: string, userId: string) {
+  const [row] = await db
+    .delete(ascent)
+    .where(and(eq(ascent.id, id), eq(ascent.userId, userId)))
+    .returning();
+  return row || null;
 }

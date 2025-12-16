@@ -4,7 +4,12 @@ import SwiftUI
 
 struct LocationDetailView: View {
     let location: LocationDTO
-    @StateObject private var viewModel = LocationDetailViewModel()
+    @StateObject private var viewModel: DiscoverVM
+
+    init(location: LocationDTO, authService: AuthenticationService) {
+        self.location = location
+        _viewModel = StateObject(wrappedValue: DiscoverVM(authService: authService))
+    }
 
     var body: some View {
         ScrollView {
@@ -87,8 +92,10 @@ struct LocationDetailView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
-        .task {
-            await viewModel.loadRoutes(for: location.id)
+        .onAppear {
+            Task {
+                await viewModel.loadFilteredRoutesByLocation(for: location.id)
+            }
         }
     }
 }
@@ -147,29 +154,5 @@ struct RouteRowView: View {
         .padding(.horizontal, 16)
         .background(Color(.systemGray6).opacity(0.5))
         .clipShape(RoundedRectangle(cornerRadius: 12))
-    }
-}
-
-@MainActor
-final class LocationDetailViewModel: ObservableObject {
-    @Published var routes: [RouteDTO] = []
-    @Published var loading: Bool = false
-    @Published var error: String? = nil
-
-    let api = APIClient()
-
-    func loadRoutes(for locationId: UUID) async {
-        loading = true
-        error = nil
-
-        do {
-            let allRoutes = try await api.listRoutes()
-            routes = allRoutes.filter { $0.locationId == locationId }
-            loading = false
-        } catch {
-            print("Error loading routes: \(error)")
-            self.error = error.localizedDescription
-            loading = false
-        }
     }
 }

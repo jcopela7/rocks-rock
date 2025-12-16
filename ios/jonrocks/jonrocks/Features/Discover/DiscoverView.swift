@@ -76,6 +76,7 @@ struct DiscoverView: View {
 }
 
 struct LocationsContentView: View {
+    @EnvironmentObject var authService: AuthenticationService
     @ObservedObject var discoverVM: DiscoverVM
     
     var body: some View {
@@ -141,7 +142,12 @@ struct LocationsContentView: View {
                 }
             } else {
                 List(discoverVM.filteredLocations) { location in
-                    NavigationLink(destination: LocationDetailView(location: location)) {
+                    NavigationLink(
+                        destination: LocationDetailView(
+                            location: location,
+                            authService: authService
+                        )
+                    ) {
                         LocationRowView(location: location)
                     }
                     .listRowSeparator(.visible)

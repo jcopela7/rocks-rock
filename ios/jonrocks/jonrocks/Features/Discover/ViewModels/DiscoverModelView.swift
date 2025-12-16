@@ -105,18 +105,9 @@ final class DiscoverVM: ObservableObject {
         }
         
         do {
-            print("📡 Making API call to listLocations()...")
-            print("📡 API client token present: \(authService.accessToken != nil ? "YES" : "NO")")
             let loadedLocations = try await api.listLocations()
-            print("✅ API call successful! Loaded \(loadedLocations.count) locations")
-            if loadedLocations.isEmpty {
-                print("⚠️ API returned empty array - no locations in database")
-            } else {
-                print("📋 Location names: \(loadedLocations.map { $0.name }.joined(separator: ", "))")
-            }
             locations = loadedLocations
             error = nil
-            print("✅ Updated locations array, count: \(locations.count)")
         } catch {
             print("❌ Backend error in loadLocations(): \(error)")
             print("❌ Error type: \(type(of: error))")
@@ -125,6 +116,38 @@ final class DiscoverVM: ObservableObject {
                 print("❌ API Error: \(apiError.errorDescription ?? "unknown")")
             }
             locations = [] // Clear locations on error
+        }
+    }
+
+     func loadFilteredRoutesByLocation(for locationId: UUID) async {
+
+        if authService.accessToken == nil {
+            print("⏳ Waiting for access token...")
+            // Wait for token to become available (with timeout)
+            for _ in 0..<10 {
+                try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+                if authService.accessToken != nil {
+                    break
+                }
+            }
+        }
+
+        // Ensure API client has the latest token
+        if let token = authService.accessToken {
+            self.api = APIClient(accessToken: token)
+        }
+
+        loading = true
+        error = nil
+
+        do {
+            let allRoutes = try await api.listRoutes()
+            routes = allRoutes.filter { $0.locationId == locationId }
+            loading = false
+        } catch {
+            print("Error loading routes: \(error)")
+            self.error = error.localizedDescription
+            loading = false
         }
     }
 }

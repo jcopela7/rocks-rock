@@ -4,7 +4,7 @@ struct YouView: View {
     @State private var selected = "Activity"
     @StateObject private var ascentsVM = AscentsVM()
     @StateObject private var discoverVM = DiscoverVM()
-    @State private var showingAddForm = false
+    @EnvironmentObject var authService: AuthenticationService
 
     init() {
         UISegmentedControl.appearance().selectedSegmentTintColor = UIColor(Color.theme.accent)
@@ -16,9 +16,11 @@ struct YouView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 12) {
-                AppHeader(title: "You") {
-                    showingAddForm = true
-                }
+                AppHeader(title: "You", onAddTap: {
+                    Task {
+                        await authService.logout()
+                    }
+                }, buttonLabel: "Log Out")
                 SegmentedPicker(
                     selection: $selected,
                     segments: ["Progress", "Activity"]
@@ -32,9 +34,6 @@ struct YouView: View {
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            }
-            .sheet(isPresented: $showingAddForm) {
-                AddActivityFormView(ascentsVM: ascentsVM, discoverVM: discoverVM)
             }
         }
     }

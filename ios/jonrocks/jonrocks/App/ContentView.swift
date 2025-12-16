@@ -6,6 +6,15 @@ import SwiftUI
 struct AppHeader: View {
     let title: String
     let onAddTap: (() -> Void)?
+    let buttonLabel: String?
+    let buttonIcon: String?
+
+    init(title: String, onAddTap: (() -> Void)? = nil, buttonLabel: String? = nil, buttonIcon: String? = nil) {
+        self.title = title
+        self.onAddTap = onAddTap
+        self.buttonLabel = buttonLabel ?? "Add"
+        self.buttonIcon = buttonIcon ?? "plus"
+    }
 
     var body: some View {
         HStack {
@@ -15,7 +24,7 @@ struct AppHeader: View {
             Spacer()
             if let onAddTap = onAddTap {
                 Button(action: onAddTap) {
-                    Label("Add", systemImage: "plus")
+                    Label(buttonLabel ?? "Add", systemImage: buttonIcon ?? "plus")
                         .fontWeight(.semibold)
                         .padding(.horizontal, 14)
                         .padding(.vertical, 6)

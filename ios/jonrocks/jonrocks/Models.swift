@@ -1,75 +1,75 @@
 import Foundation
 
 struct APIListEnvelope<T: Decodable>: Decodable {
-    let data: T
+  let data: T
 }
 
 struct UserDTO: Codable, Identifiable {
-    let id: UUID
-    let displayName: String
-    let createdAt: Date?
+  let id: UUID
+  let displayName: String
+  let createdAt: Date?
 }
 
 struct LocationDTO: Codable, Identifiable {
-    let id: UUID
-    let name: String
-    let type: String // "gym" | "crag"
-    let description: String?
-    let latitude: Double?
-    let longitude: Double?
+  let id: UUID
+  let name: String
+  let type: String  // "gym" | "crag"
+  let description: String?
+  let latitude: Double?
+  let longitude: Double?
 }
 
 struct RouteDTO: Codable, Identifiable {
-    let id: UUID
-    let locationId: UUID
-    let name: String?
-    let discipline: String // "boulder" | "sport" | "trad"
-    let description: String?
-    let gradeSystem: String // "V" | "YDS" | "Font"
-    let gradeValue: String
-    let gradeRank: Int
-    let color: String?
-    let createdAt: Date?
-    let updatedAt: Date?
+  let id: UUID
+  let locationId: UUID
+  let name: String?
+  let discipline: String  // "boulder" | "sport" | "trad"
+  let description: String?
+  let gradeSystem: String  // "V" | "YDS" | "Font"
+  let gradeValue: String
+  let gradeRank: Int
+  let color: String?
+  let createdAt: Date?
+  let updatedAt: Date?
 }
 
 struct AscentDTO: Codable, Identifiable {
-    let id: UUID
-    let userId: UUID
-    let routeId: UUID?
-    let routeName: String?
-    let locationId: UUID?
-    let locationName: String?
-    let style: String
-    let attempts: Int
-    let rating: Int?
-    let notes: String?
-    let climbedAt: Date
+  let id: UUID
+  let userId: UUID
+  let routeId: UUID?
+  let routeName: String?
+  let locationId: UUID?
+  let locationName: String?
+  let style: String
+  let attempts: Int
+  let rating: Int?
+  let notes: String?
+  let climbedAt: Date
 }
 
 struct CountOfAscentsByLocationDTO: Codable {
-    let locationName: String
-    let totalAscents: Int
+  let locationName: String
+  let totalAscents: Int
 }
 
 struct CountOfAscentsByGradeDTO: Codable {
-    let routeDiscipline: String
-    let gradeSystem: String
-    let gradeValue: String
-    let gradeRank: Int
-    let totalAscents: Int
+  let routeDiscipline: String
+  let gradeSystem: String
+  let gradeValue: String
+  let gradeRank: Int
+  let totalAscents: Int
 }
 
 struct CreateAscentRequest: Encodable {
-    let routeId: UUID?
-    let locationId: UUID?
-    let style: String
-    let attempts: Int
-    let rating: Int?
-    let notes: String?
-    let climbedAt: Date
+  let routeId: UUID?
+  let locationId: UUID?
+  let style: String
+  let attempts: Int
+  let rating: Int?
+  let notes: String?
+  let climbedAt: Date
 }
 
 struct DeleteAscentRequest: Encodable {
-    let id: UUID
+  let id: UUID
 }

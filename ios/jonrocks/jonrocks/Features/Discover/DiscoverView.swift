@@ -45,7 +45,7 @@ struct DiscoverView: View {
           if let discoverVM = discoverVM {
             LocationsContentView(discoverVM: discoverVM)
           } else {
-            ProgressView()
+            LoadingView()
               .frame(maxWidth: .infinity, maxHeight: .infinity)
           }
         }
@@ -82,7 +82,7 @@ struct LocationsContentView: View {
   var body: some View {
     Group {
       if discoverVM.loading {
-        ProgressView()
+        LoadingView()
           .frame(maxWidth: .infinity, maxHeight: .infinity)
       } else if let error = discoverVM.error {
         VStack(spacing: 12) {

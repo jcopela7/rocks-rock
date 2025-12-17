@@ -96,7 +96,7 @@ struct ActivityLoggingView: View {
 
   private var loadingOverlay: some View {
     Group {
-      if ascentsVM.loading { ProgressView() }
+      if ascentsVM.loading { LoadingView() }
       if let e = ascentsVM.error {
         Text(e).foregroundStyle(.red).padding()
       }

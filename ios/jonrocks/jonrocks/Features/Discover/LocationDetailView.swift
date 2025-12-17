@@ -59,7 +59,7 @@ struct LocationDetailView: View {
             .padding(.horizontal, 16)
 
           if viewModel.loading {
-            ProgressView()
+            LoadingView()
               .frame(maxWidth: .infinity)
               .padding()
           } else if let error = viewModel.error {

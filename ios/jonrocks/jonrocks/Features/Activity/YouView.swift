@@ -37,7 +37,7 @@ struct YouView: View {
               ActivityLoggingView(ascentsVM: ascentsVM)
             }
           } else {
-            ProgressView()
+            LoadingView()
           }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)

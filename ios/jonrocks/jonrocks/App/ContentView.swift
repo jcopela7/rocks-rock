@@ -43,17 +43,6 @@ struct AppHeader: View {
   }
 }
 
-struct ProgressView: View {
-  var body: some View {
-    VStack {
-      Text("Your climbing progress and statistics will appear here.")
-        .font(.body)
-        .foregroundStyle(.secondary)
-        .multilineTextAlignment(.center)
-    }
-  }
-}
-
 struct ContentView: View {
   var body: some View {
     TabView {

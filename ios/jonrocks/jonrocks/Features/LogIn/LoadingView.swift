@@ -9,7 +9,7 @@ struct LoadingView: View {
       RadialGradient(
         colors: [
           Color.purple.opacity(0.45),
-          Color.blue.opacity(0.70)
+          Color.blue.opacity(0.70),
         ],
         center: t ? .topLeading : .topTrailing,
         startRadius: 40,

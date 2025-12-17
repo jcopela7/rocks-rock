@@ -1,8 +1,12 @@
 // src/routes/ascents.ts
 import { FastifyInstance } from 'fastify';
-import { createUser, CreateUserInput, listUsers } from '../services/users.js';
+import { createUser, CreateUserInput, UpdateUserInput, updateUser, getUser } from '../services/users.js';
+import { authenticateUser } from '../middleware/auth.js';
 
-export async function userRoutes(app: FastifyInstance) {
+
+export async function user(app: FastifyInstance) {
+  app.addHook('onRequest', authenticateUser);
+  
   // Create user
   app.post('/user', async (req, reply) => {
     const body = CreateUserInput.parse(req.body);
@@ -10,9 +14,22 @@ export async function userRoutes(app: FastifyInstance) {
     return reply.code(201).send(created);
   });
 
-  // List users
-  app.get('/user', async () => {
-    const rows = await listUsers();
-    return { data: rows };
+  // Get user
+  app.get('/user/me', async (req, reply) => {
+    if (!req.user) {
+      return reply.code(401).send({ error: 'Unauthorized' });
+    }
+    const user = await getUser(req.user.id);
+    return reply.code(200).send(user);
+  });
+
+  // Update user
+  app.put('/user/me', async (req, reply) => {
+    if (!req.user) {
+      return reply.code(401).send({ error: 'Unauthorized' });
+    }
+    const body = UpdateUserInput.parse(req.body);
+    const updated = await updateUser(body, req.user.id);
+    return reply.code(200).send(updated);
   });
 }

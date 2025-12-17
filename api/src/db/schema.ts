@@ -13,6 +13,8 @@ export const appUser = pgTable('app_user', {
   id: uuid('id').primaryKey(), // use your auth/user UUID
   auth0Sub: text('auth0_sub').unique(), // Auth0 sub claim (e.g., "auth0|...") - nullable for legacy users
   displayName: text('display_name').notNull(),
+  email: text('email'),
+  firstName: text('first_name'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 

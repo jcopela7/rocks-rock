@@ -7,11 +7,13 @@ import { z } from 'zod';
 export const CreateUserInput = z.object({
   userId: z.string().uuid(),
   displayName: z.string(),
+  email: z.string().email().optional(),
+  firstName: z.string().optional(),
 });
 
-export type CreateUserInput = z.infer<typeof CreateUserInput>;
+export type CreateUserInputType = z.infer<typeof CreateUserInput>;
 
-export async function createUser(input: CreateUserInput) {
+export async function createUser(input: CreateUserInputType) {
   const data = CreateUserInput.parse(input);
 
   const [row] = await db
@@ -20,9 +22,50 @@ export async function createUser(input: CreateUserInput) {
       id: data.userId,
       auth0Sub: null, // Legacy support - this should not be used for new users
       displayName: data.displayName,
+      email: data.email,
+      firstName: data.firstName,
     })
     .returning();
 
+  return row;
+}
+
+export const UpdateUserInput = z.object({
+  displayName: z.string().min(1).optional(),
+  firstName: z.string().min(1).optional(),
+});
+
+export type UpdateUserInputType = z.infer<typeof UpdateUserInput>;
+
+export async function updateUser(input: UpdateUserInputType, userId: string) {
+  const data = UpdateUserInput.parse(input);
+
+  const [row] = await db
+    .update(appUser)
+    .set({
+      ...(data.displayName !== undefined ? { displayName: data.displayName } : {}),
+      ...(data.firstName !== undefined ? { firstName: data.firstName } : {}),
+    })
+    .where(eq(appUser.id, userId))
+    .returning({
+      id: appUser.id,
+      displayName: appUser.displayName,
+      firstName: appUser.firstName,
+    });
+
+  return row;
+}
+
+export async function getUser(userId: string) {
+  const [row] = await db
+    .select({
+      id: appUser.id,
+      displayName: appUser.displayName,
+      firstName: appUser.firstName,
+    })
+    .from(appUser)
+    .where(eq(appUser.id, userId))
+    .limit(1);
   return row;
 }
 
@@ -64,16 +107,4 @@ export async function getOrCreateUserByAuth0Sub(
     .returning();
 
   return newUser;
-}
-
-export async function listUsers() {
-  // Use raw SQL for date ranges (clear & indexed)
-  const sql = `
-    SELECT * FROM app_user
-    ORDER BY created_at DESC
-  `;
-
-  // For brevity, use `db.execute` here (typed results still work fine)
-  const res = await db.execute(sql);
-  return (res as unknown as { rows: unknown[] }).rows;
 }

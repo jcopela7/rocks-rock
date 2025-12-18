@@ -59,9 +59,7 @@ struct LocationDetailView: View {
             .padding(.horizontal, 16)
 
           if viewModel.loading {
-            LoadingView()
-              .frame(maxWidth: .infinity)
-              .padding()
+            LoadingListView()
           } else if let error = viewModel.error {
             VStack {
               Text("Error loading routes")

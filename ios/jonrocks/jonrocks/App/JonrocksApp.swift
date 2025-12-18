@@ -15,7 +15,7 @@ struct jonrocksApp: App {
     WindowGroup {
       Group {
         if authService.isLoading {
-          LoadingView()
+          LoginLoadingView()
         } else if authService.isAuthenticated {
           ContentView()
             .environmentObject(authService)

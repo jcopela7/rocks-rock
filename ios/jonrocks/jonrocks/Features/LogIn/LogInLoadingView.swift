@@ -1,6 +1,8 @@
 import SwiftUI
 
-struct LoadingView: View {
+/// Loading/splash view used during authentication bootstrap.
+/// Note: Named to avoid collision with the shared list/page `LoadingView`.
+struct LoginLoadingView: View {
   @State private var t = false
   @State private var showContent = false
 

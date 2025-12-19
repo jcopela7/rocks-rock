@@ -93,13 +93,18 @@ final class APIClient {
     return env.data
   }
 
-  func listUsers() async throws -> [UserDTO] {
-    let env: APIListEnvelope<[UserDTO]> = try await helpers.get("users", token: try requireToken())
+  func listRoutes() async throws -> [RouteDTO] {
+    let env: APIListEnvelope<[RouteDTO]> = try await helpers.get("route", token: try requireToken())
     return env.data
   }
 
-  func listRoutes() async throws -> [RouteDTO] {
-    let env: APIListEnvelope<[RouteDTO]> = try await helpers.get("route", token: try requireToken())
+  func getUser() async throws -> UserDTO {
+    let env: APIListEnvelope<UserDTO> = try await helpers.get("user/me", token: try requireToken())
+    return env.data
+  }
+
+  func updateUser(_ req: UpdateUserRequest) async throws -> UserDTO {
+    let env: APIListEnvelope<UserDTO> = try await helpers.put("user/me", body: req, token: try requireToken())
     return env.data
   }
 }

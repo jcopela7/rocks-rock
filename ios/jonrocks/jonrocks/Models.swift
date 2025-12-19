@@ -7,7 +7,14 @@ struct APIListEnvelope<T: Decodable>: Decodable {
 struct UserDTO: Codable, Identifiable {
   let id: UUID
   let displayName: String
+  let email: String?
+  let firstName: String?
   let createdAt: Date?
+}
+
+struct UpdateUserRequest: Encodable {
+  let displayName: String
+  let firstName: String?
 }
 
 struct LocationDTO: Codable, Identifiable {

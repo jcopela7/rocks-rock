@@ -86,6 +86,22 @@ final class APIClientHelpers {
     do { return try dec.decode(T.self, from: data) } catch { throw APIError.decode(error) }
   }
 
+  func put<Body: Encodable, T: Decodable>(_ path: String, body: Body, token: String) async throws -> T {
+    let url = base.appendingPathComponent(path)
+    var req = URLRequest(url: url)
+    req.httpMethod = "PUT"
+    req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+    req.httpBody = try enc.encode(body)
+    addAuthHeader(to: &req, token: token)
+  
+    let (data, resp) = try await session.data(for: req)
+    guard let http = resp as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
+      let body = String(data: data, encoding: .utf8)
+      throw APIError.badStatus((resp as? HTTPURLResponse)?.statusCode ?? -1, body)
+    }
+    do { return try dec.decode(T.self, from: data) } catch { throw APIError.decode(error) }
+  }
+
   func delete<T: Decodable>(_ path: String, body: Encodable? = nil, token: String) async throws -> T
   {
     let url = base.appendingPathComponent(path)

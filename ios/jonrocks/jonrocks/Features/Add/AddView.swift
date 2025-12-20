@@ -15,7 +15,7 @@ struct AddView: View {
 
   var body: some View {
     VStack(spacing: 0) {
-      AppHeader(title: "Add", onAddTap: nil)
+      AppHeader(title: "Add")
       HStack(spacing: 24) {
         FilterIconButton(
           icon: "crashpadIcon",

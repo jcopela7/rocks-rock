@@ -6,12 +6,12 @@ import SwiftUI
 struct AppHeader: View {
   let title: String
   let onSettingsTap: (() -> Void)?
-  let showSettingsButton: Bool
+  let showSettingsButton: Bool?
 
   init(
     title: String,
     onSettingsTap: (() -> Void)? = nil,
-    showSettingsButton: Bool = false
+    showSettingsButton: Bool? = nil
   ) {
     self.title = title
     self.onSettingsTap = onSettingsTap
@@ -25,7 +25,7 @@ struct AppHeader: View {
         .fontWeight(.bold)
       Spacer()
       HStack(spacing: 12) {
-        if showSettingsButton, let onSettingsTap = onSettingsTap {
+        if (showSettingsButton ?? false), let onSettingsTap = onSettingsTap {
           Button(action: onSettingsTap) {
             Image(systemName: "gearshape")
               .fontWeight(.semibold)

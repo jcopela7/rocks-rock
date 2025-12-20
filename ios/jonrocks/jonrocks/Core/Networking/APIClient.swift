@@ -48,6 +48,15 @@ final class APIClient {
     return token
   }
 
+  private func getRefreshTokenCallback() -> (() async -> String?)? {
+    return { @MainActor in
+      guard let authService = AuthenticationService.shared else {
+        return nil
+      }
+      return await authService.refreshTokenIfNeeded()
+    }
+  }
+
   // MARK: - Endpoints
 
   func listAscents(limit: Int = 20) async throws -> [AscentDTO] {
@@ -56,31 +65,47 @@ final class APIClient {
       query: [
         .init(name: "limit", value: String(limit))
       ],
-      token: try requireToken()
+      token: try requireToken(),
+      refreshToken: getRefreshTokenCallback()
     )
     return env.data
   }
 
   func createAscent(_ req: CreateAscentRequest) async throws -> AscentDTO {
     // backend alias: POST /api/v1/ascent
-    return try await helpers.post("ascent", body: req, token: try requireToken())
+    return try await helpers.post(
+      "ascent",
+      body: req,
+      token: try requireToken(),
+      refreshToken: getRefreshTokenCallback()
+    )
   }
 
   func deleteAscent(_ id: UUID) async throws -> AscentDTO {
     let env: APIListEnvelope<AscentDTO> = try await helpers.delete(
-      "ascent/\(id.uuidString)", token: try requireToken())
+      "ascent/\(id.uuidString)",
+      body: nil,
+      token: try requireToken(),
+      refreshToken: getRefreshTokenCallback()
+    )
     return env.data
   }
 
   func listLocations() async throws -> [LocationDTO] {
     let env: APIListEnvelope<[LocationDTO]> = try await helpers.get(
-      "location", token: try requireToken())
+      "location",
+      token: try requireToken(),
+      refreshToken: getRefreshTokenCallback()
+    )
     return env.data
   }
 
   func getCountOfAscentsGroupByLocation() async throws -> [CountOfAscentsByLocationDTO] {
     let env: APIListEnvelope<[CountOfAscentsByLocationDTO]> = try await helpers.get(
-      "ascent/count/location", token: try requireToken())
+      "ascent/count/location",
+      token: try requireToken(),
+      refreshToken: getRefreshTokenCallback()
+    )
     return env.data
   }
 
@@ -89,22 +114,38 @@ final class APIClient {
       "ascent/count/grade",
       query: [
         .init(name: "discipline", value: discipline)
-      ], token: try requireToken())
+      ],
+      token: try requireToken(),
+      refreshToken: getRefreshTokenCallback()
+    )
     return env.data
   }
 
   func listRoutes() async throws -> [RouteDTO] {
-    let env: APIListEnvelope<[RouteDTO]> = try await helpers.get("route", token: try requireToken())
+    let env: APIListEnvelope<[RouteDTO]> = try await helpers.get(
+      "route",
+      token: try requireToken(),
+      refreshToken: getRefreshTokenCallback()
+    )
     return env.data
   }
 
   func getUser() async throws -> UserDTO {
-    let env: APIListEnvelope<UserDTO> = try await helpers.get("user/me", token: try requireToken())
+    let env: APIListEnvelope<UserDTO> = try await helpers.get(
+      "user/me",
+      token: try requireToken(),
+      refreshToken: getRefreshTokenCallback()
+    )
     return env.data
   }
 
   func updateUser(_ req: UpdateUserRequest) async throws -> UserDTO {
-    let env: APIListEnvelope<UserDTO> = try await helpers.put("user/me", body: req, token: try requireToken())
+    let env: APIListEnvelope<UserDTO> = try await helpers.put(
+      "user/me",
+      body: req,
+      token: try requireToken(),
+      refreshToken: getRefreshTokenCallback()
+    )
     return env.data
   }
 }

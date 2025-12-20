@@ -12,6 +12,7 @@ final class APIClientHelpers {
   private let session: URLSession
   private let enc: JSONEncoder
   private let dec: JSONDecoder
+  private var refreshTask: Task<String?, Never>?
 
   init(base: URL = AppConfig.apiBaseURL, session: URLSession = .shared) {
     self.base = base
@@ -29,9 +30,29 @@ final class APIClientHelpers {
     print("🔑 Adding Authorization header with token (length: \(token.count))")
   }
 
-  func get<T: Decodable>(_ path: String, query: [URLQueryItem] = [], token: String) async throws
-    -> T
-  {
+  func get<T: Decodable>(
+    _ path: String,
+    query: [URLQueryItem] = [],
+    token: String,
+    refreshToken: (() async -> String?)? = nil
+  ) async throws -> T {
+    return try await performRequest(
+      path: path,
+      query: query,
+      method: "GET",
+      body: nil as String?,
+      token: token,
+      refreshToken: refreshToken
+    ) { token in
+      try await self.getWithoutRefresh(path, query: query, token: token)
+    }
+  }
+
+  private func getWithoutRefresh<T: Decodable>(
+    _ path: String,
+    query: [URLQueryItem] = [],
+    token: String
+  ) async throws -> T {
     var comps = URLComponents(
       url: base.appendingPathComponent(path), resolvingAgainstBaseURL: false)!
     if !query.isEmpty { comps.queryItems = query }
@@ -68,9 +89,29 @@ final class APIClientHelpers {
     }
   }
 
-  func post<Body: Encodable, T: Decodable>(_ path: String, body: Body, token: String) async throws
-    -> T
-  {
+  func post<Body: Encodable, T: Decodable>(
+    _ path: String,
+    body: Body,
+    token: String,
+    refreshToken: (() async -> String?)? = nil
+  ) async throws -> T {
+    return try await performRequest(
+      path: path,
+      query: [],
+      method: "POST",
+      body: body,
+      token: token,
+      refreshToken: refreshToken
+    ) { token in
+      try await self.postWithoutRefresh(path, body: body, token: token)
+    }
+  }
+
+  private func postWithoutRefresh<Body: Encodable, T: Decodable>(
+    _ path: String,
+    body: Body,
+    token: String
+  ) async throws -> T {
     let url = base.appendingPathComponent(path)
     var req = URLRequest(url: url)
     req.httpMethod = "POST"
@@ -86,7 +127,29 @@ final class APIClientHelpers {
     do { return try dec.decode(T.self, from: data) } catch { throw APIError.decode(error) }
   }
 
-  func put<Body: Encodable, T: Decodable>(_ path: String, body: Body, token: String) async throws -> T {
+  func put<Body: Encodable, T: Decodable>(
+    _ path: String,
+    body: Body,
+    token: String,
+    refreshToken: (() async -> String?)? = nil
+  ) async throws -> T {
+    return try await performRequest(
+      path: path,
+      query: [],
+      method: "PUT",
+      body: body,
+      token: token,
+      refreshToken: refreshToken
+    ) { token in
+      try await self.putWithoutRefresh(path, body: body, token: token)
+    }
+  }
+
+  private func putWithoutRefresh<Body: Encodable, T: Decodable>(
+    _ path: String,
+    body: Body,
+    token: String
+  ) async throws -> T {
     let url = base.appendingPathComponent(path)
     var req = URLRequest(url: url)
     req.httpMethod = "PUT"
@@ -102,8 +165,29 @@ final class APIClientHelpers {
     do { return try dec.decode(T.self, from: data) } catch { throw APIError.decode(error) }
   }
 
-  func delete<T: Decodable>(_ path: String, body: Encodable? = nil, token: String) async throws -> T
-  {
+  func delete<T: Decodable>(
+    _ path: String,
+    body: Encodable? = nil,
+    token: String,
+    refreshToken: (() async -> String?)? = nil
+  ) async throws -> T {
+    return try await performRequest(
+      path: path,
+      query: [],
+      method: "DELETE",
+      body: body,
+      token: token,
+      refreshToken: refreshToken
+    ) { token in
+      try await self.deleteWithoutRefresh(path, body: body, token: token)
+    }
+  }
+
+  private func deleteWithoutRefresh<T: Decodable>(
+    _ path: String,
+    body: Encodable? = nil,
+    token: String
+  ) async throws -> T {
     let url = base.appendingPathComponent(path)
     var req = URLRequest(url: url)
     req.httpMethod = "DELETE"
@@ -126,5 +210,48 @@ final class APIClientHelpers {
     }
 
     do { return try dec.decode(T.self, from: data) } catch { throw APIError.decode(error) }
+  }
+
+  /// Generic request handler that supports token refresh on 401 errors
+  private func performRequest<T>(
+    path: String,
+    query: [URLQueryItem],
+    method: String,
+    body: (any Encodable)?,
+    token: String,
+    refreshToken: (() async -> String?)?,
+    makeRequest: @escaping (String) async throws -> T
+  ) async throws -> T {
+    // First attempt
+    do {
+      return try await makeRequest(token)
+    } catch APIError.badStatus(let statusCode, _) where statusCode == 401 {
+      // Token expired - try to refresh
+      guard let refreshToken = refreshToken else {
+        throw APIError.badStatus(401, "Unauthorized - token expired and no refresh available")
+      }
+
+      // Ensure only one refresh happens at a time
+      let newToken: String?
+      if let existingTask = refreshTask {
+        // Another request is already refreshing, wait for it
+        newToken = await existingTask.value
+      } else {
+        // Start a new refresh task
+        let task = Task<String?, Never> {
+          await refreshToken()
+        }
+        refreshTask = task
+        newToken = await task.value
+        refreshTask = nil
+      }
+
+      guard let newToken = newToken else {
+        throw APIError.badStatus(401, "Unauthorized - token refresh failed")
+      }
+
+      // Retry with new token
+      return try await makeRequest(newToken)
+    }
   }
 }

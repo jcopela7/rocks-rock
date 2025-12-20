@@ -4,6 +4,7 @@ struct YouView: View {
   @State private var selected = "Activity"
   @State private var ascentsVM: AscentsVM?
   @State private var discoverVM: DiscoverVM?
+  @State private var showingSettings = false
   @EnvironmentObject var authService: AuthenticationService
 
   init() {
@@ -19,11 +20,11 @@ struct YouView: View {
       VStack(spacing: 12) {
         AppHeader(
           title: "You",
-          onAddTap: {
-            Task {
-              await authService.logout()
-            }
-          }, buttonLabel: "Log Out")
+          onSettingsTap: {
+            showingSettings = true
+          },
+          showSettingsButton: selected == "Activity"
+        )
         SegmentedPicker(
           selection: $selected,
           segments: ["Progress", "Activity"]
@@ -42,6 +43,10 @@ struct YouView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
       }
+    }
+    .sheet(isPresented: $showingSettings) {
+      SettingsView(authService: authService)
+        .environmentObject(authService)
     }
     .onAppear {
       if discoverVM == nil {

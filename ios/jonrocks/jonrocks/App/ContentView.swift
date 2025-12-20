@@ -5,18 +5,17 @@ import SwiftUI
 
 struct AppHeader: View {
   let title: String
-  let onAddTap: (() -> Void)?
-  let buttonLabel: String?
-  let buttonIcon: String?
+  let onSettingsTap: (() -> Void)?
+  let showSettingsButton: Bool
 
   init(
-    title: String, onAddTap: (() -> Void)? = nil, buttonLabel: String? = nil,
-    buttonIcon: String? = nil
+    title: String,
+    onSettingsTap: (() -> Void)? = nil,
+    showSettingsButton: Bool = false
   ) {
     self.title = title
-    self.onAddTap = onAddTap
-    self.buttonLabel = buttonLabel ?? "Add"
-    self.buttonIcon = buttonIcon ?? "plus"
+    self.onSettingsTap = onSettingsTap
+    self.showSettingsButton = showSettingsButton
   }
 
   var body: some View {
@@ -25,15 +24,15 @@ struct AppHeader: View {
         .font(.largeTitle)
         .fontWeight(.bold)
       Spacer()
-      if let onAddTap = onAddTap {
-        Button(action: onAddTap) {
-          Label(buttonLabel ?? "Add", systemImage: buttonIcon ?? "plus")
-            .fontWeight(.semibold)
-            .padding(.horizontal, 14)
-            .padding(.vertical, 6)
-            .background(Color.theme.accent)
-            .clipShape(Capsule())
-            .foregroundColor(.white)
+      HStack(spacing: 12) {
+        if showSettingsButton, let onSettingsTap = onSettingsTap {
+          Button(action: onSettingsTap) {
+            Image(systemName: "gearshape")
+              .fontWeight(.semibold)
+              .frame(width: 24, height: 24)
+              .clipShape(Circle())
+              .foregroundColor(Color.theme.textPrimary)
+          }
         }
       }
     }

@@ -7,7 +7,7 @@ struct DiscoverView: View {
   var body: some View {
     NavigationStack {
       VStack(spacing: 12) {
-        AppHeader(title: "Discover", onAddTap: nil)
+        AppHeader(title: "Discover")
         HStack(spacing: 12) {
           if let discoverVM = discoverVM {
             FilterButton(

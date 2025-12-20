@@ -20,7 +20,7 @@ export async function user(app: FastifyInstance) {
       return reply.code(401).send({ error: 'Unauthorized' });
     }
     const user = await getUser(req.user.id);
-    return reply.code(200).send(user);
+    return reply.code(200).send({ data: user });
   });
 
   // Update user
@@ -30,6 +30,6 @@ export async function user(app: FastifyInstance) {
     }
     const body = UpdateUserInput.parse(req.body);
     const updated = await updateUser(body, req.user.id);
-    return reply.code(200).send(updated);
+    return reply.code(200).send({ data: updated });
   });
 }

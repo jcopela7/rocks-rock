@@ -40,7 +40,6 @@ struct DiscoverView: View {
           Spacer()
         }
         .padding(.horizontal, 16)
-
         Group {
           if let discoverVM = discoverVM {
             LocationsContentView(discoverVM: discoverVM)

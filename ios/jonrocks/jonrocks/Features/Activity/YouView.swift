@@ -1,10 +1,14 @@
 import SwiftUI
 
+enum NavigationDestination: Hashable {
+  case settings
+}
+
 struct YouView: View {
   @State private var selected = "Activity"
   @State private var ascentsVM: AscentsVM?
   @State private var discoverVM: DiscoverVM?
-  @State private var showingSettings = false
+  @State private var navigationDestination: NavigationDestination?
   @EnvironmentObject var authService: AuthenticationService
 
   init() {
@@ -21,7 +25,7 @@ struct YouView: View {
         AppHeader(
           title: "You",
           onSettingsTap: {
-            showingSettings = true
+            navigationDestination = .settings
           },
           showSettingsButton: true
         )
@@ -41,10 +45,13 @@ struct YouView: View {
           }
         }
       }
-    }
-    .sheet(isPresented: $showingSettings) {
-      SettingsView(authService: authService)
-        .environmentObject(authService)
+      .navigationDestination(item: $navigationDestination) { destination in
+        switch destination {
+        case .settings:
+          SettingsView(authService: authService)
+            .environmentObject(authService)
+        }
+      }
     }
     .onAppear {
       if discoverVM == nil {

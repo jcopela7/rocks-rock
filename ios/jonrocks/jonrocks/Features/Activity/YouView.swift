@@ -23,7 +23,7 @@ struct YouView: View {
           onSettingsTap: {
             showingSettings = true
           },
-          showSettingsButton: selected == "Activity"
+          showSettingsButton: true
         )
         SegmentedPicker(
           selection: $selected,

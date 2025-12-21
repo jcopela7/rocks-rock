@@ -7,7 +7,6 @@
 import PhotosUI
 import SwiftUI
 
-
 struct ActivityLoggingView: View {
   @ObservedObject var ascentsVM: AscentsVM
 

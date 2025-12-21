@@ -94,8 +94,7 @@ struct LocationsContentView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
-      }
-      else {
+      } else {
         List(discoverVM.filteredLocations) { location in
           NavigationLink(
             destination: LocationDetailView(

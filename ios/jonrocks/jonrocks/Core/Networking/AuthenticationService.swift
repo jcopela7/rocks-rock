@@ -5,7 +5,7 @@ import Foundation
 @MainActor
 class AuthenticationService: ObservableObject {
   static var shared: AuthenticationService?
-  
+
   @Published var isAuthenticated = false
   @Published var user: UserInfo?
   @Published var accessToken: String?
@@ -17,7 +17,7 @@ class AuthenticationService: ObservableObject {
   private let authentication: Authentication
   private let credentialsManager: CredentialsManager
   private var tokenExpirationDate: Date?
-  private let tokenRefreshThreshold: TimeInterval = 300 // 5 minutes before expiration
+  private let tokenRefreshThreshold: TimeInterval = 300  // 5 minutes before expiration
 
   init() {
     let cId = AuthConfig.clientId
@@ -57,25 +57,27 @@ class AuthenticationService: ObservableObject {
     // JWT tokens have 3 parts separated by dots: header.payload.signature
     let parts = token.split(separator: ".")
     guard parts.count == 3 else { return }
-    
+
     // Decode the payload (second part)
     let payload = String(parts[1])
     // Add padding if needed for base64 decoding
-    var base64 = payload
+    var base64 =
+      payload
       .replacingOccurrences(of: "-", with: "+")
       .replacingOccurrences(of: "_", with: "/")
-    
+
     let remainder = base64.count % 4
     if remainder > 0 {
       base64 = base64.padding(toLength: base64.count + 4 - remainder, withPad: "=", startingAt: 0)
     }
-    
+
     guard let data = Data(base64Encoded: base64),
-          let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-          let exp = json["exp"] as? TimeInterval else {
+      let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+      let exp = json["exp"] as? TimeInterval
+    else {
       return
     }
-    
+
     tokenExpirationDate = Date(timeIntervalSince1970: exp)
   }
 
@@ -84,7 +86,8 @@ class AuthenticationService: ObservableObject {
   func refreshTokenIfNeeded() async -> String? {
     // Check if token is expired or close to expiring
     if let expiration = tokenExpirationDate,
-       expiration.timeIntervalSinceNow > tokenRefreshThreshold {
+      expiration.timeIntervalSinceNow > tokenRefreshThreshold
+    {
       // Token is still valid and not close to expiring
       return accessToken
     }

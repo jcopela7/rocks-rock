@@ -37,11 +37,11 @@
   },
 
   // Run on Save extension configuration for Swift files
-  "emeraldwalk.RunOnSave": {
+  "achilleshr.runonsave": {
     "commands": [
       {
         "match": "\\.swift$",
-        "cmd": "swiftformat ${file}",
+        "cmd": "swift-format format --in-place ${file}",
         "runIn": "terminal"
       }
     ]

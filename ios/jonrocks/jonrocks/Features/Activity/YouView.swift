@@ -17,7 +17,7 @@ struct YouView: View {
 
   var body: some View {
     NavigationStack {
-      VStack(spacing: 12) {
+      VStack(spacing: 0) {
         AppHeader(
           title: "You",
           onSettingsTap: {
@@ -29,7 +29,6 @@ struct YouView: View {
           selection: $selected,
           segments: ["Progress", "Activity"]
         )
-        .padding(.horizontal, 16)
         Group {
           if let ascentsVM = ascentsVM {
             if selected == "Progress" {
@@ -41,7 +40,6 @@ struct YouView: View {
             LoadingListView()
           }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
       }
     }
     .sheet(isPresented: $showingSettings) {

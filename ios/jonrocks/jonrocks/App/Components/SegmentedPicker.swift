@@ -39,10 +39,9 @@ struct SegmentedPicker<T: Hashable>: View {
 
   var body: some View {
     VStack(spacing: 0) {
-      HStack(spacing: spacing) {
+      HStack(spacing: 0) {
         ForEach(segments, id: \.self) { item in
           let isSelected = item == selection
-
           VStack(spacing: 6) {
             Text(title(item))
               .fontWeight(.semibold)
@@ -57,8 +56,6 @@ struct SegmentedPicker<T: Hashable>: View {
                   UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 #endif
               }
-
-            // Only draw underline for selected
             if isSelected {
               Rectangle()
                 .fill(underlineColor)
@@ -74,8 +71,4 @@ struct SegmentedPicker<T: Hashable>: View {
       }
     }
   }
-}
-
-#Preview {
-  ContentView()
 }

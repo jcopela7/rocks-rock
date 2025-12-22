@@ -4,11 +4,18 @@ struct DiscoverView: View {
   @EnvironmentObject var authService: AuthenticationService
   @State private var discoverVM: DiscoverVM?
 
+  private var searchTextBinding: Binding<String> {
+    Binding(
+      get: { discoverVM?.searchText ?? "" },
+      set: { discoverVM?.searchText = $0 }
+    )
+  }
+
   var body: some View {
     NavigationStack {
-      VStack(spacing: 12) {
+      VStack(spacing: 0) {
         AppHeader(title: "Discover")
-        HStack(spacing: 12) {
+        HStack(alignment: .top, spacing: 8) {
           if let discoverVM = discoverVM {
             FilterButton(
               title: "Gym",
@@ -22,7 +29,6 @@ struct DiscoverView: View {
                 }
               }
             )
-
             FilterButton(
               title: "Crag",
               icon: "camIcon",
@@ -36,10 +42,18 @@ struct DiscoverView: View {
               }
             )
           }
-
-          Spacer()
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+        Rectangle()
+          .fill(Color.raw.slate200)
+          .frame(height: 1)
+        if discoverVM != nil {
+          SearchBar(text: searchTextBinding, placeholder: "Search by location name...")
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+        }
         Group {
           if let discoverVM = discoverVM {
             LocationsContentView(discoverVM: discoverVM)
@@ -49,6 +63,7 @@ struct DiscoverView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
       }
+      .background(Color.raw.slate100)
       .onAppear {
         if discoverVM == nil {
           discoverVM = DiscoverVM(authService: authService)

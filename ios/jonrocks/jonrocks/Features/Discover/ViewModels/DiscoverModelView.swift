@@ -10,6 +10,7 @@ final class DiscoverVM: ObservableObject {
   @Published var loading: Bool = false
   @Published var error: String? = nil
   @Published var selectedFilterType: String? = nil  // nil = all, "gym" or "crag"
+  @Published var searchText: String = ""
 
   var api: APIClient
   private let authService: AuthenticationService
@@ -18,6 +19,16 @@ final class DiscoverVM: ObservableObject {
   init(authService: AuthenticationService) {
     self.authService = authService
     self.api = APIClient.shared
+    
+    // Debounce search text changes and reload locations
+    $searchText
+      .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
+      .sink { [weak self] _ in
+        Task { @MainActor [weak self] in
+          await self?.loadLocations()
+        }
+      }
+      .store(in: &cancellables)
   }
 
   var filteredLocations: [LocationDTO] {
@@ -57,7 +68,9 @@ final class DiscoverVM: ObservableObject {
     defer { loading = false }
 
     do {
-      let loadedLocations = try await api.listLocations()
+      // Use searchText for backend filtering by name
+      let nameFilter = searchText.isEmpty ? nil : searchText
+      let loadedLocations = try await api.listLocations(name: nameFilter)
       locations = loadedLocations
       error = nil
     } catch let apiError as APIError {

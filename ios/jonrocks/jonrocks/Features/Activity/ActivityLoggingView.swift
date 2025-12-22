@@ -18,7 +18,7 @@ struct ActivityLoggingView: View {
 
   var body: some View {
     VStack(spacing: 8) {
-      SearchBar(text: $ascentsVM.searchText)
+      SearchBar(text: $ascentsVM.searchText, placeholder: "Search by route name...")
         .padding(.horizontal, 16)
         .padding(.top, 8)
       List(ascentsVM.filteredAscents) { ascent in

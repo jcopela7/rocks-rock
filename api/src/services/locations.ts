@@ -1,4 +1,5 @@
 // src/services/ascents.ts
+import { and, desc, ilike } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../db/index.js';
 import { location } from '../db/schema.js';
@@ -34,12 +35,29 @@ export async function createLocation(input: CreateLocationInput) {
   return row;
 }
 
-export async function listLocations() {
-  const sql = `
-  SELECT * FROM location
-  ORDER BY created_at DESC
-  `;
+export const ListLocationsQuery = z.object({
+  name: z.string().optional(),
+});
 
-  const res = await db.execute(sql);
-  return (res as unknown as { rows: unknown[] }).rows;
+export type ListLocationsQueryType = z.infer<typeof ListLocationsQuery>;
+
+export async function listLocations(query?: ListLocationsQueryType) {
+  const params = query ? ListLocationsQuery.parse(query) : {};
+
+  const conditions = [];
+
+  if (params.name) {
+    conditions.push(ilike(location.name, `%${params.name}%`));
+  }
+
+  const queryBuilder = db
+    .select()
+    .from(location);
+
+  const finalQuery = conditions.length > 0
+    ? queryBuilder.where(and(...conditions))
+    : queryBuilder;
+
+  const rows = await finalQuery.orderBy(desc(location.createdAt));
+  return rows;
 }

@@ -1,4 +1,5 @@
 // src/services/ascents.ts
+import { sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../db/index.js';
 import { location } from '../db/schema.js';
@@ -34,12 +35,28 @@ export async function createLocation(input: CreateLocationInput) {
   return row;
 }
 
-export async function listLocations() {
-  const sql = `
-  SELECT * FROM location
-  ORDER BY created_at DESC
-  `;
+export const ListLocationsQuery = z.object({
+  name: z.string().optional(),
+  type: z.enum(['gym', 'crag']).optional(),
+});
 
-  const res = await db.execute(sql);
+export type ListLocationsQueryType = z.infer<typeof ListLocationsQuery>;
+
+export async function listLocations(query?: ListLocationsQueryType) {
+  const params = query ? ListLocationsQuery.parse(query) : {};
+  
+  let querySql = sql`SELECT * FROM location WHERE deleted_at IS NULL`;
+  
+  if (params.name) {
+    querySql = sql`${querySql} AND LOWER(name) LIKE LOWER(${`%${params.name}%`})`;
+  }
+  
+  if (params.type) {
+    querySql = sql`${querySql} AND type = ${params.type}`;
+  }
+  
+  querySql = sql`${querySql} ORDER BY created_at DESC`;
+
+  const res = await db.execute(querySql);
   return (res as unknown as { rows: unknown[] }).rows;
 }

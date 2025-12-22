@@ -1,10 +1,14 @@
 import SwiftUI
 
+enum NavigationDestination: Hashable {
+  case settings
+}
+
 struct YouView: View {
   @State private var selected = "Activity"
   @State private var ascentsVM: AscentsVM?
   @State private var discoverVM: DiscoverVM?
-  @State private var showingSettings = false
+  @State private var navigationDestination: NavigationDestination?
   @EnvironmentObject var authService: AuthenticationService
 
   init() {
@@ -17,19 +21,18 @@ struct YouView: View {
 
   var body: some View {
     NavigationStack {
-      VStack(spacing: 12) {
+      VStack(spacing: 0) {
         AppHeader(
           title: "You",
           onSettingsTap: {
-            showingSettings = true
+            navigationDestination = .settings
           },
-          showSettingsButton: selected == "Activity"
+          showSettingsButton: true
         )
         SegmentedPicker(
           selection: $selected,
           segments: ["Progress", "Activity"]
         )
-        .padding(.horizontal, 16)
         Group {
           if let ascentsVM = ascentsVM {
             if selected == "Progress" {
@@ -41,12 +44,14 @@ struct YouView: View {
             LoadingListView()
           }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
       }
-    }
-    .sheet(isPresented: $showingSettings) {
-      SettingsView(authService: authService)
-        .environmentObject(authService)
+      .navigationDestination(item: $navigationDestination) { destination in
+        switch destination {
+        case .settings:
+          SettingsView(authService: authService)
+            .environmentObject(authService)
+        }
+      }
     }
     .onAppear {
       if discoverVM == nil {

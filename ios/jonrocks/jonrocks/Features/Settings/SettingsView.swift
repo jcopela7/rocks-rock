@@ -4,61 +4,67 @@ struct SettingsView: View {
   @EnvironmentObject var authService: AuthenticationService
   @Environment(\.dismiss) var dismiss
   @StateObject private var userVM: UserVM
-  
+
   init(authService: AuthenticationService) {
     _userVM = StateObject(wrappedValue: UserVM(authService: authService))
   }
-  
-  var body: some View {
-    NavigationStack {
-      VStack(spacing: 0) {
-        if let user = userVM.user  {
-          VStack(spacing: 16) {
-            HStack {
-                Text("Display Name")
-                  .foregroundColor(Color.theme.textPrimary)
-                Spacer()
-                Text(user.displayName)
-                  .foregroundColor(Color.theme.textSecondary)
-              }
-              
-              HStack {
-                Text("Email")
-                  .foregroundColor(Color.theme.textPrimary)
-                Spacer()
-                Text(user.email ?? "")
-                  .foregroundColor(Color.theme.textSecondary)
-                  .font(.system(.body, design: .monospaced))
-              }
 
-              Button(action: {
-                Task {
-                  await authService.logout()
-                  dismiss()
-                }
-              }) {
-                HStack {
-                  Spacer()
-                  Text("Log Out")
-                    .foregroundColor(Color.theme.danger)
-                    .fontWeight(.semibold)
-                  Spacer()
-                }
-              }
-          }
-          .frame(maxWidth: .infinity, maxHeight: .infinity)
-        }  else {
-          LoadingListView()
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+  var body: some View {
+    VStack(spacing: 16) {
+      if let user = userVM.user {
+        VStack {
+          Image(systemName: "person.circle.fill")
+            .resizable()
+            .scaledToFit()
+            .frame(width: 100, height: 100)
+            .foregroundColor(Color.raw.slate200)
         }
-      }
-      .navigationTitle("Settings")
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        ToolbarItem(placement: .navigationBarTrailing) {
-          Button("Done") {
-            dismiss()
+        VStack(spacing: 16) {
+          HStack(alignment: .center, spacing: 4) {
+            Text("Display Name: ")
+              .font(.system(.body))
+              .foregroundColor(Color.theme.textPrimary)
+            Text(user.displayName)
+              .font(.system(.body))
+              .foregroundColor(Color.theme.textSecondary)
           }
+          HStack(alignment: .center, spacing: 4) {
+            Text("Email: ")
+              .font(.system(.body))
+              .foregroundColor(Color.theme.textPrimary)
+            Text(user.email ?? "placeholder@example.com")
+              .font(.system(.body))
+              .foregroundColor(Color.theme.textSecondary)
+          }
+        }
+        VStack(spacing: 16) {
+          Button(action: {
+            Task {
+              await authService.logout()
+              dismiss()
+            }
+          }) {
+            HStack {
+              Spacer()
+              Text("Log Out")
+                .foregroundColor(Color.theme.danger)
+                .fontWeight(.semibold)
+              Spacer()
+            }
+          }
+        }
+        .padding()
+      } else {
+        LoadingListView()
+          .frame(maxWidth: .infinity, maxHeight: .infinity)
+      }
+    }
+    .navigationTitle("Settings")
+    .navigationBarTitleDisplayMode(.inline)
+    .toolbar {
+      ToolbarItem(placement: .navigationBarTrailing) {
+        Button("Done") {
+          dismiss()
         }
       }
     }
@@ -67,4 +73,3 @@ struct SettingsView: View {
     }
   }
 }
-

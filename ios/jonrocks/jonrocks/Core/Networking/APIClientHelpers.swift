@@ -156,7 +156,7 @@ final class APIClientHelpers {
     req.setValue("application/json", forHTTPHeaderField: "Content-Type")
     req.httpBody = try enc.encode(body)
     addAuthHeader(to: &req, token: token)
-  
+
     let (data, resp) = try await session.data(for: req)
     guard let http = resp as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
       let body = String(data: data, encoding: .utf8)

@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify';
-import { createLocation, CreateLocationInput, listLocations } from '../services/locations.js';
+import { createLocation, CreateLocationInput, listLocations, ListLocationsQuery } from '../services/locations.js';
 import { authenticateUser } from '../middleware/auth.js';
 
 export async function locationRoutes(app: FastifyInstance) {
@@ -21,7 +21,9 @@ export async function locationRoutes(app: FastifyInstance) {
     if (!req.user) {
       throw new Error('User not authenticated');
     }
-    const rows = await listLocations();
+    // Fastify types `req.query` as unknown; validate with Zod
+    const query = ListLocationsQuery.parse(req.query);
+    const rows = await listLocations(query);
     return { data: rows };
   });
 }

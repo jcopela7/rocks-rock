@@ -26,6 +26,7 @@ export async function locationRoutes(app: FastifyInstance) {
     if (!req.user) {
       throw new Error('User not authenticated');
     }
+    // Fastify types `req.query` as unknown; validate with Zod
     const query = ListLocationsQuery.parse(req.query);
     const rows = await listLocations(query);
     return { data: rows };

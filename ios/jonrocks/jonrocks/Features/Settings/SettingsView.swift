@@ -10,23 +10,31 @@ struct SettingsView: View {
   }
 
   var body: some View {
-    VStack(spacing: 0) {
+    VStack(spacing: 16) {
       if let user = userVM.user {
+        VStack {
+          Image(systemName: "person.circle.fill")
+            .resizable()
+            .scaledToFit()
+            .frame(width: 100, height: 100)
+            .foregroundColor(Color.raw.slate200)
+        }
         VStack(spacing: 16) {
-          HStack {
-            Text("Display Name")
+          HStack(alignment: .center, spacing: 4) {
+            Text("Display Name: ")
+              .font(.system(.body))
               .foregroundColor(Color.theme.textPrimary)
-            Spacer()
             Text(user.displayName)
+              .font(.system(.body))
               .foregroundColor(Color.theme.textSecondary)
           }
-          HStack {
-            Text("Email")
+          HStack(alignment: .center, spacing: 4) {
+            Text("Email: ")
+              .font(.system(.body))
               .foregroundColor(Color.theme.textPrimary)
-            Spacer()
-            Text(user.email ?? "")
+            Text(user.email ?? "placeholder@example.com")
+              .font(.system(.body))
               .foregroundColor(Color.theme.textSecondary)
-              .font(.system(.body, design: .monospaced))
           }
         }
         VStack(spacing: 16) {
@@ -45,7 +53,6 @@ struct SettingsView: View {
             }
           }
         }
-        .frame(maxWidth: .infinity, alignment: .topLeading)
         .padding()
       } else {
         LoadingListView()

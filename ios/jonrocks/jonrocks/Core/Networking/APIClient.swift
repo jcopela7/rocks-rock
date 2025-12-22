@@ -91,9 +91,14 @@ final class APIClient {
     return env.data
   }
 
-  func listLocations() async throws -> [LocationDTO] {
+  func listLocations(name: String? = nil) async throws -> [LocationDTO] {
+    var query: [URLQueryItem] = []
+    if let name = name, !name.isEmpty {
+      query.append(.init(name: "name", value: name))
+    }
     let env: APIListEnvelope<[LocationDTO]> = try await helpers.get(
       "location",
+      query: query,
       token: try requireToken(),
       refreshToken: getRefreshTokenCallback()
     )

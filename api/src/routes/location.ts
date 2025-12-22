@@ -1,5 +1,10 @@
 import { FastifyInstance } from 'fastify';
-import { createLocation, CreateLocationInput, listLocations, ListLocationsQuery } from '../services/locations.js';
+import {
+  createLocation,
+  CreateLocationInput,
+  listLocations,
+  ListLocationsQuery,
+} from '../services/locations.js';
 import { authenticateUser } from '../middleware/auth.js';
 
 export async function locationRoutes(app: FastifyInstance) {

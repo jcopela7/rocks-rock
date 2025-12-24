@@ -10,5 +10,6 @@ extension Color {
     static let success = Color.raw.green500
     static let warning = Color.raw.amber500
     static let danger = Color.raw.red500
+    static let border = Color.raw.slate200
   }
 }

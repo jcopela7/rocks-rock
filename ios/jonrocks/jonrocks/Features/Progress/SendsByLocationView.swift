@@ -1,53 +1,40 @@
 import Charts
 import SwiftUI
 
-struct SendsByGradeView: View {
+struct SendsByLocationView: View {
   @ObservedObject var viewModel: AscentsVM
-  var discipline: String
-
-  // Optional: consistent ordering
-  private let boulderingGradeOrder: [String] = [
-    "V0", "V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "V10",
-  ]
-  private let sportGradeOrder: [String] = [
-    "5.5", "5.6", "5.7", "5.8", "5.9", "5.10", "5.11", "5.12", "5.13", "5.14", "5.15",
-  ]
 
   var body: some View {
     VStack(alignment: .leading, spacing: 12) {
       HStack {
-        Text("\(discipline.capitalized) Sends")
+        Text("Sends by Location")
           .font(.headline)
           .foregroundColor(Color.theme.accent)
         Spacer()
       }
       .padding(.top, 16)
-      HStack(alignment: .center, spacing: 32) {
-        ascentMetric(label: "Highest Grade", value: "V10")
-        ascentMetric(label: "Total Sends", value: "62")
-      }
-      Chart(viewModel.ascentsByGrade, id: \.gradeValue) { row in
+      Chart(viewModel.ascentsByLocation, id: \.locationName) { row in
         BarMark(
-          x: .value("Grade", row.gradeValue),
-          y: .value("Sends", row.totalAscents)
+          x: .value("Total Sends", row.totalAscents),
+          y: .value("Location", row.locationName)
         )
         .foregroundStyle(Color.theme.accent)
+        .annotation(position: .trailing) {
+          Text("\(row.totalAscents)")
+            .font(.caption)
+            .foregroundStyle(Color.theme.textPrimary)
+        }
       }
       .chartLegend(position: .bottom, alignment: .leading)
-      .chartXScale(
-        domain: discipline == "boulder" || discipline == "board"
-          ? boulderingGradeOrder : sportGradeOrder
-      )
+      .chartXScale()
       .chartXAxis {
-        AxisMarks { _ in
+        AxisMarks(values: .automatic) {
           AxisGridLine(stroke: StrokeStyle(lineWidth: 0))
-          AxisTick()
-          AxisValueLabel()
         }
       }
       .chartYAxis {
-        AxisMarks(values: .automatic) {
-          AxisGridLine(stroke: StrokeStyle(lineWidth: 1))
+        AxisMarks { _ in
+          AxisGridLine(stroke: StrokeStyle(lineWidth: 0))
           AxisTick()
           AxisValueLabel()
             .foregroundStyle(Color.theme.textPrimary)
@@ -65,7 +52,6 @@ struct SendsByGradeView: View {
       RoundedRectangle(cornerRadius: 32)
         .stroke(Color.theme.border, lineWidth: 1)
     )
-
   }
 
   private func ascentMetric(label: String, value: String) -> some View {

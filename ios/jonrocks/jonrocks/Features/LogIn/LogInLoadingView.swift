@@ -8,17 +8,15 @@ struct LoginLoadingView: View {
 
   var body: some View {
     ZStack {
-      RadialGradient(
+      LinearGradient(
         colors: [
-          Color.purple.opacity(0.45),
-          Color.blue.opacity(0.70),
+          Color.raw.fuchsia700.opacity(0.5),
+          Color.raw.blue600.opacity(1),
         ],
-        center: t ? .topLeading : .topTrailing,
-        startRadius: 40,
-        endRadius: 600
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
       )
       .ignoresSafeArea()
-      .animation(.easeInOut(duration: 4).repeatForever(autoreverses: true), value: t)
 
       VStack(spacing: 16) {
         Image("LogInLogo")
@@ -26,23 +24,11 @@ struct LoginLoadingView: View {
           .scaledToFit()
           .frame(width: 300, height: 300)
           .foregroundColor(.white)
-          .opacity(showContent ? 1 : 0)
-          .animation(.easeIn(duration: 1), value: showContent)
-
         Text("ESTEL")
           .font(.largeTitle)
           .fontWeight(.bold)
           .multilineTextAlignment(.center)
           .foregroundColor(.white)
-          .cornerRadius(16)
-          .opacity(showContent ? 1 : 0)
-          .animation(.easeIn(duration: 1), value: showContent)
-      }
-    }
-    .onAppear {
-      t = true
-      withAnimation(.easeIn(duration: 1)) {
-        showContent = true
       }
     }
   }

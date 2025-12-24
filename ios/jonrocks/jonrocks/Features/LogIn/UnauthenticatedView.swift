@@ -8,15 +8,24 @@ struct UnauthenticatedView: View {
     ZStack {
       RadialGradient(
         colors: [
-          Color.purple.opacity(0.45),
-          Color.blue.opacity(0.70),
+          Color.raw.fuchsia700.opacity(0.7),
+          Color.raw.blue600.opacity(1),
         ],
         center: t ? .topLeading : .topTrailing,
         startRadius: 40,
-        endRadius: 600
+        endRadius: 400
       )
       .ignoresSafeArea()
       .animation(.easeInOut(duration: 4).repeatForever(autoreverses: true), value: t)
+      LinearGradient(
+        colors: [
+          Color.white.opacity(0.1),
+          Color.black,
+        ],
+        startPoint: UnitPoint(x: 0.5, y: 0.2),
+        endPoint: UnitPoint(x: 0.5, y: 0.5)
+      )
+      .ignoresSafeArea()
       VStack(spacing: 16) {
         Image("LogInLogo")
           .resizable()
@@ -29,7 +38,7 @@ struct UnauthenticatedView: View {
           .multilineTextAlignment(.center)
           .foregroundColor(.white)
           .cornerRadius(16)
-        Text("Get started by signing in to your account")
+        Text("An app for rock climbers by rock climbers")
           .font(.body)
           .multilineTextAlignment(.center)
           .foregroundColor(.white)
@@ -43,7 +52,7 @@ struct UnauthenticatedView: View {
         } label: {
           Text("Log In")
             .font(.headline)
-            .foregroundColor(Color.theme.accent)
+            .foregroundColor(Color.theme.textPrimary)
             .frame(maxWidth: 240)
             .padding()
             .background(

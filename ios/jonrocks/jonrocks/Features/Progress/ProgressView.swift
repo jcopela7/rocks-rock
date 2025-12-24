@@ -9,6 +9,7 @@ struct ProgressViewTab: View {
       VStack(alignment: .leading, spacing: 12) {
         ClimbingCalendarView(month: Date(), ascents: viewModel.ascents)
         SendsByGradeView(viewModel: viewModel, discipline: "boulder")
+        SendsByLocationView(viewModel: viewModel)
       }
       .padding(.horizontal, 16)
       .padding(.top, 8)
@@ -17,10 +18,12 @@ struct ProgressViewTab: View {
     .task {
       await viewModel.loadAscents()
       await viewModel.loadCountOfAscentsByGrade(discipline: "boulder")
+      await viewModel.loadCountOfAscentsGroupByLocation()
     }
     .refreshable {
       await viewModel.loadAscents()
       await viewModel.loadCountOfAscentsByGrade(discipline: "boulder")
+      await viewModel.loadCountOfAscentsGroupByLocation()
     }
   }
 }

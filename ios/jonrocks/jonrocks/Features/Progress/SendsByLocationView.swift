@@ -47,7 +47,7 @@ struct SendsByLocationView: View {
     .padding(.horizontal, 16)
     .background(.white)
     .cornerRadius(32)
-    .shadow(color: Color.theme.border.opacity(0.1), radius: 4, x: 0, y: 2)
+    .shadow(color: Color.theme.shadow, radius: 4, x: 0, y: 2)
     .overlay(
       RoundedRectangle(cornerRadius: 32)
         .stroke(Color.theme.border, lineWidth: 1)

@@ -11,5 +11,6 @@ extension Color {
     static let warning = Color.raw.amber500
     static let danger = Color.raw.red500
     static let border = Color.raw.slate200
+    static let shadow = Color.raw.slate800.opacity(0.1)
   }
 }

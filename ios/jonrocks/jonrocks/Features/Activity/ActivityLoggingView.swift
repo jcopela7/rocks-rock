@@ -17,24 +17,23 @@ struct ActivityLoggingView: View {
   @State private var selectedItem: PhotosPickerItem?
 
   var body: some View {
-    VStack(spacing: 8) {
-      SearchBar(text: $ascentsVM.searchText, placeholder: "Search by route name...")
-        .padding(.horizontal, 16)
-        .padding(.top, 8)
-      List(ascentsVM.filteredAscents) { ascent in
-        ActivityRowView(
-          ascent: ascent,
-          viewModel: ascentsVM,
-          selectedItem: $selectedItem,
-          pickingForAscent: $pickingForAscent,
-          ascentToDelete: $ascentToDelete,
-          showingDeleteAlert: $showingDeleteAlert
-        )
-        // iOS 17+: trim default side gutters
-        .listRowSeparator(.visible)
+    ScrollView {
+      VStack(spacing: 0) {
+        SearchBar(text: $ascentsVM.searchText, placeholder: "Search by route name...")
+          .padding(.horizontal, 16)
+          .padding(.vertical, 8)
+        ForEach(ascentsVM.filteredAscents) { ascent in
+          ActivityRowView(
+            ascent: ascent,
+            viewModel: ascentsVM,
+            selectedItem: $selectedItem,
+            pickingForAscent: $pickingForAscent,
+            ascentToDelete: $ascentToDelete,
+            showingDeleteAlert: $showingDeleteAlert
+          )
+          .padding(.bottom, 4)
+        }
       }
-      .listStyle(.plain)
-      .contentMargins(.horizontal, 12)  // iOS 17
     }
     .background(Color.raw.slate100)
     .overlay(alignment: .center) {

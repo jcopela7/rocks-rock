@@ -27,13 +27,15 @@ struct ActivityRowView: View {
       ascentImage
       Spacer()
     }
-    .padding(.vertical, 4)
-    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-      Button("Delete", role: .destructive) {
-        ascentToDelete = ascent
-        showingDeleteAlert = true
-      }
-    }
+    .padding(.vertical, 16)
+    .padding(.horizontal, 16)
+    .background(.white)
+    .cornerRadius(4)
+    .shadow(color: Color.theme.shadow, radius: 4, x: 0, y: 2)
+    .overlay(
+      RoundedRectangle(cornerRadius: 4)
+        .stroke(Color.theme.border, lineWidth: 1)
+    )
   }
 
   private var ascentHeader: some View {

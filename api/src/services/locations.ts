@@ -1,6 +1,5 @@
 // src/services/locations.ts
-import { eq } from 'drizzle-orm';
-import { sql } from 'drizzle-orm';
+import { and, desc, eq, ilike, isNull } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../db/index.js';
 import { location } from '../db/schema.js';
@@ -45,21 +44,22 @@ export type ListLocationsQueryType = z.infer<typeof ListLocationsQuery>;
 
 export async function listLocations(query?: ListLocationsQueryType) {
   const params = query ? ListLocationsQuery.parse(query) : {};
-  
-  let querySql = sql`SELECT * FROM location WHERE deleted_at IS NULL`;
-  
-  if (params.name) {
-    querySql = sql`${querySql} AND LOWER(name) LIKE LOWER(${`%${params.name}%`})`;
-  }
-  
-  if (params.type) {
-    querySql = sql`${querySql} AND type = ${params.type}`;
-  }
-  
-  querySql = sql`${querySql} ORDER BY created_at DESC`;
 
-  const res = await db.execute(querySql);
-  return (res as unknown as { rows: unknown[] }).rows;
+  const conditions = [isNull(location.deletedAt)];
+  if (params.name) {
+    conditions.push(ilike(location.name, `%${params.name}%`));
+  }
+  if (params.type) {
+    conditions.push(eq(location.type, params.type));
+  }
+
+  const rows = await db
+    .select()
+    .from(location)
+    .where(and(...conditions))
+    .orderBy(desc(location.createdAt));
+
+  return rows;
 }
 
 export async function deleteLocation(id: string) {

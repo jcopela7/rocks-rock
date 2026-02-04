@@ -1,4 +1,4 @@
-import { Input, Modal, Select } from "@geist-ui/core";
+import { Input, Modal, Select, Text } from "@geist-ui/core";
 import { useState } from "react";
 import type { CreateLocationInput } from "../api/Locations";
 import { useCreateLocation } from "../api_controllers/useLocations";
@@ -34,17 +34,18 @@ export default function AddLocationForm({ open, setOpen, onSuccess }: Props) {
       createdBy: "00000000-0000-0000-0000-000000000001", // TODO: Replace with actual user ID
     };
 
-    await createLocation(locationData);
-    onSuccess?.();
-
-    // Reset form on success
-    if (!error) {
+    try {
+      await createLocation(locationData);
       setFormData({
         name: "",
         type: "gym",
         latitude: undefined,
         longitude: undefined,
       });
+      setOpen(false);
+      onSuccess?.();
+    } catch {
+      // Error is surfaced by useCreateLocation; keep modal open
     }
   };
 
@@ -62,7 +63,12 @@ export default function AddLocationForm({ open, setOpen, onSuccess }: Props) {
     <Modal visible={open} onClose={() => setOpen(false)}>
       <Modal.Title>Add Location</Modal.Title>
       <Modal.Content>
-        <form onSubmit={handleSubmit}>
+        {error && (
+          <Text type="error" small style={{ marginBottom: 8 }}>
+            {error}
+          </Text>
+        )}
+        <form id="add-location-form" onSubmit={handleSubmit}>
           {/* @ts-expect-error Geist Input typing is overly strict here */}
           <Input
             label="Location Name"
@@ -92,7 +98,13 @@ export default function AddLocationForm({ open, setOpen, onSuccess }: Props) {
       </Modal.Action>
       {/* @ts-expect-error Geist Select typing is overly strict here */}
 
-      <Modal.Action onClick={() => setOpen(false)}>Add Location</Modal.Action>
+      <Modal.Action
+        onClick={() =>
+          (document.getElementById("add-location-form") as HTMLFormElement | null)?.requestSubmit()
+        }
+      >
+        Add Location
+      </Modal.Action>
     </Modal>
   );
 }

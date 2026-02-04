@@ -38,12 +38,16 @@ export function useCreateLocation() {
   const [error, setError] = useState<string | null>(null);
 
   const createLocation = async (location: CreateLocationInput) => {
+    setLoading(true);
+    setError(null);
     try {
-      setLoading(true);
       const newLocation = await createLocationApi(location);
       setData(newLocation as LocationType);
+      return newLocation as LocationType;
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Unknown error");
+      const message = e instanceof Error ? e.message : "Unknown error";
+      setError(message);
+      throw e;
     } finally {
       setLoading(false);
     }

@@ -67,6 +67,10 @@ struct CountOfAscentsByGradeDTO: Codable {
   let totalAscents: Int
 }
 
+struct MaxGradeByDisciplineDTO: Codable {
+  let maxGrade: Int
+}
+
 struct CreateAscentRequest: Encodable {
   let routeId: UUID?
   let locationId: UUID?

@@ -1,5 +1,5 @@
 // src/services/ascents.ts
-import { and, count, desc, eq, getTableColumns, gte, lte } from 'drizzle-orm';
+import { and, count, desc, eq, getTableColumns, gte, lte, max } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../db/index.js';
 import { ascent, location, route } from '../db/schema.js';
@@ -127,7 +127,8 @@ export async function getCountOfAscentsGroupByLocation(userId: string) {
   }).from(ascent)
   .leftJoin(location, eq(ascent.locationId, location.id))
   .where(eq(ascent.userId, userId))
-  .groupBy(location.name);
+  .groupBy(location.name)
+  .orderBy(desc(count(ascent.id)));
 
   const rows = await query;
   return rows;
@@ -153,6 +154,23 @@ export async function getCountOfAscentsByGrade(body: GetCountOfAscentsByGradeQue
 
   const rows = await query;
   return rows;
+}
+
+export const GetMaxGradeByDisciplineQuery = z.object({
+  discipline: z.enum(['boulder', 'sport', 'trad', 'board']),
+});
+export type GetMaxGradeByDisciplineQueryType = z.infer<typeof GetMaxGradeByDisciplineQuery>;
+
+export async function getMaxGradeByDiscipline(body: GetMaxGradeByDisciplineQueryType, userId: string) {
+  const query = db
+  .select({
+    maxGrade: max(route.gradeRank),
+  }).from(ascent)
+  .leftJoin(route, eq(ascent.routeId, route.id))
+  .where(and(eq(ascent.userId, userId), eq(route.discipline, body.discipline)))
+  .orderBy(desc(max(route.gradeRank)));
+  const rows = await query;
+  return rows[0] || null;
 }
 
 export async function deleteAscent(id: string, userId: string) {

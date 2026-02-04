@@ -10,6 +10,8 @@ import {
   GetCountOfAscentsByGradeQuery,
   GetCountOfAscentsByLocationQuery,
   getCountOfAscentsGroupByLocation,
+  getMaxGradeByDiscipline,
+  GetMaxGradeByDisciplineQuery,
   listAscents,
   ListAscentsQuery,
 } from '../services/ascent.js';
@@ -57,6 +59,15 @@ export async function ascentRoutes(app: FastifyInstance) {
     return { data: count };
   });
 
+  app.get('/ascent/max/grade', async (req) => {
+    if (!req.user) {
+      throw new Error('User not authenticated');
+    }
+    const query = GetMaxGradeByDisciplineQuery.parse(req.query);
+    const maxGrade = await getMaxGradeByDiscipline(query, req.user.id);
+    return { data: maxGrade };
+  });
+  
   app.get('/ascent/:id', async (req, reply) => {
     if (!req.user) {
       return reply.code(401).send({ error: 'Unauthorized' });

@@ -12,6 +12,7 @@ import SwiftUI
 @MainActor
 final class AscentsVM: ObservableObject {
   @Published var ascents: [AscentDTO] = []
+  @Published var maxGradeByDiscipline: MaxGradeByDisciplineDTO? = nil
   @Published var ascentsByLocation: [CountOfAscentsByLocationDTO] = []
   @Published var ascentsByGrade: [CountOfAscentsByGradeDTO] = []
   @Published var routes: [RouteDTO] = []
@@ -97,6 +98,19 @@ final class AscentsVM: ObservableObject {
       error = nil
     } catch {
       print("Backend error in loadCountOfAscentsByGrade(): \(error)")
+      self.error = error.localizedDescription
+    }
+  }
+
+  func loadMaxGradeByDiscipline(discipline: String) async {
+    loading = true
+    defer { loading = false }
+    do {
+      let maxGrade = try await api.getMaxGradeByDiscipline(discipline: discipline)
+      maxGradeByDiscipline = maxGrade
+      error = nil
+    } catch {
+      print("Backend error in loadMaxGradeByDiscipline(): \(error)")
       self.error = error.localizedDescription
     }
   }

@@ -126,6 +126,18 @@ final class APIClient {
     return env.data
   }
 
+  func getMaxGradeByDiscipline(discipline: String) async throws -> MaxGradeByDisciplineDTO {
+    let env: APIListEnvelope<MaxGradeByDisciplineDTO> = try await helpers.get(
+      "ascent/max/grade",
+      query: [
+        .init(name: "discipline", value: discipline)
+      ],
+      token: try requireToken(),
+      refreshToken: getRefreshTokenCallback()
+    )
+    return env.data
+  }
+
   func listRoutes() async throws -> [RouteDTO] {
     let env: APIListEnvelope<[RouteDTO]> = try await helpers.get(
       "route",

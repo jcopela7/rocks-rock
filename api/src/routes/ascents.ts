@@ -6,6 +6,8 @@ import {
   CreateAscentInput,
   deleteAscent,
   getAscentDetail,
+  getCountOfAscentsByDiscipline,
+  GetCountOfAscentsByDisciplineQuery,
   getCountOfAscentsByGrade,
   GetCountOfAscentsByGradeQuery,
   GetCountOfAscentsByLocationQuery,
@@ -66,6 +68,15 @@ export async function ascentRoutes(app: FastifyInstance) {
     const query = GetMaxGradeByDisciplineQuery.parse(req.query);
     const maxGrade = await getMaxGradeByDiscipline(query, req.user.id);
     return { data: maxGrade };
+  });
+
+  app.get('/ascent/count/discipline', async (req) => {
+    if (!req.user) {
+      throw new Error('User not authenticated');
+    }
+    const query = GetCountOfAscentsByDisciplineQuery.parse(req.query);
+    const count = await getCountOfAscentsByDiscipline(query, req.user.id);
+    return { data: count };
   });
   
   app.get('/ascent/:id', async (req, reply) => {

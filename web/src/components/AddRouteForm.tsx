@@ -22,10 +22,16 @@ export default function AddRouteForm({ open, setOpen, onSuccess }: Props) {
   });
 
   const handleSubmit = async () => {
-
-    // if (!formData.locationId || !formData.discipline || !formData.gradeSystem || !formData.gradeValue || formData.gradeRank === undefined) {
-    //   return;
-    // }
+    if (
+      !formData.locationId ||
+      !formData.discipline ||
+      !formData.gradeSystem ||
+      formData.gradeValue === undefined ||
+      formData.gradeValue === "" ||
+      formData.gradeRank === undefined
+    ) {
+      return;
+    }
 
     const routeData: CreateRouteInputType = {
       locationId: formData.locationId,
@@ -128,8 +134,11 @@ export default function AddRouteForm({ open, setOpen, onSuccess }: Props) {
             name="gradeRank"
             htmlType="number"
             placeholder="e.g., 5 for V5"
-            value={formData.gradeRank || ""}
-            onChange={(e) => handleInputChange("gradeRank", parseInt(e.target.value, 10))}
+            value={String(formData.gradeRank ?? "")}
+            onChange={(e) => {
+              const parsed = parseInt(e.target.value, 10);
+              handleInputChange("gradeRank", isNaN(parsed) ? 0 : parsed);
+            }}
             required
           />
           {/* @ts-expect-error Geist Input typing is overly strict here */}

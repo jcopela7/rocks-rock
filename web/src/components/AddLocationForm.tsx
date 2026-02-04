@@ -10,7 +10,7 @@ type Props = {
 };
 
 export default function AddLocationForm({ open, setOpen, onSuccess }: Props) {
-  const { createLocation, loading, error } = useCreateLocation();
+  const { createLocation, error } = useCreateLocation();
   const [formData, setFormData] = useState<Partial<CreateLocationInput>>({
     name: "",
     type: "gym",

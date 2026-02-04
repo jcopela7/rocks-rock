@@ -13,6 +13,7 @@ import SwiftUI
 final class AscentsVM: ObservableObject {
   @Published var ascents: [AscentDTO] = []
   @Published var maxGradeByDiscipline: MaxGradeByDisciplineDTO? = nil
+  @Published var totalCountOfAscentsByDiscipline: CountOfAscentsByDisciplineDTO? = nil
   @Published var ascentsByLocation: [CountOfAscentsByLocationDTO] = []
   @Published var ascentsByGrade: [CountOfAscentsByGradeDTO] = []
   @Published var routes: [RouteDTO] = []
@@ -115,6 +116,18 @@ final class AscentsVM: ObservableObject {
     }
   }
 
+  func loadTotalCountOfAscentsByDiscipline(discipline: String) async {
+    loading = true
+    defer { loading = false }
+    do {
+      let count = try await api.getTotalCountOfAscentsByDiscipline(discipline: discipline)
+      totalCountOfAscentsByDiscipline = count
+      error = nil
+    } catch {
+      print("Backend error in loadTotalCountOfAscentsByDiscipline(): \(error)")
+      self.error = error.localizedDescription
+    }
+  }
   // MARK: Local images
 
   private func loadImageRefs() {

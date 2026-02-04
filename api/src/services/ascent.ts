@@ -173,6 +173,23 @@ export async function getMaxGradeByDiscipline(body: GetMaxGradeByDisciplineQuery
   return rows[0] || null;
 }
 
+export const GetCountOfAscentsByDisciplineQuery = z.object({
+  discipline: z.enum(['boulder', 'sport', 'trad', 'board']),
+});
+export type GetCountOfAscentsByDisciplineQueryType = z.infer<typeof GetCountOfAscentsByDisciplineQuery>;
+
+export async function getCountOfAscentsByDiscipline(body: GetCountOfAscentsByDisciplineQueryType, userId: string) {
+  const query = db
+  .select({
+    totalAscents: count(ascent.id),
+  }).from(ascent)
+  .leftJoin(route, eq(ascent.routeId, route.id))
+  .where(and(eq(ascent.userId, userId), eq(route.discipline, body.discipline)))
+  .groupBy(route.discipline);
+  const rows = await query;
+  return rows[0] || null;
+}
+
 export async function deleteAscent(id: string, userId: string) {
   const [row] = await db
     .delete(ascent)

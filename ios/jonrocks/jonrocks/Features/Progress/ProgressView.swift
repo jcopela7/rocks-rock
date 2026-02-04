@@ -20,12 +20,14 @@ struct ProgressViewTab: View {
       await viewModel.loadCountOfAscentsByGrade(discipline: "boulder")
       await viewModel.loadCountOfAscentsGroupByLocation()
       await viewModel.loadMaxGradeByDiscipline(discipline: "boulder")
+      await viewModel.loadTotalCountOfAscentsByDiscipline(discipline: "boulder")
     }
     .refreshable {
       await viewModel.loadAscents()
       await viewModel.loadCountOfAscentsByGrade(discipline: "boulder")
       await viewModel.loadCountOfAscentsGroupByLocation()
       await viewModel.loadMaxGradeByDiscipline(discipline: "boulder")
+      await viewModel.loadTotalCountOfAscentsByDiscipline(discipline: "boulder")
     }
   }
 }

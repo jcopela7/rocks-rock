@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
+import { getApiBaseUrl, getAuthHeaders } from "./client";
 
 export type RouteType = {
   id: string;
@@ -15,7 +15,8 @@ export type RouteType = {
 };
 
 export async function getRoutes(): Promise<RouteType[]> {
-  const res = await fetch(`${API_BASE_URL}/api/v1/route`);
+  const headers = await getAuthHeaders();
+  const res = await fetch(`${getApiBaseUrl()}/api/v1/route`, { headers });
   if (!res.ok) {
     throw new Error(`Failed to fetch routes: ${res.status}`);
   }
@@ -24,7 +25,8 @@ export async function getRoutes(): Promise<RouteType[]> {
 }
 
 export async function getRoute(id: string): Promise<RouteType> {
-  const res = await fetch(`${API_BASE_URL}/api/v1/route/${id}`);
+  const headers = await getAuthHeaders();
+  const res = await fetch(`${getApiBaseUrl()}/api/v1/route/${id}`, { headers });
   if (!res.ok) {
     throw new Error(`Failed to fetch route: ${res.status}`);
   }
@@ -44,9 +46,10 @@ export type CreateRouteInputType = {
 };
 
 export async function createRoute(route: CreateRouteInputType): Promise<RouteType> {
-  const res = await fetch(`${API_BASE_URL}/api/v1/route`, {
+  const authHeaders = await getAuthHeaders();
+  const res = await fetch(`${getApiBaseUrl()}/api/v1/route`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...authHeaders },
     body: JSON.stringify(route),
   });
   if (!res.ok) {
@@ -69,9 +72,10 @@ export async function updateRoute(
   id: string,
   route: UpdateRouteInputType,
 ): Promise<RouteType> {
-  const res = await fetch(`${API_BASE_URL}/api/v1/route/${id}`, {
+  const authHeaders = await getAuthHeaders();
+  const res = await fetch(`${getApiBaseUrl()}/api/v1/route/${id}`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...authHeaders },
     body: JSON.stringify(route),
   });
   if (!res.ok) {
@@ -82,8 +86,10 @@ export async function updateRoute(
 }
 
 export async function deleteRoute(id: string): Promise<RouteType> {
-  const res = await fetch(`${API_BASE_URL}/api/v1/route/${id}`, {
+  const headers = await getAuthHeaders();
+  const res = await fetch(`${getApiBaseUrl()}/api/v1/route/${id}`, {
     method: "DELETE",
+    headers,
   });
   if (!res.ok) {
     throw new Error(`Failed to delete route: ${res.status}`);

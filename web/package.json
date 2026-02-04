@@ -11,9 +11,10 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@auth0/auth0-react": "^2.12.0",
+    "@geist-ui/core": "2.3.8",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "@geist-ui/core": "2.3.8"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",

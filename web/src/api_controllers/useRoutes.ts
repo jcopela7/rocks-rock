@@ -4,9 +4,9 @@ import {
   deleteRoute as deleteRouteApi,
   getRoute,
   getRoutes,
-  type CreateRouteInput,
+  type CreateRouteInputType,
   type RouteType,
-  type UpdateRouteInput,
+  type UpdateRouteInputType,
   updateRoute as updateRouteApi,
 } from "../api/Routes";
 
@@ -67,7 +67,7 @@ export function useCreateRoute() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const createRoute = async (route: CreateRouteInput) => {
+  const createRoute = async (route: CreateRouteInputType) => {
     try {
       setLoading(true);
       const newRoute = await createRouteApi(route);
@@ -91,7 +91,7 @@ export function useUpdateRoute() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const updateRoute = async (id: string, route: UpdateRouteInput) => {
+  const updateRoute = async (id: string, route: UpdateRouteInputType) => {
     try {
       setLoading(true);
       const updatedRoute = await updateRouteApi(id, route);

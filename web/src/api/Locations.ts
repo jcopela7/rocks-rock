@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
+import { getApiBaseUrl, getAuthHeaders } from "./client";
 
 export type LocationType = {
   id: string;
@@ -11,7 +11,8 @@ export type LocationType = {
 };
 
 export async function getLocations(): Promise<LocationType[]> {
-  const res = await fetch(`${API_BASE_URL}/api/v1/location`);
+  const headers = await getAuthHeaders();
+  const res = await fetch(`${getApiBaseUrl()}/api/v1/location`, { headers });
   if (!res.ok) {
     throw new Error(`Failed to fetch locations: ${res.status}`);
   }
@@ -31,9 +32,10 @@ export type CreateLocationInput = {
 export async function createLocation(
   location: CreateLocationInput,
 ): Promise<LocationType> {
-  const res = await fetch(`${API_BASE_URL}/api/v1/location`, {
+  const authHeaders = await getAuthHeaders();
+  const res = await fetch(`${getApiBaseUrl()}/api/v1/location`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...authHeaders },
     body: JSON.stringify(location),
   });
   if (!res.ok) {

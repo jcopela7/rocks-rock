@@ -138,6 +138,20 @@ final class APIClient {
     return env.data
   }
 
+  func getTotalCountOfAscentsByDiscipline(discipline: String) async throws
+    -> CountOfAscentsByDisciplineDTO
+  {
+    let env: APIListEnvelope<CountOfAscentsByDisciplineDTO> = try await helpers.get(
+      "ascent/count/discipline",
+      query: [
+        .init(name: "discipline", value: discipline)
+      ],
+      token: try requireToken(),
+      refreshToken: getRefreshTokenCallback()
+    )
+    return env.data
+  }
+
   func listRoutes() async throws -> [RouteDTO] {
     let env: APIListEnvelope<[RouteDTO]> = try await helpers.get(
       "route",

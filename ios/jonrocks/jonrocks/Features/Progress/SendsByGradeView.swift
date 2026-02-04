@@ -25,7 +25,9 @@ struct SendsByGradeView: View {
       HStack(alignment: .center, spacing: 32) {
         ascentMetric(
           label: "Highest Grade", value: "\(viewModel.maxGradeByDiscipline?.maxGrade ?? 0)")
-        ascentMetric(label: "Total Sends", value: "62")
+        ascentMetric(
+          label: "Total Sends",
+          value: "\(viewModel.totalCountOfAscentsByDiscipline?.totalAscents ?? 0)")
       }
       Chart(viewModel.ascentsByGrade, id: \.gradeValue) { row in
         BarMark(

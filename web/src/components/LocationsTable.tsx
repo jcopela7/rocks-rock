@@ -65,11 +65,12 @@ export default function LocationsTable() {
         <>
           <Spacer h={0.5} />
           <Table data={tableData}>
+            <Table.Column prop="id" label="ID" />
             <Table.Column prop="name" label="Name" />
             <Table.Column prop="type" label="Type" />
             <Table.Column prop="latitude" label="Lat" />
             <Table.Column prop="longitude" label="Lng" />
-            <Table.Column prop="created_at" label="Created" />
+            <Table.Column prop="createdAt" label="Created" />
             <Table.Column prop="actions" label="Actions" />
           </Table>
           <AddLocationForm

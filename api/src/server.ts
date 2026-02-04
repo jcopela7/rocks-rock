@@ -12,7 +12,11 @@ import { user } from './routes/user.js';
 dotenv.config();
 
 const app = Fastify();
-app.register(cors, { origin: '*' });
+app.register(cors, {
+  origin: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+});
 app.register(ascentRoutes, { prefix: '/api/v1' });
 app.register(user, { prefix: '/api/v1' });
 app.register(locationRoutes, { prefix: '/api/v1' });

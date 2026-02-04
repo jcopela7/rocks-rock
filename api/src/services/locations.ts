@@ -1,4 +1,5 @@
-// src/services/ascents.ts
+// src/services/locations.ts
+import { eq } from 'drizzle-orm';
 import { sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../db/index.js';
@@ -59,4 +60,17 @@ export async function listLocations(query?: ListLocationsQueryType) {
 
   const res = await db.execute(querySql);
   return (res as unknown as { rows: unknown[] }).rows;
+}
+
+export async function deleteLocation(id: string) {
+  const [row] = await db
+    .update(location)
+    .set({
+      deletedAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .where(eq(location.id, id))
+    .returning();
+
+  return row;
 }

@@ -43,3 +43,16 @@ export async function createLocation(
   }
   return res.json() as Promise<LocationType>;
 }
+
+export async function deleteLocation(id: string): Promise<LocationType> {
+  const headers = await getAuthHeaders();
+  const res = await fetch(`${getApiBaseUrl()}/api/v1/location/${id}`, {
+    method: "DELETE",
+    headers,
+  });
+  if (!res.ok) {
+    throw new Error(`Failed to delete location: ${res.status}`);
+  }
+  const json = (await res.json()) as { data: unknown };
+  return json.data as LocationType;
+}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   createLocation as createLocationApi,
+  deleteLocation as deleteLocationApi,
   getLocations,
   type CreateLocationInput,
   type LocationType,
@@ -49,4 +50,28 @@ export function useCreateLocation() {
   };
 
   return { data, loading, error, createLocation } as const;
+}
+
+export function useDeleteLocation() {
+  const [data, setData] = useState<LocationType | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const deleteLocation = async (id: string) => {
+    try {
+      setLoading(true);
+      const deleted = await deleteLocationApi(id);
+      setData(deleted);
+      setError(null);
+      return deleted;
+    } catch (e) {
+      const errorMessage = e instanceof Error ? e.message : "Unknown error";
+      setError(errorMessage);
+      throw e;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { data, loading, error, deleteLocation } as const;
 }

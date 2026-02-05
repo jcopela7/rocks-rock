@@ -6,39 +6,27 @@ struct RouteRowView: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 8) {
       HStack {
-        if let name = route.name, !name.isEmpty {
-          Text(name)
+        VStack(alignment: .leading, spacing: 4) {
+          Text(route.name ?? "Unnamed Route")
             .font(.headline)
             .foregroundColor(Color.theme.accent)
-        } else {
-          Text("Unnamed Route")
-            .font(.headline)
-            .foregroundStyle(.secondary)
+          HStack(spacing: 12) {
+            Text(route.discipline.capitalized)
+              .font(.subheadline)
+              .foregroundStyle(.secondary)
+              .padding(.horizontal, 8)
+              .padding(.vertical, 4)
+              .background(Color(.systemGray6))
+              .clipShape(Capsule())
+          }
         }
         Spacer()
-        Text(route.gradeValue)
-          .font(.headline)
-          .fontWeight(.semibold)
-          .foregroundColor(Color.theme.accent)
-      }
-
-      HStack(spacing: 12) {
-        Text(route.discipline.capitalized)
-          .font(.subheadline)
-          .foregroundStyle(.secondary)
-          .padding(.horizontal, 8)
-          .padding(.vertical, 4)
-          .background(Color(.systemGray6))
-          .clipShape(Capsule())
-
-        if let color = route.color, !color.isEmpty {
-          Text(color)
-            .font(.subheadline)
-            .foregroundStyle(.secondary)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(Color(.systemGray6))
-            .clipShape(Capsule())
+        VStack(alignment: .trailing, spacing: 4) {
+          Text(route.gradeValue)
+            .font(.headline)
+            .fontWeight(.semibold)
+            .foregroundColor(Color.theme.accent)
+          routeStarRating(value: route.starRating ?? 0)
         }
       }
     }
@@ -51,5 +39,22 @@ struct RouteRowView: View {
       RoundedRectangle(cornerRadius: 12)
         .stroke(Color.theme.border, lineWidth: 1)
     )
+  }
+
+  private func routeStarRating(value: Int) -> some View {
+    VStack(alignment: .leading, spacing: 4) {
+      if value > 0 {
+        HStack(spacing: 2) {
+          ForEach(0..<value, id: \.self) { _ in
+            Image(systemName: "star.fill")
+              .foregroundColor(.yellow)
+          }
+        }
+      } else {
+        Text("0 stars")
+          .font(.body)
+          .foregroundStyle(Color.theme.textPrimary)
+      }
+    }
   }
 }

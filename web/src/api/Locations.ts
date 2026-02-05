@@ -4,6 +4,7 @@ export type LocationType = {
   id: string;
   name: string;
   type: string;
+  description: string | null;
   latitude: number | null;
   longitude: number | null;
   created_at?: string;

@@ -67,6 +67,7 @@ export default function LocationsTable() {
           <Table data={tableData}>
             <Table.Column prop="id" label="ID" />
             <Table.Column prop="name" label="Name" />
+            <Table.Column prop="description" label="Description" />
             <Table.Column prop="type" label="Type" />
             <Table.Column prop="latitude" label="Lat" />
             <Table.Column prop="longitude" label="Lng" />

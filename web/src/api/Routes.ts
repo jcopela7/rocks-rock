@@ -4,6 +4,7 @@ export type RouteType = {
   id: string;
   locationId: string;
   name: string | null;
+  description: string | null;
   discipline: "boulder" | "sport" | "trad";
   gradeSystem: "V" | "YDS" | "Font";
   gradeValue: string;

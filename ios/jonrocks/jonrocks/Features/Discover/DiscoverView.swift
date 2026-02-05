@@ -3,6 +3,7 @@ import SwiftUI
 struct DiscoverView: View {
   @EnvironmentObject var authService: AuthenticationService
   @State private var discoverVM: DiscoverVM?
+  @State private var selected = "My Locations"
 
   private var searchTextBinding: Binding<String> {
     Binding(
@@ -15,37 +16,12 @@ struct DiscoverView: View {
     NavigationStack {
       VStack(spacing: 0) {
         AppHeader(title: "Discover")
-        HStack(alignment: .top, spacing: 8) {
-          if let discoverVM = discoverVM {
-            FilterButton(
-              title: "Gym",
-              icon: "crashpadIcon",
-              isActive: discoverVM.selectedFilterType == "gym",
-              action: {
-                if discoverVM.selectedFilterType == "gym" {
-                  discoverVM.selectedFilterType = nil
-                } else {
-                  discoverVM.selectedFilterType = "gym"
-                }
-              }
-            )
-            FilterButton(
-              title: "Crag",
-              icon: "camIcon",
-              isActive: discoverVM.selectedFilterType == "crag",
-              action: {
-                if discoverVM.selectedFilterType == "crag" {
-                  discoverVM.selectedFilterType = nil
-                } else {
-                  discoverVM.selectedFilterType = "crag"
-                }
-              }
-            )
-          }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 16)
-        .padding(.vertical, 8)
+          .background(Color.white)
+        SegmentedPicker(
+          selection: $selected,
+          segments: ["My Locations", "All Locations"]
+        )
+        .background(Color.white)
         Rectangle()
           .fill(Color.raw.slate200)
           .frame(height: 1)

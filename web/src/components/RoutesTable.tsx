@@ -67,6 +67,7 @@ export default function RoutesTable() {
           <Spacer h={0.5} />
           <Table data={tableData}>
             <Table.Column prop="name" label="Name" />
+            <Table.Column prop="description" label="Description" />
             <Table.Column prop="discipline" label="Discipline" />
             <Table.Column prop="gradeSystem" label="Grade System" />
             <Table.Column prop="gradeValue" label="Grade" />

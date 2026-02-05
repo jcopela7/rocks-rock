@@ -6,6 +6,8 @@ import {
   deleteLocation,
   listLocations,
   ListLocationsQuery,
+  updateLocation,
+  updateLocationInput,
 } from '../services/locations.js';
 import { authenticateUser } from '../middleware/auth.js';
 
@@ -21,6 +23,17 @@ export async function locationRoutes(app: FastifyInstance) {
     const body = CreateLocationInput.parse(req.body);
     const created = await createLocation(body);
     return reply.code(201).send(created);
+  });
+
+  // Update location
+  app.put('/location/:id', async (req, reply) => {
+    if (!req.user) {
+      return reply.code(401).send({ error: 'Unauthorized' });
+    }
+    const { id } = z.object({ id: z.string() }).parse(req.params);
+    const body = updateLocationInput.parse(req.body);
+    const updated = await updateLocation(id, body);
+    return reply.code(200).send({ data: updated });
   });
 
   // List locations

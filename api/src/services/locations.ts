@@ -35,6 +35,29 @@ export async function createLocation(input: CreateLocationInput) {
   return row;
 }
 
+export const updateLocationInput = z.object({
+  name: z.string().optional(),
+  type: z.enum(['gym', 'crag']).optional(),
+  description: z.string().optional(),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
+});
+
+export type updateLocationInput = z.infer<typeof updateLocationInput>;
+
+export async function updateLocation(id: string, input: updateLocationInput) {
+  const data = updateLocationInput.parse(input);
+  const [row] = await db
+    .update(location)
+    .set({
+      ...data,
+      updatedAt: new Date(),
+    })
+    .where(eq(location.id, id))
+    .returning();
+  return row;
+}
+
 export const ListLocationsQuery = z.object({
   name: z.string().optional(),
   type: z.enum(['gym', 'crag']).optional(),

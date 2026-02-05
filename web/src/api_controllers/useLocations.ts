@@ -3,8 +3,10 @@ import {
   createLocation as createLocationApi,
   deleteLocation as deleteLocationApi,
   getLocations,
+  updateLocation as updateLocationApi,
   type CreateLocationInput,
   type LocationType,
+  type UpdateLocationInput,
 } from "../api/Locations";
 
 export function useGetLocations() {
@@ -54,6 +56,31 @@ export function useCreateLocation() {
   };
 
   return { data, loading, error, createLocation } as const;
+}
+
+export function useUpdateLocation() {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const updateLocation = async (
+    id: string,
+    location: UpdateLocationInput,
+  ): Promise<LocationType> => {
+    setLoading(true);
+    setError(null);
+    try {
+      const updated = await updateLocationApi(id, location);
+      return updated;
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Unknown error";
+      setError(message);
+      throw e;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { loading, error, updateLocation } as const;
 }
 
 export function useDeleteLocation() {

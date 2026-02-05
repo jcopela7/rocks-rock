@@ -44,6 +44,7 @@ export const route = pgTable('route', {
   gradeSystem: text('grade_system').notNull(), // 'V' | 'YDS' | 'Font'
   gradeValue: text('grade_value').notNull(), // 'V5' | '5.12a' | 8a+
   gradeRank: integer('grade_rank').notNull(), // numeric for filters
+  starRating: integer('star_rating'), // 1-5 stars, nullable
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
   deletedAt: timestamp('deleted_at', { withTimezone: true }),

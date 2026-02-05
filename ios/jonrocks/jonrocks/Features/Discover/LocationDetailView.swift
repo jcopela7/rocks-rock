@@ -72,11 +72,13 @@ struct LocationDetailView: View {
       }
     }
     .navigationBarTitleDisplayMode(.inline)
+    .navigationTitle(location.name)
+    .background(Color.white)
     .onAppear {
       Task {
         await viewModel.loadFilteredRoutesByLocation(for: location.id)
       }
     }
-    .background(Color.white)
+
   }
 }

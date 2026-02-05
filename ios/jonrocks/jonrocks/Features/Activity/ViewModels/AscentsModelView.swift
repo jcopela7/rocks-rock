@@ -34,6 +34,12 @@ final class AscentsVM: ObservableObject {
 
   // MARK: API
 
+  private func isCancellation(_ error: Error) -> Bool {
+    if error is CancellationError { return true }
+    if let urlError = error as? URLError, urlError.code == .cancelled { return true }
+    return false
+  }
+
   func loadAscents() async {
     loading = true
     defer { loading = false }
@@ -41,6 +47,7 @@ final class AscentsVM: ObservableObject {
       ascents = try await api.listAscents()
       error = nil
     } catch {
+      if isCancellation(error) { return }
       print("Backend error in load(): \(error)")
       self.error = error.localizedDescription
     }
@@ -85,6 +92,7 @@ final class AscentsVM: ObservableObject {
       ascentsByLocation = count
       error = nil
     } catch {
+      if isCancellation(error) { return }
       print("Backend error in loadCountOfAscentsGroupByLocation(): \(error)")
       self.error = error.localizedDescription
     }
@@ -98,6 +106,7 @@ final class AscentsVM: ObservableObject {
       ascentsByGrade = count
       error = nil
     } catch {
+      if isCancellation(error) { return }
       print("Backend error in loadCountOfAscentsByGrade(): \(error)")
       self.error = error.localizedDescription
     }
@@ -111,6 +120,7 @@ final class AscentsVM: ObservableObject {
       maxGradeByDiscipline = maxGrade
       error = nil
     } catch {
+      if isCancellation(error) { return }
       print("Backend error in loadMaxGradeByDiscipline(): \(error)")
       self.error = error.localizedDescription
     }
@@ -124,6 +134,7 @@ final class AscentsVM: ObservableObject {
       totalCountOfAscentsByDiscipline = count
       error = nil
     } catch {
+      if isCancellation(error) { return }
       print("Backend error in loadTotalCountOfAscentsByDiscipline(): \(error)")
       self.error = error.localizedDescription
     }

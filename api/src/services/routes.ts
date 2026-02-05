@@ -13,6 +13,7 @@ export const CreateRouteInput = z.object({
   gradeValue: z.string(),
   gradeRank: z.number().int(),
   description: z.string().optional(),
+  starRating: z.number().int().min(1).max(5).optional(),
 });
 
 export type CreateRouteInput = z.infer<typeof CreateRouteInput>;
@@ -25,6 +26,7 @@ export const UpdateRouteInput = z.object({
   gradeValue: z.string().optional(),
   gradeRank: z.number().int().optional(),
   description: z.string().optional(),
+  starRating: z.number().int().min(1).max(5).optional().nullable(),
 });
 
 export type UpdateRouteInput = z.infer<typeof UpdateRouteInput>;
@@ -43,6 +45,7 @@ export async function createRoute(input: CreateRouteInput) {
       gradeValue: data.gradeValue,
       gradeRank: data.gradeRank,
       description: data.description ?? null,
+      starRating: data.starRating ?? null,
     })
     .returning();
 

@@ -1,0 +1,1 @@
+ALTER TABLE "route" ADD COLUMN "star_rating" integer;

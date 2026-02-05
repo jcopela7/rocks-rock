@@ -29,6 +29,13 @@
       "when": 1766158702313,
       "tag": "0003_tense_scarlet_spider",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1770317188636,
+      "tag": "0004_add_route_star_rating",
+      "breakpoints": true
     }
   ]
 }

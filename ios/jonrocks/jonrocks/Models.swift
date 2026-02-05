@@ -35,7 +35,7 @@ struct RouteDTO: Codable, Identifiable {
   let gradeSystem: String  // "V" | "YDS" | "Font"
   let gradeValue: String
   let gradeRank: Int
-  let color: String?
+  let starRating: Int?  // 1-5 stars
   let createdAt: Date?
   let updatedAt: Date?
 }

@@ -9,7 +9,7 @@ export type RouteType = {
   gradeSystem: "V" | "YDS" | "Font";
   gradeValue: string;
   gradeRank: number;
-  color: string | null;
+  starRating: number | null;
   createdAt?: string;
   updatedAt?: string;
   deletedAt?: string | null;
@@ -43,7 +43,7 @@ export type CreateRouteInputType = {
   gradeSystem: "V" | "YDS" | "Font";
   gradeValue: string;
   gradeRank: number;
-  color?: string;
+  starRating?: number;
 };
 
 export async function createRoute(route: CreateRouteInputType): Promise<RouteType> {
@@ -66,7 +66,7 @@ export type UpdateRouteInputType = {
   gradeSystem?: "V" | "YDS" | "Font";
   gradeValue?: string;
   gradeRank?: number;
-  color?: string;
+  starRating?: number | null;
 };
 
 export async function updateRoute(

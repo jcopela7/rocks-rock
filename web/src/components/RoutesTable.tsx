@@ -6,12 +6,14 @@ import {
 } from "../api_controllers/useRoutes";
 import type { RouteType } from "../api/Routes";
 import AddRouteForm from "./AddRouteForm";
+import EditRouteForm from "./EditRouteForm";
 
 export default function RoutesTable() {
   const { data: routes, loading, error, refetch } = useGetRoutes();
   const { deleteRoute, loading: deleting, error: deleteError } =
     useDeleteRoute();
   const [open, setOpen] = useState(false);
+  const [editingRoute, setEditingRoute] = useState<RouteType | null>(null);
 
   const handleDelete = useCallback(
     async (row: RouteType) => {
@@ -30,16 +32,30 @@ export default function RoutesTable() {
   const tableData = useMemo(() => {
     return (routes ?? []).map((row) => ({
       ...row,
+      starRatingDisplay:
+        row.starRating != null
+          ? "★".repeat(row.starRating) + "☆".repeat(5 - row.starRating)
+          : "—",
       actions: (
-        // @ts-expect-error Geist Button typing is overly strict here
-        <Button
-          auto
-          type="error"
-          loading={deleting}
-          onClick={() => handleDelete(row)}
-        >
-          Delete
-        </Button>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {/* @ts-expect-error Geist Button typing is overly strict here */}
+          <Button
+            auto
+            type="secondary"
+            onClick={() => setEditingRoute(row)}
+          >
+            Edit
+          </Button>
+          {/* @ts-expect-error Geist Button typing is overly strict here */}
+          <Button
+            auto
+            type="error"
+            loading={deleting}
+            onClick={() => handleDelete(row)}
+          >
+            Delete
+          </Button>
+        </div>
       ),
     }));
   }, [routes, deleting, handleDelete]);
@@ -72,6 +88,7 @@ export default function RoutesTable() {
             <Table.Column prop="gradeSystem" label="Grade System" />
             <Table.Column prop="gradeValue" label="Grade" />
             <Table.Column prop="gradeRank" label="Grade Rank" />
+            <Table.Column prop="starRatingDisplay" label="Stars" />
             <Table.Column prop="locationId" label="Location ID" />
             <Table.Column prop="createdAt" label="Created" />
             <Table.Column prop="actions" label="Actions" />
@@ -81,6 +98,15 @@ export default function RoutesTable() {
             setOpen={setOpen}
             onSuccess={() => {
               setOpen(false);
+              void refetch();
+            }}
+          />
+          <EditRouteForm
+            route={editingRoute}
+            open={editingRoute !== null}
+            setOpen={(isOpen: boolean) => !isOpen && setEditingRoute(null)}
+            onSuccess={() => {
+              setEditingRoute(null);
               void refetch();
             }}
           />

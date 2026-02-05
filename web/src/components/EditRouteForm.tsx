@@ -1,110 +1,137 @@
-import { Input, Modal, Select } from "@geist-ui/core";
-import { useState } from "react";
-import type { CreateRouteInputType } from "../api/Routes";
-import { useCreateRoute } from "../api_controllers/useRoutes";
+import { Input, Modal, Select, Text } from "@geist-ui/core";
+import { useEffect, useState } from "react";
+import type {
+  RouteType,
+  UpdateRouteInputType,
+} from "../api/Routes";
+import { useUpdateRoute } from "../api_controllers/useRoutes";
 
 type Props = {
+  route: RouteType | null;
   open: boolean;
   setOpen: (open: boolean) => void;
   onSuccess?: () => void;
 };
 
-export default function AddRouteForm({ open, setOpen, onSuccess }: Props) {
-  const { createRoute, loading, error } = useCreateRoute();
-  const [formData, setFormData] = useState<Partial<CreateRouteInputType>>({
+export default function EditRouteForm({
+  route,
+  open,
+  setOpen,
+  onSuccess,
+}: Props) {
+  const { updateRoute, loading, error } = useUpdateRoute();
+  const [formData, setFormData] = useState<{
+    locationId: string;
+    name: string;
+    discipline: string;
+    gradeSystem: string;
+    gradeValue: string;
+    gradeRank: number;
+    starRating: number | null;
+  }>({
     locationId: "",
     name: "",
     discipline: "boulder",
     gradeSystem: "V",
     gradeValue: "",
     gradeRank: 0,
-    starRating: undefined,
+    starRating: null,
   });
 
-  const handleSubmit = async () => {
+  useEffect(() => {
+    if (route) {
+      setFormData({
+        locationId: route.locationId ?? "",
+        name: route.name ?? "",
+        discipline: route.discipline ?? "boulder",
+        gradeSystem: route.gradeSystem ?? "V",
+        gradeValue: route.gradeValue ?? "",
+        gradeRank: route.gradeRank ?? 0,
+        starRating: route.starRating ?? null,
+      });
+    }
+  }, [route]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!route) return;
     if (
       !formData.locationId ||
       !formData.discipline ||
       !formData.gradeSystem ||
-      formData.gradeValue === undefined ||
       formData.gradeValue === "" ||
       formData.gradeRank === undefined
     ) {
       return;
     }
 
-    const routeData: CreateRouteInputType = {
+    const payload: UpdateRouteInputType = {
       locationId: formData.locationId,
       name: formData.name || undefined,
-      discipline: formData.discipline,
-      gradeSystem: formData.gradeSystem,
+      discipline: formData.discipline as "boulder" | "sport" | "trad",
+      gradeSystem: formData.gradeSystem as "V" | "YDS" | "Font",
       gradeValue: formData.gradeValue,
       gradeRank: formData.gradeRank,
-
       starRating:
         formData.starRating != null && formData.starRating >= 1
           ? formData.starRating
-          : undefined,
+          : null,
     };
-    await createRoute(routeData);
-    onSuccess?.();
 
-    // Reset form on success
-    if (!error) {
-      setFormData({
-        locationId: "",
-        name: "",
-        discipline: "boulder",
-        gradeSystem: "V",
-        gradeValue: "",
-        gradeRank: 0,
-
-        starRating: undefined,
-      });
+    try {
+      await updateRoute(route.id, payload);
+      setOpen(false);
+      onSuccess?.();
+    } catch {
+      // Error surfaced by useUpdateRoute
     }
   };
 
-  const handleInputChange = (
-    field: keyof CreateRouteInputType,
-    value: string | number | undefined,
+  const handleChange = (
+    field: keyof typeof formData,
+    value: string | number | null,
   ) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
+
+  if (!route) return null;
 
   return (
     <Modal visible={open} onClose={() => setOpen(false)}>
-      <Modal.Title>Add Route</Modal.Title>
+      <Modal.Title>Edit Route</Modal.Title>
       <Modal.Content>
-        <form onSubmit={handleSubmit}>
+        {error && (
+          <Text type="error" small style={{ marginBottom: 8 }}>
+            {error}
+          </Text>
+        )}
+        <form id="edit-route-form" onSubmit={handleSubmit}>
           {/* @ts-expect-error Geist Input typing is overly strict here */}
           <Input
             label="Location ID"
-            id="location-id"
+            id="edit-route-location-id"
             name="locationId"
             htmlType="text"
             placeholder="Enter location ID (UUID)"
-            value={formData.locationId || ""}
-            onChange={(e) => handleInputChange("locationId", e.target.value)}
+            value={formData.locationId}
+            onChange={(e) => handleChange("locationId", e.target.value)}
             required
           />
           {/* @ts-expect-error Geist Input typing is overly strict here */}
           <Input
             label="Route Name (Optional)"
-            id="route-name"
+            id="edit-route-name"
             name="name"
             htmlType="text"
             placeholder="Enter route name"
-            value={formData.name || ""}
-            onChange={(e) => handleInputChange("name", e.target.value)}
+            value={formData.name}
+            onChange={(e) => handleChange("name", e.target.value)}
           />
           {/* @ts-expect-error Geist Select typing is overly strict here */}
           <Select
             placeholder="Select discipline"
             value={formData.discipline}
-            onChange={(value) => handleInputChange("discipline", value as string)}
+            onChange={(value) => handleChange("discipline", value as string)}
           >
             <Select.Option value="boulder">Boulder</Select.Option>
             <Select.Option value="sport">Sport</Select.Option>
@@ -114,7 +141,7 @@ export default function AddRouteForm({ open, setOpen, onSuccess }: Props) {
           <Select
             placeholder="Select grade system"
             value={formData.gradeSystem}
-            onChange={(value) => handleInputChange("gradeSystem", value as string)}
+            onChange={(value) => handleChange("gradeSystem", value as string)}
           >
             <Select.Option value="V">V Scale</Select.Option>
             <Select.Option value="YDS">YDS</Select.Option>
@@ -123,25 +150,25 @@ export default function AddRouteForm({ open, setOpen, onSuccess }: Props) {
           {/* @ts-expect-error Geist Input typing is overly strict here */}
           <Input
             label="Grade Value"
-            id="grade-value"
+            id="edit-route-grade-value"
             name="gradeValue"
             htmlType="text"
             placeholder="e.g., V5, 5.12a"
-            value={formData.gradeValue || ""}
-            onChange={(e) => handleInputChange("gradeValue", e.target.value)}
+            value={formData.gradeValue}
+            onChange={(e) => handleChange("gradeValue", e.target.value)}
             required
           />
           {/* @ts-expect-error Geist Input typing is overly strict here */}
           <Input
             label="Grade Rank"
-            id="grade-rank"
+            id="edit-route-grade-rank"
             name="gradeRank"
             htmlType="number"
             placeholder="e.g., 5 for V5"
-            value={String(formData.gradeRank ?? "")}
+            value={String(formData.gradeRank)}
             onChange={(e) => {
               const parsed = parseInt(e.target.value, 10);
-              handleInputChange("gradeRank", isNaN(parsed) ? 0 : parsed);
+              handleChange("gradeRank", isNaN(parsed) ? 0 : parsed);
             }}
             required
           />
@@ -154,9 +181,9 @@ export default function AddRouteForm({ open, setOpen, onSuccess }: Props) {
                 : ""
             }
             onChange={(value) =>
-              handleInputChange(
+              handleChange(
                 "starRating",
-                value === "" ? undefined : parseInt(value as string, 10),
+                value === "" ? null : parseInt(value as string, 10),
               )
             }
           >
@@ -169,13 +196,22 @@ export default function AddRouteForm({ open, setOpen, onSuccess }: Props) {
           </Select>
         </form>
       </Modal.Content>
-      {/* @ts-expect-error Geist Select typing is overly strict here */}
+      {/* @ts-expect-error Geist Modal.Action typing is overly strict here */}
       <Modal.Action onClick={() => setOpen(false)} type="secondary">
         Cancel
       </Modal.Action>
-      {/* @ts-expect-error Geist Select typing is overly strict here */}
-      <Modal.Action onClick={handleSubmit} loading={loading}>
-        Add Route
+      {/* @ts-expect-error Geist Modal.Action typing is overly strict here */}
+      <Modal.Action
+        loading={loading}
+        onClick={() =>
+          (
+            document.getElementById("edit-route-form") as
+              | HTMLFormElement
+              | null
+          )?.requestSubmit()
+        }
+      >
+        Save
       </Modal.Action>
     </Modal>
   );

@@ -88,6 +88,8 @@ export async function listAscents(body: ListAscentsQueryType, userId: string) {
       ...getTableColumns(ascent),
       routeName: route.name,
       routeDiscipline: route.discipline,
+      routeGradeValue: route.gradeValue,
+      routeGradeRank: route.gradeRank,
       locationName: location.name,
     })
     .from(ascent)

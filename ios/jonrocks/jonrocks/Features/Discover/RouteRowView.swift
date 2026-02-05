@@ -31,14 +31,6 @@ struct RouteRowView: View {
           .background(Color(.systemGray6))
           .clipShape(Capsule())
 
-        Text(route.gradeSystem)
-          .font(.subheadline)
-          .foregroundStyle(.secondary)
-          .padding(.horizontal, 8)
-          .padding(.vertical, 4)
-          .background(Color(.systemGray6))
-          .clipShape(Capsule())
-
         if let color = route.color, !color.isEmpty {
           Text(color)
             .font(.subheadline)

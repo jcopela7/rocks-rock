@@ -13,51 +13,32 @@ struct LocationDetailView: View {
 
   var body: some View {
     ScrollView {
-      VStack(alignment: .leading, spacing: 20) {
+      VStack(alignment: .leading, spacing: 0) {
         // Location Description Section
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading) {
           Text(location.name)
             .font(.largeTitle)
             .fontWeight(.bold)
             .foregroundColor(Color.theme.accent)
-
-          HStack {
-            Text(location.type.capitalized)
-              .font(.subheadline)
-              .fontWeight(.semibold)
-              .foregroundStyle(.secondary)
-              .padding(.horizontal, 12)
-              .padding(.vertical, 6)
-              .background(Color(.systemGray5))
-              .clipShape(Capsule())
-
-            Spacer()
-          }
-
-          if let lat = location.latitude, let lon = location.longitude {
-            HStack {
-              Image(systemName: "mappin.circle.fill")
-                .foregroundStyle(.secondary)
-              Text(String(format: "%.4f, %.4f", lat, lon))
-                .font(.body)
-                .foregroundStyle(.secondary)
-            }
-            .padding(.top, 4)
-          }
+            .padding(.vertical, 8)
+            .padding(.horizontal, 16)
+          Text(location.description ?? "")
+            .font(.body)
+            .foregroundStyle(.secondary)
+            .padding(.bottom, 8)
+            .padding(.horizontal, 16)
+          Rectangle()
+            .fill(Color.raw.slate200)
+            .frame(height: 1)
         }
-        .padding(.horizontal, 16)
-        .padding(.top, 8)
-
-        Divider()
-          .padding(.horizontal, 16)
-
+        .background(Color.white)
         // Routes Section
         VStack(alignment: .leading, spacing: 12) {
           Text("Routes")
             .font(.title2)
             .fontWeight(.bold)
             .padding(.horizontal, 16)
-
+            .padding(.vertical, 8)
           if viewModel.loading {
             LoadingListView()
           } else if let error = viewModel.error {
@@ -87,6 +68,7 @@ struct LocationDetailView: View {
           }
         }
         .padding(.bottom, 20)
+        .background(Color.theme.background)
       }
     }
     .navigationBarTitleDisplayMode(.inline)
@@ -95,6 +77,6 @@ struct LocationDetailView: View {
         await viewModel.loadFilteredRoutesByLocation(for: location.id)
       }
     }
-    .background(Color.theme.background)
+    .background(Color.white)
   }
 }

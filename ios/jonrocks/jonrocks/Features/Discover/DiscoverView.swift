@@ -22,9 +22,6 @@ struct DiscoverView: View {
           segments: ["My Locations", "All Locations"]
         )
         .background(Color.white)
-        Rectangle()
-          .fill(Color.raw.slate200)
-          .frame(height: 1)
         if discoverVM != nil {
           SearchBar(text: searchTextBinding, placeholder: "Search by location name...")
             .padding(.horizontal, 16)

@@ -20,7 +20,7 @@ struct ActivityRowView: View {
       ascentDetails
       Spacer()
       HStack(alignment: .center, spacing: 32) {
-        ascentMetric(label: "Grade", value: "V5" ?? "")
+        ascentMetric(label: "Grade", value: ascent.routeGradeValue ?? "")
         ascentMetric(label: "Attempts", value: String(ascent.attempts))
         ascentRating(label: "Stars", value: Int(ascent.rating ?? 0))
       }
@@ -47,9 +47,20 @@ struct ActivityRowView: View {
     }
   }
 
+  private var disciplineIconName: String {
+    switch ascent.routeDiscipline?.lowercased() {
+    case "boulder":
+      return "crashpadIcon"
+    case "sport":
+      return "quickdrawIcon"
+    default:
+      return "quickdrawIcon"
+    }
+  }
+
   private var ascentLocation: some View {
     HStack(spacing: 4) {
-      Image("crashpadIcon")
+      Image(disciplineIconName)
         .resizable()
         .scaledToFit()
         .frame(width: 20, height: 20)

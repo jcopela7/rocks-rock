@@ -16,6 +16,7 @@ struct AddView: View {
   var body: some View {
     VStack(spacing: 0) {
       AppHeader(title: "Add")
+        .background(Color.white)
       HStack(spacing: 24) {
         FilterIconButton(
           icon: "crashpadIcon",
@@ -45,6 +46,7 @@ struct AddView: View {
       }
       .padding(.horizontal, 16)
       .padding(.vertical, 12)
+      .background(Color.white)
 
       if selectedFilter == .boulder, let ascentsVM = ascentsVM, let discoverVM = discoverVM {
         BoulderingClimbForm(

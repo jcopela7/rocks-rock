@@ -45,6 +45,31 @@ export async function createLocation(
   return res.json() as Promise<LocationType>;
 }
 
+export type UpdateLocationInput = {
+  name?: string;
+  type?: "gym" | "crag";
+  description?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+};
+
+export async function updateLocation(
+  id: string,
+  location: UpdateLocationInput,
+): Promise<LocationType> {
+  const authHeaders = await getAuthHeaders();
+  const res = await fetch(`${getApiBaseUrl()}/api/v1/location/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...authHeaders },
+    body: JSON.stringify(location),
+  });
+  if (!res.ok) {
+    throw new Error(`Failed to update location: ${res.status}`);
+  }
+  const json = (await res.json()) as { data: LocationType };
+  return json.data;
+}
+
 export async function deleteLocation(id: string): Promise<LocationType> {
   const headers = await getAuthHeaders();
   const res = await fetch(`${getApiBaseUrl()}/api/v1/location/${id}`, {

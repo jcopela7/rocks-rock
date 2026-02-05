@@ -6,12 +6,16 @@ import {
 } from "../api_controllers/useLocations";
 import type { LocationType } from "../api/Locations";
 import AddLocationForm from "./AddLocationForm";
+import EditLocationForm from "./EditLocationForm";
 
 export default function LocationsTable() {
   const { data: locations, loading, error, refetch } = useGetLocations();
   const { deleteLocation, loading: deleting, error: deleteError } =
     useDeleteLocation();
   const [open, setOpen] = useState(false);
+  const [editingLocation, setEditingLocation] = useState<LocationType | null>(
+    null,
+  );
 
   const handleDelete = useCallback(
     async (row: LocationType) => {
@@ -30,15 +34,25 @@ export default function LocationsTable() {
     return (locations ?? []).map((row) => ({
       ...row,
       actions: (
-        // @ts-expect-error Geist Button typing is overly strict here
-        <Button
-          auto
-          type="error"
-          loading={deleting}
-          onClick={() => handleDelete(row)}
-        >
-          Delete
-        </Button>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {/* @ts-expect-error Geist Button typing is overly strict here */}
+          <Button
+            auto
+            type="secondary"
+            onClick={() => setEditingLocation(row)}
+          >
+            Edit
+          </Button>
+          {/* @ts-expect-error Geist Button typing is overly strict here */}
+          <Button
+            auto
+            type="error"
+            loading={deleting}
+            onClick={() => handleDelete(row)}
+          >
+            Delete
+          </Button>
+        </div>
       ),
     }));
   }, [locations, deleting, handleDelete]);
@@ -79,6 +93,15 @@ export default function LocationsTable() {
             setOpen={setOpen}
             onSuccess={() => {
               setOpen(false);
+              void refetch();
+            }}
+          />
+          <EditLocationForm
+            location={editingLocation}
+            open={editingLocation !== null}
+            setOpen={(isOpen) => !isOpen && setEditingLocation(null)}
+            onSuccess={() => {
+              setEditingLocation(null);
               void refetch();
             }}
           />

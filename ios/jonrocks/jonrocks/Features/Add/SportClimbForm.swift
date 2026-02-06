@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct BoulderingClimbForm: View {
+struct SportClimbForm: View {
   @ObservedObject var discoverVM: DiscoverVM
   @ObservedObject var ascentsVM: AscentsVM
 
@@ -15,11 +15,11 @@ struct BoulderingClimbForm: View {
   @State private var showingSearchModal = false
 
   var filteredRoutes: [RouteDTO] {
-    let boulderRoutes = discoverVM.routes.filter { $0.discipline == "boulder" }
+    let sportRoutes = discoverVM.routes.filter { $0.discipline == "sport" }
     guard let locationId = selectedLocationId else {
-      return boulderRoutes
+      return sportRoutes
     }
-    return boulderRoutes.filter { $0.locationId == locationId }
+    return sportRoutes.filter { $0.locationId == locationId }
   }
 
   var body: some View {

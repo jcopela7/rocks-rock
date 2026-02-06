@@ -53,6 +53,11 @@ struct AddView: View {
           discoverVM: discoverVM,
           ascentsVM: ascentsVM
         )
+      } else if selectedFilter == .sport, let ascentsVM = ascentsVM, let discoverVM = discoverVM {
+        SportClimbForm(
+          discoverVM: discoverVM,
+          ascentsVM: ascentsVM
+        )
       } else {
         Spacer()
       }

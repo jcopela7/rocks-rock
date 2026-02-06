@@ -7,6 +7,7 @@ struct ContentView: View {
   @State private var selectedTab = 0
   @State private var showClimbTypeDrawer = false
   @State private var selectedClimbType: ClimbFilter?
+  @State private var sheetContentHeight: CGFloat = 400
 
   private let addTabIndex = 1
 
@@ -36,7 +37,10 @@ struct ContentView: View {
         selectedTab = addTabIndex
         showClimbTypeDrawer = false
       }
-      .presentationDetents([.height(400)])
+      .onPreferenceChange(SheetHeightPreferenceKey.self) { height in
+        if height > 0 { sheetContentHeight = height + 34 }  // + bottom safe area
+      }
+      .presentationDetents([.height(sheetContentHeight)])
       .presentationDragIndicator(.visible)
     }
   }

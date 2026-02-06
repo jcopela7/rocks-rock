@@ -14,36 +14,6 @@ struct AddView: View {
     VStack(spacing: 0) {
       AppHeader(title: "Add")
         .background(Color.white)
-      HStack(spacing: 24) {
-        FilterIconButton(
-          icon: "crashpadIcon",
-          title: "Boulder",
-          isActive: selectedFilter == .boulder,
-          action: { selectedFilter = .boulder }
-        )
-        FilterIconButton(
-          icon: "camIcon",
-          title: "Trad",
-          isActive: selectedFilter == .trad,
-          action: { selectedFilter = .trad }
-        )
-        FilterIconButton(
-          icon: "quickdrawIcon",
-          title: "Sport",
-          isActive: selectedFilter == .sport,
-          action: { selectedFilter = .sport }
-        )
-        FilterIconButton(
-          icon: "boardIcon",
-          title: "Board",
-          isActive: selectedFilter == .board,
-          action: { selectedFilter = .board }
-        )
-        Spacer()
-      }
-      .padding(.horizontal, 16)
-      .padding(.vertical, 12)
-      .background(Color.white)
 
       if selectedFilter == .boulder, let ascentsVM = ascentsVM, let discoverVM = discoverVM {
         BoulderingClimbForm(

@@ -1,5 +1,12 @@
 import Foundation
 
+enum ClimbFilter {
+  case boulder
+  case trad
+  case sport
+  case board
+}
+
 struct APIListEnvelope<T: Decodable>: Decodable {
   let data: T
 }

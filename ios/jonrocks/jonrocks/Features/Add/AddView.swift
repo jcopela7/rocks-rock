@@ -4,13 +4,10 @@ struct AddView: View {
   @EnvironmentObject var authService: AuthenticationService
   @State private var discoverVM: DiscoverVM?
   @State private var ascentsVM: AscentsVM?
-  @State private var selectedFilter: ClimbFilter = .boulder
+  @State private var selectedFilter: ClimbFilter
 
-  enum ClimbFilter {
-    case boulder
-    case trad
-    case sport
-    case board
+  init(initialFilter: ClimbFilter = .boulder) {
+    _selectedFilter = State(initialValue: initialFilter)
   }
 
   var body: some View {

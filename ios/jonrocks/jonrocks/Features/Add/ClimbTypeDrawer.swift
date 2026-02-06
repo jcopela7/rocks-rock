@@ -24,72 +24,24 @@ struct ClimbTypeDrawer: View {
         .padding(.horizontal, 16)
 
       VStack(spacing: 24) {
-        VStack(spacing: 4) {
-          HStack(alignment: .center, spacing: 8) {
-            Image("crashpadIcon")
-              .resizable()
-              .scaledToFit()
-              .frame(width: 36, height: 36)
-              .foregroundColor(Color.theme.textSecondary)
-            Text("Boulder")
-              .font(.headline)
-              .foregroundColor(Color.theme.textPrimary)
-              .frame(maxWidth: .infinity, alignment: .leading)
-              .padding(.horizontal, 16)
-          }
+        ClimbTypeRow(icon: "crashpadIcon", title: "Boulder") {
+          onSelect(.boulder)
         }
-        VStack(spacing: 4) {
-          HStack(alignment: .center, spacing: 8) {
-            Image("camIcon")
-              .resizable()
-              .scaledToFit()
-              .frame(width: 36, height: 36)
-              .foregroundColor(Color.theme.textSecondary)
-            Text("Trad")
-              .font(.headline)
-              .foregroundColor(Color.theme.textPrimary)
-              .frame(maxWidth: .infinity, alignment: .leading)
-              .padding(.horizontal, 16)
-          }
+        ClimbTypeRow(icon: "camIcon", title: "Trad") {
+          onSelect(.trad)
         }
-        VStack(spacing: 4) {
-          HStack(alignment: .center, spacing: 8) {
-            Image("quickdrawIcon")
-              .resizable()
-              .scaledToFit()
-              .frame(width: 36, height: 36)
-              .foregroundColor(Color.theme.textSecondary)
-            Text("Sport")
-              .font(.headline)
-              .foregroundColor(Color.theme.textPrimary)
-              .frame(maxWidth: .infinity, alignment: .leading)
-              .padding(.horizontal, 16)
-          }
+        ClimbTypeRow(icon: "quickdrawIcon", title: "Sport") {
+          onSelect(.sport)
         }
-        VStack(spacing: 4) {
-          HStack(alignment: .center, spacing: 8) {
-            Image("boardIcon")
-              .resizable()
-              .scaledToFit()
-              .frame(width: 36, height: 36)
-              .foregroundColor(Color.theme.textSecondary)
-            Text("Board")
-              .font(.headline)
-              .foregroundColor(Color.theme.textPrimary)
-              .frame(maxWidth: .infinity, alignment: .leading)
-              .padding(.horizontal, 16)
-          }
+        ClimbTypeRow(icon: "boardIcon", title: "Board") {
+          onSelect(.board)
         }
       }
-      .padding(.horizontal, 16)
+      .padding(.horizontal, 4)
       .padding(.top, 24)
 
       Spacer(minLength: 0)
     }
     .background(Color.theme.background)
   }
-}
-
-#Preview {
-  ClimbTypeDrawer { _ in }
 }

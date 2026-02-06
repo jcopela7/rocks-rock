@@ -12,7 +12,7 @@ struct AddView: View {
 
   var body: some View {
     VStack(spacing: 0) {
-      AppHeader(title: "Log a Climb")
+      AppHeader(title: "Log a \(String(describing: selectedFilter).capitalized) Climb")
         .background(Color.white)
 
       if selectedFilter == .boulder, let ascentsVM = ascentsVM, let discoverVM = discoverVM {

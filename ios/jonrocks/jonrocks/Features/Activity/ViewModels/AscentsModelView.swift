@@ -23,12 +23,14 @@ final class AscentsVM: ObservableObject {
   @Published var searchText: String = ""
 
   @Published var filterDiscipline: String? = nil
-  @Published var filterGrade: String? = nil
+  @Published var filterMinGrade: String? = nil
+  @Published var filterMaxGrade: String? = nil
   @Published var filterMinDate: Date? = nil
   @Published var filterMaxDate: Date? = nil
 
   var hasActiveFilters: Bool {
-    filterDiscipline != nil || filterGrade != nil || filterMinDate != nil || filterMaxDate != nil
+    filterDiscipline != nil || filterMinGrade != nil || filterMaxGrade != nil
+      || filterMinDate != nil || filterMaxDate != nil
   }
 
   var api: APIClient
@@ -192,9 +194,32 @@ final class AscentsVM: ObservableObject {
         ascent.routeDiscipline?.lowercased() == discipline.lowercased()
       }
     }
-    if let grade = filterGrade {
+    if let minGrade = filterMinGrade {
+      let minRankValue: Int
+      if let found = ascents.first(where: { $0.routeGradeValue == minGrade }) {
+        let rankOptional = found.routeGradeRank
+        minRankValue = rankOptional != nil ? rankOptional! : 0
+      } else {
+        minRankValue = 0
+      }
       result = result.filter { ascent in
-        ascent.routeGradeValue == grade
+        var ascentRank = 0
+        if let r = ascent.routeGradeRank { ascentRank = r }
+        return ascentRank >= minRankValue
+      }
+    }
+    if let maxGrade = filterMaxGrade {
+      let maxRankValue: Int
+      if let found = ascents.first(where: { $0.routeGradeValue == maxGrade }) {
+        let rankOptional = found.routeGradeRank
+        maxRankValue = rankOptional != nil ? rankOptional! : 0
+      } else {
+        maxRankValue = 0
+      }
+      result = result.filter { ascent in
+        var ascentRank = 0
+        if let r = ascent.routeGradeRank { ascentRank = r }
+        return ascentRank <= maxRankValue
       }
     }
     if let minDate = filterMinDate {

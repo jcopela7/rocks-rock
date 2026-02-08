@@ -2,7 +2,16 @@
 //  ActivityFilterSheet.swift
 //  jonrocks
 //
+import Charts
 import SwiftUI
+
+private let disciplineOptions: [(id: String?, label: String, icon: String)] = [
+  (nil, "All", "square.grid.2x2"),
+  ("boulder", "Boulder", "crashpadIcon"),
+  ("sport", "Sport", "quickdrawIcon"),
+  ("trad", "Trad", "camIcon"),
+  ("board", "Board", "boardIcon"),
+]
 
 struct ActivityFilterSheet: View {
   @ObservedObject var ascentsVM: AscentsVM
@@ -23,36 +32,249 @@ struct ActivityFilterSheet: View {
     }
   }
 
+  private var gradeCounts: [(grade: String, count: Int)] {
+    let source = ascentsVM.ascents
+    let filtered: [AscentDTO]
+    if let discipline = ascentsVM.filterDiscipline {
+      filtered = source.filter { $0.routeDiscipline?.lowercased() == discipline.lowercased() }
+    } else {
+      filtered = source
+    }
+    return availableGrades.map { grade in
+      (grade, filtered.filter { $0.routeGradeValue == grade }.count)
+    }
+  }
+
+  private var minGradeIndex: Int {
+    guard let g = ascentsVM.filterMinGrade, let i = availableGrades.firstIndex(of: g) else {
+      return 0
+    }
+    return i
+  }
+
+  private var maxGradeIndex: Int {
+    let n = availableGrades.count
+    guard n > 0 else { return 0 }
+    guard let g = ascentsVM.filterMaxGrade, let i = availableGrades.firstIndex(of: g) else {
+      return n - 1
+    }
+    return i
+  }
+
   private static let calendar = Calendar.current
   private static var defaultMinDate: Date {
     calendar.date(from: calendar.dateComponents([.year], from: Date())) ?? Date()
   }
 
   var body: some View {
-    NavigationStack {
-      Form {
-        Section("Discipline") {
-          Picker("Discipline", selection: $ascentsVM.filterDiscipline) {
-            Text("All").tag(nil as String?)
-            Text("Boulder").tag("boulder" as String?)
-            Text("Sport").tag("sport" as String?)
-            Text("Trad").tag("trad" as String?)
-            Text("Board").tag("board" as String?)
-          }
-          .pickerStyle(.menu)
+    VStack(spacing: 0) {
+      header
+      ScrollView {
+        VStack(alignment: .leading, spacing: 24) {
+          disciplineSection
+          gradeSection
+          dateSection
         }
+        .padding(.horizontal, 20)
+        .padding(.bottom, 24)
+      }
+      footer
+    }
+    .background(Color.white)
+    .foregroundColor(Color.theme.textPrimary)
+  }
 
-        Section("Grade") {
-          Picker("Grade", selection: $ascentsVM.filterGrade) {
-            Text("All").tag(nil as String?)
-            ForEach(availableGrades, id: \.self) { grade in
-              Text(grade).tag(grade as String?)
+  private var header: some View {
+    HStack {
+      Text("Filter")
+        .font(.headline)
+        .fontWeight(.bold)
+        .foregroundColor(Color.theme.textPrimary)
+      Spacer()
+      Button {
+        dismiss()
+      } label: {
+        Image(systemName: "xmark")
+          .font(.system(size: 16, weight: .medium))
+          .foregroundColor(Color.theme.textPrimary)
+          .frame(width: 32, height: 32)
+      }
+    }
+    .padding(.horizontal, 20)
+    .padding(.vertical, 16)
+    .background(Color.white)
+  }
+
+  private var disciplineSection: some View {
+    VStack(alignment: .leading, spacing: 12) {
+      Text("Discipline")
+        .font(.subheadline)
+        .fontWeight(.semibold)
+        .foregroundColor(Color.theme.textPrimary)
+
+      ScrollView(.horizontal, showsIndicators: false) {
+        HStack(spacing: 12) {
+          ForEach(disciplineOptions, id: \.id) { option in
+            let isSelected = ascentsVM.filterDiscipline == option.id
+            Button {
+              ascentsVM.filterDiscipline = option.id
+            } label: {
+              VStack(spacing: 8) {
+                if option.icon == "crashpadIcon" || option.icon == "quickdrawIcon"
+                  || option.icon == "camIcon" || option.icon == "boardIcon"
+                {
+                  Image(option.icon)
+                    .renderingMode(.template)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 28, height: 28)
+                    .foregroundColor(isSelected ? .white : Color.theme.textSecondary)
+                } else {
+                  Image(systemName: option.icon)
+                    .font(.system(size: 24))
+                    .foregroundColor(isSelected ? .white : Color.theme.textSecondary)
+                }
+                Text(option.label)
+                  .font(.caption)
+                  .fontWeight(.medium)
+                  .foregroundColor(isSelected ? .white : Color.theme.textPrimary)
+              }
+              .frame(width: 80, height: 72)
+              .background(isSelected ? Color.theme.accent : Color.raw.slate100)
+              .cornerRadius(12)
+            }
+            .buttonStyle(.plain)
+          }
+        }
+        .padding(.vertical, 4)
+      }
+    }
+    .padding(.top, 8)
+  }
+
+  private var gradeSection: some View {
+    VStack(alignment: .leading, spacing: 12) {
+      Text("Grade range")
+        .font(.subheadline)
+        .fontWeight(.semibold)
+        .foregroundColor(Color.theme.textPrimary)
+      Text("Sends by grade")
+        .font(.caption)
+        .foregroundColor(Color.theme.textSecondary)
+
+      if availableGrades.isEmpty {
+        Text("No grades in your ascents")
+          .font(.subheadline)
+          .foregroundColor(Color.theme.textSecondary)
+          .frame(maxWidth: .infinity)
+          .padding(.vertical, 24)
+      } else {
+        gradeChart
+        gradeRangeSlider
+      }
+    }
+    .padding(.top, 8)
+  }
+
+  private var gradeChart: some View {
+    let counts = gradeCounts
+    let maxCount = counts.map(\.count).max() ?? 1
+    return Chart(counts, id: \.grade) { item in
+      BarMark(
+        x: .value("Grade", item.grade),
+        y: .value("Sends", item.count)
+      )
+      .foregroundStyle(Color.theme.accent)
+    }
+    .chartYScale(domain: 0...(maxCount + 1))
+    .chartXAxis {
+      AxisMarks { _ in
+        AxisGridLine(stroke: StrokeStyle(lineWidth: 0))
+        AxisTick()
+        AxisValueLabel()
+      }
+    }
+    .frame(height: 120)
+  }
+
+  private var gradeRangeSlider: some View {
+    let grades = availableGrades
+    let n = grades.count
+    let minIdx = minGradeIndex
+    let maxIdx = maxGradeIndex
+
+    return VStack(alignment: .leading, spacing: 8) {
+      HStack {
+        Text("Minimum")
+          .font(.caption)
+          .foregroundColor(Color.theme.textSecondary)
+        Spacer()
+        Text(grades.isEmpty ? "" : grades[minIdx])
+          .font(.caption)
+          .fontWeight(.medium)
+          .foregroundColor(Color.theme.textPrimary)
+      }
+      Slider(
+        value: Binding(
+          get: { Double(minIdx) },
+          set: { new in
+            let i = min(Int(round(new)), maxIdx)
+            if i == 0 && maxIdx == n - 1 {
+              ascentsVM.filterMinGrade = nil
+              ascentsVM.filterMaxGrade = nil
+            } else {
+              ascentsVM.filterMinGrade = grades[i]
+              if ascentsVM.filterMaxGrade == nil && n > 0 {
+                ascentsVM.filterMaxGrade = grades[n - 1]
+              }
             }
           }
-          .pickerStyle(.menu)
-        }
+        ),
+        in: 0...Double(max(0, n - 1)),
+        step: 1
+      )
 
-        Section("Date range") {
+      HStack {
+        Text("Maximum")
+          .font(.caption)
+          .foregroundColor(Color.theme.textSecondary)
+        Spacer()
+        Text(grades.isEmpty ? "" : grades[maxIdx])
+          .font(.caption)
+          .fontWeight(.medium)
+          .foregroundColor(Color.theme.textPrimary)
+      }
+      Slider(
+        value: Binding(
+          get: { Double(maxIdx) },
+          set: { new in
+            let i = max(Int(round(new)), minIdx)
+            if minIdx == 0 && i == n - 1 {
+              ascentsVM.filterMinGrade = nil
+              ascentsVM.filterMaxGrade = nil
+            } else {
+              ascentsVM.filterMaxGrade = grades[i]
+              if ascentsVM.filterMinGrade == nil && n > 0 {
+                ascentsVM.filterMinGrade = grades[0]
+              }
+            }
+          }
+        ),
+        in: Double(minIdx)...Double(max(0, n - 1)),
+        step: 1
+      )
+    }
+  }
+
+  private var dateSection: some View {
+    VStack(alignment: .leading, spacing: 12) {
+      Text("Date range")
+        .font(.subheadline)
+        .fontWeight(.semibold)
+        .foregroundColor(Color.theme.textPrimary)
+
+      VStack(alignment: .leading, spacing: 4) {
+        HStack(spacing: 24) {
           HStack {
             DatePicker(
               "From",
@@ -62,13 +284,18 @@ struct ActivityFilterSheet: View {
               ),
               displayedComponents: [.date]
             )
+            .labelsHidden()
             if ascentsVM.filterMinDate != nil {
               Button("Clear") {
                 ascentsVM.filterMinDate = nil
               }
+              .font(.caption)
               .foregroundColor(Color.theme.accent)
             }
           }
+          Rectangle()
+            .frame(width: 18, height: 2)
+            .foregroundColor(Color.theme.textSecondary)
           HStack {
             DatePicker(
               "To",
@@ -78,40 +305,51 @@ struct ActivityFilterSheet: View {
               ),
               displayedComponents: [.date]
             )
+            .labelsHidden()
             if ascentsVM.filterMaxDate != nil {
               Button("Clear") {
                 ascentsVM.filterMaxDate = nil
               }
+              .font(.caption)
               .foregroundColor(Color.theme.accent)
             }
           }
         }
-
-        Section {
-          Button("Clear all filters") {
-            ascentsVM.filterDiscipline = nil
-            ascentsVM.filterGrade = nil
-            ascentsVM.filterMinDate = nil
-            ascentsVM.filterMaxDate = nil
-          }
-          .foregroundColor(Color.theme.accent)
-          .frame(maxWidth: .infinity)
-        }
-      }
-      .scrollContentBackground(.hidden)
-      .background(Color.raw.slate100)
-      .foregroundColor(Color.theme.textPrimary)
-      .navigationTitle("Filter")
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        ToolbarItem(placement: .confirmationAction) {
-          Button("Done") {
-            dismiss()
-          }
-          .foregroundColor(Color.theme.accent)
-        }
       }
     }
+    .padding(.top, 8)
+  }
+
+  private var footer: some View {
+    HStack {
+      Button("Clear all") {
+        ascentsVM.filterDiscipline = nil
+        ascentsVM.filterMinGrade = nil
+        ascentsVM.filterMaxGrade = nil
+        ascentsVM.filterMinDate = nil
+        ascentsVM.filterMaxDate = nil
+      }
+      .font(.subheadline)
+      .foregroundColor(Color.theme.textSecondary)
+
+      Spacer()
+
+      Button {
+        dismiss()
+      } label: {
+        Text("Show \(ascentsVM.filteredAscents.count) results")
+          .font(.subheadline)
+          .fontWeight(.semibold)
+          .foregroundColor(.white)
+          .padding(.horizontal, 20)
+          .padding(.vertical, 12)
+          .background(Color.theme.textPrimary)
+          .cornerRadius(8)
+      }
+    }
+    .padding(.horizontal, 20)
+    .padding(.vertical, 16)
+    .background(Color.white)
   }
 }
 

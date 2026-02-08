@@ -15,13 +15,28 @@ struct ActivityLoggingView: View {
 
   @State private var pickingForAscent: AscentDTO?
   @State private var selectedItem: PhotosPickerItem?
+  @State private var showingFilterSheet = false
 
   var body: some View {
     ScrollView {
       VStack(spacing: 0) {
-        SearchBar(text: $ascentsVM.searchText, placeholder: "Search by route name...")
-          .padding(.horizontal, 16)
-          .padding(.vertical, 8)
+        HStack(spacing: 8) {
+          SearchBar(text: $ascentsVM.searchText, placeholder: "Search by route name...")
+          Button {
+            showingFilterSheet = true
+          } label: {
+            Image(systemName: "line.3.horizontal.decrease.circle")
+              .font(.system(size: 24))
+              .foregroundColor(
+                ascentsVM.hasActiveFilters ? Color.theme.accent : Color.theme.textSecondary
+              )
+              .padding(6)
+              .background(Color.white)
+              .clipShape(RoundedRectangle(cornerRadius: 10))
+          }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
         ForEach(ascentsVM.filteredAscents) { ascent in
           ActivityRowView(
             ascent: ascent,
@@ -40,6 +55,9 @@ struct ActivityLoggingView: View {
       loadingOverlay
     }
     .task { await ascentsVM.loadAscents() }
+    .sheet(isPresented: $showingFilterSheet) {
+      ActivityFilterSheet(ascentsVM: ascentsVM)
+    }
     .alert("Delete Ascent", isPresented: $showingDeleteAlert) {
       deleteAlertContent
     } message: {

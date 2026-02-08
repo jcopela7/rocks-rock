@@ -39,6 +39,7 @@ export type CreateRouteInputType = {
   id?: string;
   locationId: string;
   name?: string;
+  description?: string;
   discipline: "boulder" | "sport" | "trad";
   gradeSystem: "V" | "YDS" | "Font";
   gradeValue: string;
@@ -62,6 +63,7 @@ export async function createRoute(route: CreateRouteInputType): Promise<RouteTyp
 export type UpdateRouteInputType = {
   locationId?: string;
   name?: string;
+  description?: string | null;
   discipline?: "boulder" | "sport" | "trad";
   gradeSystem?: "V" | "YDS" | "Font";
   gradeValue?: string;

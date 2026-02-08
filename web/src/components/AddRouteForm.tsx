@@ -14,6 +14,7 @@ export default function AddRouteForm({ open, setOpen, onSuccess }: Props) {
   const [formData, setFormData] = useState<Partial<CreateRouteInputType>>({
     locationId: "",
     name: "",
+    description: "",
     discipline: "boulder",
     gradeSystem: "V",
     gradeValue: "",
@@ -36,6 +37,7 @@ export default function AddRouteForm({ open, setOpen, onSuccess }: Props) {
     const routeData: CreateRouteInputType = {
       locationId: formData.locationId,
       name: formData.name || undefined,
+      description: formData.description || undefined,
       discipline: formData.discipline,
       gradeSystem: formData.gradeSystem,
       gradeValue: formData.gradeValue,
@@ -54,11 +56,11 @@ export default function AddRouteForm({ open, setOpen, onSuccess }: Props) {
       setFormData({
         locationId: "",
         name: "",
+        description: "",
         discipline: "boulder",
         gradeSystem: "V",
         gradeValue: "",
         gradeRank: 0,
-
         starRating: undefined,
       });
     }
@@ -99,6 +101,16 @@ export default function AddRouteForm({ open, setOpen, onSuccess }: Props) {
             placeholder="Enter route name"
             value={formData.name || ""}
             onChange={(e) => handleInputChange("name", e.target.value)}
+          />
+          {/* @ts-expect-error Geist Input typing is overly strict here */}
+          <Input
+            label="Description (Optional)"
+            id="route-description"
+            name="description"
+            htmlType="text"
+            placeholder="Enter route description"
+            value={formData.description || ""}
+            onChange={(e) => handleInputChange("description", e.target.value)}
           />
           {/* @ts-expect-error Geist Select typing is overly strict here */}
           <Select

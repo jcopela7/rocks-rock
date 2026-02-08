@@ -62,8 +62,11 @@ struct LocationDetailView: View {
             .padding()
           } else {
             ForEach(viewModel.routes) { route in
-              RouteRowView(route: route)
-                .padding(.horizontal, 16)
+              NavigationLink(destination: RouteDetailView(route: route)) {
+                RouteRowView(route: route)
+              }
+              .buttonStyle(.plain)
+              .padding(.horizontal, 16)
             }
           }
         }

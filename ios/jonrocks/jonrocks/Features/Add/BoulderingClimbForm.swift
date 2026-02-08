@@ -84,22 +84,25 @@ struct BoulderingClimbForm: View {
         }
 
         Section {
-          Button(action: {
-            Task { await submitForm() }
-          }) {
-            Text("Save")
-              .frame(maxWidth: .infinity)
-              .padding(.vertical, 12)
-              .background(Color.theme.accent)
-              .foregroundColor(.white)
-              .font(.headline)
-              .cornerRadius(4)
-              .contentShape(Rectangle())
+          HStack {
+            Spacer()
+            Button(action: {
+              Task { await submitForm() }
+            }) {
+              Text("Save")
+                .font(.subheadline)
+                .fontWeight(.semibold)
+                .foregroundColor(.white)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+                .background(Color.theme.textPrimary)
+                .cornerRadius(8)
+            }
+            .disabled(isSubmitting || selectedLocationId == nil)
           }
-          .disabled(isSubmitting || selectedLocationId == nil)
+          .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+          .listRowBackground(Color.clear)
         }
-        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-        .listRowBackground(Color.clear)
       }
       .scrollContentBackground(.hidden)
       .background(Color.raw.slate100)

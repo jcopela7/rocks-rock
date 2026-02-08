@@ -22,6 +22,15 @@ final class AscentsVM: ObservableObject {
   @Published var imagesByAscent: [UUID: [LocalImageRef]] = [:]
   @Published var searchText: String = ""
 
+  @Published var filterDiscipline: String? = nil
+  @Published var filterGrade: String? = nil
+  @Published var filterMinDate: Date? = nil
+  @Published var filterMaxDate: Date? = nil
+
+  var hasActiveFilters: Bool {
+    filterDiscipline != nil || filterGrade != nil || filterMinDate != nil || filterMaxDate != nil
+  }
+
   var api: APIClient
   private let imagesKey = "imagesByAscent.v1"
   private let authService: AuthenticationService
@@ -167,16 +176,42 @@ final class AscentsVM: ObservableObject {
     }
   }
 
-  // MARK: Search functionality
+  // MARK: Search and filter
+
+  private static let calendar = Calendar.current
 
   var filteredAscents: [AscentDTO] {
-    if searchText.isEmpty {
-      return ascents
-    } else {
-      return ascents.filter { ascent in
+    var result = ascents
+    if !searchText.isEmpty {
+      result = result.filter { ascent in
         ascent.routeName?.localizedCaseInsensitiveContains(searchText) ?? false
       }
     }
+    if let discipline = filterDiscipline {
+      result = result.filter { ascent in
+        ascent.routeDiscipline?.lowercased() == discipline.lowercased()
+      }
+    }
+    if let grade = filterGrade {
+      result = result.filter { ascent in
+        ascent.routeGradeValue == grade
+      }
+    }
+    if let minDate = filterMinDate {
+      let startOfDay = Self.calendar.startOfDay(for: minDate)
+      result = result.filter { ascent in
+        Self.calendar.startOfDay(for: ascent.climbedAt) >= startOfDay
+      }
+    }
+    if let maxDate = filterMaxDate {
+      let endOfDay =
+        Self.calendar.date(byAdding: .day, value: 1, to: Self.calendar.startOfDay(for: maxDate))
+        ?? maxDate
+      result = result.filter { ascent in
+        ascent.climbedAt < endOfDay
+      }
+    }
+    return result
   }
 }
 

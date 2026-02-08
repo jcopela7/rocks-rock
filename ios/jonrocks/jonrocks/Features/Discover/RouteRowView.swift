@@ -39,6 +39,7 @@ struct RouteRowView: View {
       RoundedRectangle(cornerRadius: 12)
         .stroke(Color.theme.border, lineWidth: 1)
     )
+    .contentShape(Rectangle())
   }
 
   private func routeStarRating(value: Int) -> some View {

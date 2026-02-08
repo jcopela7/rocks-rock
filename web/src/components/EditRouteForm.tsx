@@ -23,6 +23,7 @@ export default function EditRouteForm({
   const [formData, setFormData] = useState<{
     locationId: string;
     name: string;
+    description: string;
     discipline: string;
     gradeSystem: string;
     gradeValue: string;
@@ -31,6 +32,7 @@ export default function EditRouteForm({
   }>({
     locationId: "",
     name: "",
+    description: "",
     discipline: "boulder",
     gradeSystem: "V",
     gradeValue: "",
@@ -43,6 +45,7 @@ export default function EditRouteForm({
       setFormData({
         locationId: route.locationId ?? "",
         name: route.name ?? "",
+        description: route.description ?? "",
         discipline: route.discipline ?? "boulder",
         gradeSystem: route.gradeSystem ?? "V",
         gradeValue: route.gradeValue ?? "",
@@ -68,6 +71,7 @@ export default function EditRouteForm({
     const payload: UpdateRouteInputType = {
       locationId: formData.locationId,
       name: formData.name || undefined,
+      description: formData.description || null,
       discipline: formData.discipline as "boulder" | "sport" | "trad",
       gradeSystem: formData.gradeSystem as "V" | "YDS" | "Font",
       gradeValue: formData.gradeValue,
@@ -126,6 +130,16 @@ export default function EditRouteForm({
             placeholder="Enter route name"
             value={formData.name}
             onChange={(e) => handleChange("name", e.target.value)}
+          />
+          {/* @ts-expect-error Geist Input typing is overly strict here */}
+          <Input
+            label="Description (Optional)"
+            id="edit-route-description"
+            name="description"
+            htmlType="text"
+            placeholder="Enter route description"
+            value={formData.description}
+            onChange={(e) => handleChange("description", e.target.value)}
           />
           {/* @ts-expect-error Geist Select typing is overly strict here */}
           <Select

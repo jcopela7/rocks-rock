@@ -12,47 +12,57 @@ struct RouteDetailView: View {
             .font(.largeTitle)
             .fontWeight(.bold)
             .foregroundColor(Color.theme.accent)
-
-          HStack(spacing: 12) {
-            Text(route.discipline.capitalized)
-              .font(.subheadline)
-              .foregroundStyle(.secondary)
-              .padding(.horizontal, 10)
-              .padding(.vertical, 6)
-              .background(Color(.systemGray6))
-              .clipShape(Capsule())
-          }
         }
         .padding(.horizontal, 16)
         .padding(.top, 16)
 
+        // Grade
+        HStack(alignment: .top, spacing: 12) {
+          VStack(alignment: .leading, spacing: 8) {
+            Text("Grade")
+              .font(.caption)
+              .fontWeight(.semibold)
+              .foregroundStyle(.secondary)
+            Text(route.gradeValue)
+              .font(.title)
+              .fontWeight(.semibold)
+              .foregroundColor(Color.theme.accent)
+          }
+          .padding(.horizontal, 16)
+
+          // Stars
+          VStack(alignment: .leading, spacing: 8) {
+            Text("Rating")
+              .font(.caption)
+              .fontWeight(.semibold)
+              .foregroundStyle(.secondary)
+            routeStarRating(value: route.starRating ?? 0)
+          }
+          .padding(.horizontal, 16)
+        }
+
+        //discipline
+        VStack(alignment: .leading, spacing: 8) {
+          HStack(spacing: 8) {
+            Image(disciplineIconName)
+              .resizable()
+              .scaledToFit()
+              .frame(width: 18, height: 18)
+              .foregroundStyle(.secondary)
+            Text(route.discipline.capitalized)
+              .font(.subheadline)
+              .foregroundStyle(.secondary)
+          }
+          .padding(.horizontal, 16)
+          .padding(.vertical, 8)
+          .background(Color(.systemGray6))
+          .clipShape(Capsule())
+        }
+        .padding(.horizontal, 16)
+
         Rectangle()
           .fill(Color.raw.slate200)
           .frame(height: 1)
-          .padding(.horizontal, 16)
-
-        // Grade
-        VStack(alignment: .leading, spacing: 8) {
-          Text("Grade")
-            .font(.caption)
-            .fontWeight(.semibold)
-            .foregroundStyle(.secondary)
-          Text(route.gradeValue)
-            .font(.title)
-            .fontWeight(.semibold)
-            .foregroundColor(Color.theme.accent)
-        }
-        .padding(.horizontal, 16)
-
-        // Stars
-        VStack(alignment: .leading, spacing: 8) {
-          Text("Rating")
-            .font(.caption)
-            .fontWeight(.semibold)
-            .foregroundStyle(.secondary)
-          routeStarRating(value: route.starRating ?? 0)
-        }
-        .padding(.horizontal, 16)
 
         // Description
         if let description = route.description, !description.isEmpty {
@@ -75,17 +85,25 @@ struct RouteDetailView: View {
     .background(Color.theme.background)
   }
 
+  private var disciplineIconName: String {
+    switch route.discipline.lowercased() {
+    case "boulder": return "crashpadIcon"
+    case "sport": return "quickdrawIcon"
+    case "trad": return "camIcon"
+    case "board": return "boardIcon"
+    default: return "quickdrawIcon"
+    }
+  }
+
   private func routeStarRating(value: Int) -> some View {
     HStack(spacing: 2) {
       if value > 0 {
         ForEach(0..<value, id: \.self) { _ in
           Image(systemName: "star.fill")
             .foregroundColor(.yellow)
+            .frame(width: 32, height: 32)
+            .scaledToFit()
         }
-        Text("\(value) star\(value == 1 ? "" : "s")")
-          .font(.subheadline)
-          .foregroundStyle(.secondary)
-          .padding(.leading, 4)
       } else {
         Text("No rating")
           .font(.body)

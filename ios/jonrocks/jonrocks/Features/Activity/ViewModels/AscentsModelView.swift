@@ -27,10 +27,11 @@ final class AscentsVM: ObservableObject {
   @Published var filterMaxGrade: String? = nil
   @Published var filterMinDate: Date? = nil
   @Published var filterMaxDate: Date? = nil
+  @Published var filterLocationIds: Set<UUID> = []
 
   var hasActiveFilters: Bool {
     filterDiscipline != nil || filterMinGrade != nil || filterMaxGrade != nil
-      || filterMinDate != nil || filterMaxDate != nil
+      || filterMinDate != nil || filterMaxDate != nil || !filterLocationIds.isEmpty
   }
 
   var api: APIClient
@@ -234,6 +235,12 @@ final class AscentsVM: ObservableObject {
         ?? maxDate
       result = result.filter { ascent in
         ascent.climbedAt < endOfDay
+      }
+    }
+    if !filterLocationIds.isEmpty {
+      result = result.filter { ascent in
+        guard let id = ascent.locationId else { return false }
+        return filterLocationIds.contains(id)
       }
     }
     return result

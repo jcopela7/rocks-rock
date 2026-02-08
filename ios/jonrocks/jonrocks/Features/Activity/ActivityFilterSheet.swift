@@ -72,8 +72,12 @@ struct ActivityFilterSheet: View {
       ScrollView {
         VStack(alignment: .leading, spacing: 24) {
           disciplineSection
+          Divider().padding(.vertical, 8)
           gradeSection
+          Divider().padding(.vertical, 8)
           dateSection
+          Divider().padding(.vertical, 8)
+          locationsSection
         }
         .padding(.horizontal, 20)
         .padding(.bottom, 24)
@@ -154,13 +158,10 @@ struct ActivityFilterSheet: View {
 
   private var gradeSection: some View {
     VStack(alignment: .leading, spacing: 12) {
-      Text("Grade range")
+      Text("Grade Range")
         .font(.subheadline)
         .fontWeight(.semibold)
         .foregroundColor(Color.theme.textPrimary)
-      Text("Sends by grade")
-        .font(.caption)
-        .foregroundColor(Color.theme.textSecondary)
 
       if availableGrades.isEmpty {
         Text("No grades in your ascents")
@@ -268,7 +269,7 @@ struct ActivityFilterSheet: View {
 
   private var dateSection: some View {
     VStack(alignment: .leading, spacing: 12) {
-      Text("Date range")
+      Text("Date Range")
         .font(.subheadline)
         .fontWeight(.semibold)
         .foregroundColor(Color.theme.textPrimary)
@@ -320,6 +321,64 @@ struct ActivityFilterSheet: View {
     .padding(.top, 8)
   }
 
+  /// Unique locations from ascents (id + name), sorted by name, excluding nil locations.
+  private var uniqueLocations: [(id: UUID, name: String)] {
+    var seen: Set<UUID> = []
+    var list: [(id: UUID, name: String)] = []
+    for a in ascentsVM.ascents {
+      guard let id = a.locationId, let name = a.locationName, !name.isEmpty, !seen.contains(id)
+      else { continue }
+      seen.insert(id)
+      list.append((id: id, name: name))
+    }
+    return list.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+  }
+
+  private var locationsSection: some View {
+    VStack(alignment: .leading, spacing: 12) {
+      Text("Location")
+        .font(.subheadline)
+        .fontWeight(.semibold)
+        .foregroundColor(Color.theme.textPrimary)
+
+      if uniqueLocations.isEmpty {
+        Text("No locations in your ascents")
+          .font(.subheadline)
+          .foregroundColor(Color.theme.textSecondary)
+          .frame(maxWidth: .infinity)
+          .padding(.vertical, 16)
+      } else {
+        VStack(spacing: 0) {
+          ForEach(Array(uniqueLocations.enumerated()), id: \.element.id) { index, loc in
+            let isSelected = ascentsVM.filterLocationIds.contains(loc.id)
+            Button {
+              if isSelected {
+                ascentsVM.filterLocationIds.remove(loc.id)
+              } else {
+                ascentsVM.filterLocationIds.insert(loc.id)
+              }
+            } label: {
+              HStack(spacing: 12) {
+                Text(loc.name)
+                  .font(.subheadline)
+                  .foregroundColor(Color.theme.textPrimary)
+                Spacer()
+                Image(systemName: isSelected ? "checkmark.square.fill" : "square")
+                  .font(.system(size: 22))
+                  .foregroundColor(isSelected ? Color.theme.accent : Color.theme.textSecondary)
+              }
+              .padding(.vertical, 14)
+              .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+          }
+        }
+        .cornerRadius(12)
+      }
+    }
+    .padding(.top, 8)
+  }
+
   private var footer: some View {
     HStack {
       Button("Clear all") {
@@ -328,6 +387,7 @@ struct ActivityFilterSheet: View {
         ascentsVM.filterMaxGrade = nil
         ascentsVM.filterMinDate = nil
         ascentsVM.filterMaxDate = nil
+        ascentsVM.filterLocationIds = []
       }
       .font(.subheadline)
       .foregroundColor(Color.theme.textSecondary)

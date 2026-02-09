@@ -1,5 +1,5 @@
 // src/services/ascents.ts
-import { and, count, desc, eq, getTableColumns, gte, inArray, lte, max } from 'drizzle-orm';
+import { and, count, desc, eq, getTableColumns, gte, inArray, isNull, lte, max, or } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../db/index.js';
 import { ascent, location, route } from '../db/schema.js';
@@ -98,7 +98,13 @@ export async function listAscents(body: ListAscentsQueryType, userId: string) {
     .from(ascent)
     .leftJoin(route, eq(ascent.routeId, route.id))
     .leftJoin(location, eq(ascent.locationId, location.id))
-    .where(and(...conditions))
+    .where(and(
+      ...conditions,
+      // Only include ascents from active (non-deleted) locations
+      // If locationId is null, this condition is ignored (left join)
+      // If locationId exists, ensure the location is not deleted
+      or(isNull(ascent.locationId), isNull(location.deletedAt))
+    ))
     .orderBy(desc(ascent.climbedAt))
     .limit(params.limit);
   const rows = await query;
@@ -115,7 +121,12 @@ export async function getAscentDetail(id: string, userId: string) {
    }).from(ascent)
    .leftJoin(route, eq(ascent.routeId, route.id))
    .leftJoin(location, eq(ascent.locationId, location.id))
-   .where(and(eq(ascent.id, id!), eq(ascent.userId, userId)))
+   .where(and(
+     eq(ascent.id, id!),
+     eq(ascent.userId, userId),
+     // Only include ascents from active (non-deleted) locations
+     or(isNull(ascent.locationId), isNull(location.deletedAt))
+   ))
    .orderBy(desc(ascent.climbedAt));
   const rows = await query;
   return rows[0] || null;
@@ -131,7 +142,11 @@ export async function getCountOfAscentsGroupByLocation(userId: string) {
     totalAscents: count(ascent.id),
   }).from(ascent)
   .leftJoin(location, eq(ascent.locationId, location.id))
-  .where(eq(ascent.userId, userId))
+  .where(and(
+    eq(ascent.userId, userId),
+    // Only count ascents from active (non-deleted) locations
+    or(isNull(ascent.locationId), isNull(location.deletedAt))
+  ))
   .groupBy(location.name)
   .orderBy(desc(count(ascent.id)));
 

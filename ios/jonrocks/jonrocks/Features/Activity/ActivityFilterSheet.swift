@@ -297,9 +297,9 @@ struct ActivityFilterSheet: View {
 
     return VStack(alignment: .leading, spacing: 8) {
       HStack {
-        Text("Grade Range")
-          .font(.caption)
-          .foregroundColor(Color.theme.textSecondary)
+        // Text("Grade Range")
+        //   .font(.caption)
+        //   .foregroundColor(Color.theme.textSecondary)
         Spacer()
         HStack(spacing: 4) {
           Text(grades.isEmpty ? "" : grades[minIdx])

@@ -1,5 +1,5 @@
 // src/services/ascents.ts
-import { and, count, desc, eq, getTableColumns, gte, lte, max } from 'drizzle-orm';
+import { and, count, desc, eq, getTableColumns, gte, inArray, lte, max } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../db/index.js';
 import { ascent, location, route } from '../db/schema.js';
@@ -50,8 +50,8 @@ export const ListAscentsQuery = z.object({
   after: z.coerce.date().optional(), // fetch ascents after this date
   before: z.coerce.date().optional(), // or before this date
   style: z.enum(['attempt', 'send', 'flash', 'onsight', 'project']).optional(),
-  routeId: z.string().uuid().optional(),
-  locationId: z.string().uuid().optional(),
+  routeId: z.string().optional(),
+  locationId: z.array(z.string()).optional(),
   isOutdoor: z.boolean().optional(),
   minRating: z.number().optional(),
   maxRating: z.number().optional(),
@@ -81,6 +81,9 @@ export async function listAscents(body: ListAscentsQueryType, userId: string) {
   }
   if (params.maxRating) {
     conditions.push(lte(ascent.rating, params.maxRating));
+  }
+  if (params.locationId?.length) {
+    conditions.push(inArray(ascent.locationId, params.locationId));
   }
 
   const query = db

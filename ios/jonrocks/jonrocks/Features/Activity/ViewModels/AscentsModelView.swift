@@ -14,7 +14,7 @@ final class AscentsVM: ObservableObject {
   @Published var ascents: [AscentDTO] = []
   @Published var maxGradeByDiscipline: MaxGradeByDisciplineDTO? = nil
   @Published var totalCountOfAscentsByDiscipline: CountOfAscentsByDisciplineDTO? = nil
-  @Published var ascentsByLocation: [CountOfAscentsByLocationDTO] = []
+  @Published var ascentsByLocationByDiscipline: [CountOfAscentsByLocationDTO] = []
   @Published var ascentsByGrade: [CountOfAscentsByGradeDTO] = []
   @Published var routes: [RouteDTO] = []
   @Published var loading: Bool = false
@@ -96,12 +96,12 @@ final class AscentsVM: ObservableObject {
     }
   }
 
-  func loadCountOfAscentsGroupByLocation() async {
+  func loadCountOfAscentsGroupByLocation(discipline: String) async {
     loading = true
     defer { loading = false }
     do {
-      let count = try await api.getCountOfAscentsGroupByLocation()
-      ascentsByLocation = count
+      let count = try await api.getCountOfAscentsGroupByLocation(discipline: discipline)
+      ascentsByLocationByDiscipline = count
       error = nil
     } catch {
       if isCancellation(error) { return }

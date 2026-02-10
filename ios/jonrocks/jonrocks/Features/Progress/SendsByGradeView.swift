@@ -37,9 +37,9 @@ struct SendsByGradeView: View {
           y: .value("Sends", row.totalAscents)
         )
         .foregroundStyle(
-          selectedGrade == row.gradeValue
-            ? Color.theme.accent.opacity(0.6)
-            : Color.theme.accent
+          selectedGrade == nil || selectedGrade == row.gradeValue
+            ? Color.theme.accent
+            : Color.theme.accent.opacity(0.6)
         )
       }
       .chartXSelection(value: $selectedGrade)

@@ -4,6 +4,7 @@ import SwiftUI
 struct SendsByGradeView: View {
   @ObservedObject var viewModel: AscentsVM
   var discipline: String
+  @State private var selectedGrade: String?
 
   // Optional: consistent ordering
   private let boulderingGradeOrder: [String] = [
@@ -35,8 +36,13 @@ struct SendsByGradeView: View {
           x: .value("Grade", row.gradeValue),
           y: .value("Sends", row.totalAscents)
         )
-        .foregroundStyle(Color.theme.accent)
+        .foregroundStyle(
+          selectedGrade == row.gradeValue
+            ? Color.theme.accent.opacity(0.6)
+            : Color.theme.accent
+        )
       }
+      .chartXSelection(value: $selectedGrade)
       .chartLegend(position: .bottom, alignment: .leading)
       .chartXScale(
         domain: discipline == "boulder" || discipline == "board"
@@ -62,6 +68,25 @@ struct SendsByGradeView: View {
       }
       .frame(height: 200)
       .padding(.horizontal, 8)
+      .chartOverlay { proxy in
+        GeometryReader { geometry in
+          let gradeOrder =
+            discipline == "boulder" || discipline == "board"
+            ? boulderingGradeOrder : sportGradeOrder
+          if let grade = selectedGrade,
+            let row = viewModel.ascentsByGrade.first(where: { $0.gradeValue == grade }),
+            let idx = gradeOrder.firstIndex(of: grade),
+            let plotFrame = proxy.plotFrame.flatMap({ geometry[$0] })
+          {
+            let n = CGFloat(gradeOrder.count)
+            let xCenter = plotFrame.minX + (CGFloat(idx) + 0.5) * (plotFrame.width / n)
+            let yCenter = plotFrame.midY
+            sendsCountPopover(grade: grade, count: row.totalAscents)
+              .position(x: xCenter, y: yCenter)
+          }
+        }
+        .allowsHitTesting(false)
+      }
       Spacer()
     }
     .padding(.horizontal, 16)
@@ -84,6 +109,26 @@ struct SendsByGradeView: View {
         .font(.body)
         .foregroundStyle(Color.theme.textPrimary)
     }
+  }
+
+  private func sendsCountPopover(grade: String, count: Int) -> some View {
+    VStack(spacing: 4) {
+      Text(grade)
+        .font(.subheadline.weight(.semibold))
+        .foregroundStyle(Color.theme.textPrimary)
+      Text("\(count) send\(count == 1 ? "" : "s")")
+        .font(.caption)
+        .foregroundStyle(.secondary)
+    }
+    .padding(.horizontal, 12)
+    .padding(.vertical, 8)
+    .background(Color.theme.background)
+    .cornerRadius(10)
+    .shadow(color: Color.theme.shadow, radius: 6, x: 0, y: 2)
+    .overlay(
+      RoundedRectangle(cornerRadius: 10)
+        .stroke(Color.theme.border, lineWidth: 1)
+    )
   }
 }
 

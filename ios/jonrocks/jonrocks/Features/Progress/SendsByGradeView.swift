@@ -42,7 +42,6 @@ struct SendsByGradeView: View {
             : Color.theme.accent.opacity(0.6)
         )
       }
-      .chartXSelection(value: $selectedGrade)
       .chartLegend(position: .bottom, alignment: .leading)
       .chartXScale(
         domain: discipline == "boulder" || discipline == "board"
@@ -70,22 +69,43 @@ struct SendsByGradeView: View {
       .padding(.horizontal, 8)
       .chartOverlay { proxy in
         GeometryReader { geometry in
+          let plotFrame = proxy.plotFrame.flatMap { geometry[$0] }
           let gradeOrder =
             discipline == "boulder" || discipline == "board"
             ? boulderingGradeOrder : sportGradeOrder
+
+          Color.clear
+            .contentShape(Rectangle())
+            .gesture(
+              DragGesture(minimumDistance: 0)
+                .onChanged { value in
+                  guard let plotFrame else { return }
+                  let xInPlot = value.location.x - plotFrame.minX
+                  guard let pressedGrade = proxy.value(atX: xInPlot, as: String.self) else {
+                    selectedGrade = nil
+                    return
+                  }
+                  let hasData = viewModel.ascentsByGrade.contains { $0.gradeValue == pressedGrade }
+                  selectedGrade = hasData ? pressedGrade : nil
+                }
+                .onEnded { _ in
+                  selectedGrade = nil
+                }
+            )
+
           if let grade = selectedGrade,
             let row = viewModel.ascentsByGrade.first(where: { $0.gradeValue == grade }),
             let idx = gradeOrder.firstIndex(of: grade),
-            let plotFrame = proxy.plotFrame.flatMap({ geometry[$0] })
+            let plotFrame
           {
             let n = CGFloat(gradeOrder.count)
             let xCenter = plotFrame.minX + (CGFloat(idx) + 0.5) * (plotFrame.width / n)
-            let yCenter = plotFrame.midY
+            let yCenter = plotFrame.minY + 20
             sendsCountPopover(grade: grade, count: row.totalAscents)
               .position(x: xCenter, y: yCenter)
+              .allowsHitTesting(false)
           }
         }
-        .allowsHitTesting(false)
       }
       Spacer()
     }

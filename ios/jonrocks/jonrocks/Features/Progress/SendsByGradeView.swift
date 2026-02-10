@@ -100,10 +100,16 @@ struct SendsByGradeView: View {
           {
             let n = CGFloat(gradeOrder.count)
             let xCenter = plotFrame.minX + (CGFloat(idx) + 0.5) * (plotFrame.width / n)
-            let yCenter = plotFrame.minY + 20
-            sendsCountPopover(grade: grade, count: row.totalAscents)
-              .position(x: xCenter, y: yCenter)
-              .allowsHitTesting(false)
+            let maxTotal = CGFloat(viewModel.ascentsByGrade.map(\.totalAscents).max() ?? 1)
+            let topOfBar =
+              plotFrame.maxY - (CGFloat(row.totalAscents) / maxTotal) * plotFrame.height
+            let popoverHeight: CGFloat = 44
+            let connectorHeight = max(0, topOfBar - plotFrame.minY - popoverHeight)
+            sendsCountPopoverWithConnector(
+              grade: grade, count: row.totalAscents, connectorHeight: connectorHeight
+            )
+            .position(x: xCenter, y: topOfBar - connectorHeight / 2 - popoverHeight / 2)
+            .allowsHitTesting(false)
           }
         }
       }
@@ -149,6 +155,17 @@ struct SendsByGradeView: View {
       RoundedRectangle(cornerRadius: 10)
         .stroke(Color.theme.border, lineWidth: 1)
     )
+  }
+
+  private func sendsCountPopoverWithConnector(
+    grade: String, count: Int, connectorHeight: CGFloat
+  ) -> some View {
+    VStack(spacing: 0) {
+      sendsCountPopover(grade: grade, count: count)
+      Rectangle()
+        .fill(Color.theme.border)
+        .frame(width: 2, height: connectorHeight - 8)
+    }
   }
 }
 

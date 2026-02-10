@@ -374,36 +374,50 @@ struct ActivityFilterSheet: View {
   }
 
   private var footer: some View {
-    HStack {
-      Button("Clear all") {
-        ascentsVM.filterDiscipline = nil
-        ascentsVM.filterMinGrade = nil
-        ascentsVM.filterMaxGrade = nil
-        ascentsVM.filterMinDate = nil
-        ascentsVM.filterMaxDate = nil
-        ascentsVM.filterLocationIds = []
+    VStack(spacing: 0) {
+      HStack {
+        Button("Clear all") {
+          ascentsVM.filterDiscipline = nil
+          ascentsVM.filterMinGrade = nil
+          ascentsVM.filterMaxGrade = nil
+          ascentsVM.filterMinDate = nil
+          ascentsVM.filterMaxDate = nil
+          ascentsVM.filterLocationIds = []
+        }
+        .font(.subheadline)
+        .foregroundColor(Color.theme.textSecondary)
+        Spacer()
+        Button {
+          dismiss()
+        } label: {
+          Text("Show \(ascentsVM.filteredAscents.count) results")
+            .font(.subheadline)
+            .fontWeight(.semibold)
+            .foregroundColor(.white)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 12)
+            .background(Color.theme.textPrimary)
+            .cornerRadius(8)
+        }
       }
-      .font(.subheadline)
-      .foregroundColor(Color.theme.textSecondary)
-
-      Spacer()
-
-      Button {
-        dismiss()
-      } label: {
-        Text("Show \(ascentsVM.filteredAscents.count) results")
-          .font(.subheadline)
-          .fontWeight(.semibold)
-          .foregroundColor(.white)
-          .padding(.horizontal, 20)
-          .padding(.vertical, 12)
-          .background(Color.theme.textPrimary)
-          .cornerRadius(8)
-      }
+      .padding(.horizontal, 20)
+      .padding(.vertical, 16)
+      .background(Color.white)
     }
-    .padding(.horizontal, 20)
-    .padding(.vertical, 16)
-    .background(Color.white)
+    .overlay(alignment: .top) {
+      LinearGradient(
+        colors: [
+          Color.clear,
+          Color.theme.textSecondary.opacity(0.08),
+          Color.theme.textSecondary.opacity(0.15),
+        ],
+        startPoint: .top,
+        endPoint: .bottom
+      )
+      .frame(height: 8)
+      .frame(maxWidth: .infinity)
+      .offset(y: -8)
+    }
   }
 }
 

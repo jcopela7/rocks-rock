@@ -105,9 +105,14 @@ final class APIClient {
     return env.data
   }
 
-  func getCountOfAscentsGroupByLocation() async throws -> [CountOfAscentsByLocationDTO] {
+  func getCountOfAscentsGroupByLocation(discipline: String) async throws
+    -> [CountOfAscentsByLocationDTO]
+  {
     let env: APIListEnvelope<[CountOfAscentsByLocationDTO]> = try await helpers.get(
       "ascent/count/location",
+      query: [
+        .init(name: "discipline", value: discipline)
+      ],
       token: try requireToken(),
       refreshToken: getRefreshTokenCallback()
     )

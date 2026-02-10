@@ -57,7 +57,7 @@ export async function ascentRoutes(app: FastifyInstance) {
       throw new Error('User not authenticated');
     }
     const query = GetCountOfAscentsByLocationQuery.parse(req.query);
-    const count = await getCountOfAscentsGroupByLocation(req.user.id);
+    const count = await getCountOfAscentsGroupByLocation(query, req.user.id);
     return { data: count };
   });
 

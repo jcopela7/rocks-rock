@@ -24,9 +24,9 @@ struct FilterButton: View {
       .padding(.horizontal, 16)
       .padding(.vertical, 8)
       .background(isActive ? Color.theme.accent : Color.raw.slate50)
-      .cornerRadius(8)
+      .cornerRadius(24)
       .overlay(
-        RoundedRectangle(cornerRadius: 8)
+        RoundedRectangle(cornerRadius: 24)
           .stroke(isActive ? Color.theme.accent : Color.raw.slate500, lineWidth: 1)
       )
     }

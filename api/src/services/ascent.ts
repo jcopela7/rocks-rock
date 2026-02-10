@@ -132,18 +132,23 @@ export async function getAscentDetail(id: string, userId: string) {
   return rows[0] || null;
 }
 
-export const GetCountOfAscentsByLocationQuery = z.object({});
+export const GetCountOfAscentsByLocationQuery = z.object({  
+  discipline: z.enum(['boulder', 'sport', 'trad', 'board']),
+});
 export type GetCountOfAscentsByLocationQueryType = z.infer<typeof GetCountOfAscentsByLocationQuery>;
 
-export async function getCountOfAscentsGroupByLocation(userId: string) {
+export async function getCountOfAscentsGroupByLocation(body: GetCountOfAscentsByLocationQueryType, userId: string) {
   const query = db
   .select({
     locationName: location.name,
     totalAscents: count(ascent.id),
   }).from(ascent)
+  .leftJoin(route, eq(ascent.routeId, route.id))
   .leftJoin(location, eq(ascent.locationId, location.id))
   .where(and(
     eq(ascent.userId, userId),
+    // Only count ascents matching discipline (via route)
+    eq(route.discipline, body.discipline),
     // Only count ascents from active (non-deleted) locations
     or(isNull(ascent.locationId), isNull(location.deletedAt))
   ))
@@ -151,7 +156,7 @@ export async function getCountOfAscentsGroupByLocation(userId: string) {
   .orderBy(desc(count(ascent.id)));
 
   const rows = await query;
-  return rows;
+  return rows || [];
 }
 
 export const GetCountOfAscentsByGradeQuery = z.object({
@@ -173,7 +178,7 @@ export async function getCountOfAscentsByGrade(body: GetCountOfAscentsByGradeQue
   .groupBy(route.discipline, route.gradeSystem, route.gradeValue, route.gradeRank);
 
   const rows = await query;
-  return rows;
+  return rows || [];
 }
 
 export const GetMaxGradeByDisciplineQuery = z.object({

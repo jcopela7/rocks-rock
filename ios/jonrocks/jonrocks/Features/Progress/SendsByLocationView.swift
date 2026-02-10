@@ -13,7 +13,7 @@ struct SendsByLocationView: View {
         Spacer()
       }
       .padding(.top, 16)
-      Chart(viewModel.ascentsByLocation, id: \.locationName) { row in
+      Chart(viewModel.ascentsByLocationByDiscipline, id: \.locationName) { row in
         BarMark(
           x: .value("Total Sends", row.totalAscents),
           y: .value("Location", row.locationName)

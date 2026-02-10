@@ -10,7 +10,8 @@ struct SendsByGradeView: View {
     "V0", "V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "V10",
   ]
   private let sportGradeOrder: [String] = [
-    "5.5", "5.6", "5.7", "5.8", "5.9", "5.10", "5.11", "5.12", "5.13", "5.14", "5.15",
+    "5.5", "5.6", "5.7", "5.8", "5.9", "5.10a", "5.10b", "5.10c", "5.11a", "5.11b", "5.11c",
+    "5.12a",
   ]
 
   var body: some View {
@@ -42,10 +43,13 @@ struct SendsByGradeView: View {
           ? boulderingGradeOrder : sportGradeOrder
       )
       .chartXAxis {
-        AxisMarks { _ in
+        AxisMarks { value in
           AxisGridLine(stroke: StrokeStyle(lineWidth: 0))
           AxisTick()
-          AxisValueLabel()
+          AxisValueLabel {
+            Text(value.as(String.self) ?? "")
+              .rotationEffect(Angle(degrees: -45))
+          }
         }
       }
       .chartYAxis {

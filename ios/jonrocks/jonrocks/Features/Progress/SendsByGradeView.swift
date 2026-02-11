@@ -1,11 +1,9 @@
-import Charts
 import SwiftUI
 
 struct SendsByGradeView: View {
   @ObservedObject var viewModel: AscentsVM
   var discipline: String
 
-  // Optional: consistent ordering
   private let boulderingGradeOrder: [String] = [
     "V0", "V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "V10",
   ]
@@ -30,38 +28,11 @@ struct SendsByGradeView: View {
           label: "Total Sends",
           value: "\(viewModel.totalCountOfAscentsByDiscipline?.totalAscents ?? 0)")
       }
-      Chart(viewModel.ascentsByGrade, id: \.gradeValue) { row in
-        BarMark(
-          x: .value("Grade", row.gradeValue),
-          y: .value("Sends", row.totalAscents)
-        )
-        .foregroundStyle(Color.theme.accent)
-      }
-      .chartLegend(position: .bottom, alignment: .leading)
-      .chartXScale(
-        domain: discipline == "boulder" || discipline == "board"
+      SelectableGradeBarChart(
+        data: viewModel.ascentsByGrade,
+        xDomain: discipline == "boulder" || discipline == "board"
           ? boulderingGradeOrder : sportGradeOrder
       )
-      .chartXAxis {
-        AxisMarks { value in
-          AxisGridLine(stroke: StrokeStyle(lineWidth: 0))
-          AxisTick()
-          AxisValueLabel {
-            Text(value.as(String.self) ?? "")
-              .rotationEffect(Angle(degrees: -45))
-          }
-        }
-      }
-      .chartYAxis {
-        AxisMarks(values: .automatic) {
-          AxisGridLine(stroke: StrokeStyle(lineWidth: 1))
-          AxisTick()
-          AxisValueLabel()
-            .foregroundStyle(Color.theme.textPrimary)
-        }
-      }
-      .frame(height: 200)
-      .padding(.horizontal, 8)
       Spacer()
     }
     .padding(.horizontal, 16)
@@ -72,7 +43,6 @@ struct SendsByGradeView: View {
       RoundedRectangle(cornerRadius: 32)
         .stroke(Color.theme.border, lineWidth: 1)
     )
-
   }
 
   private func ascentMetric(label: String, value: String) -> some View {

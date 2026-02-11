@@ -94,6 +94,8 @@ export async function listAscents(body: ListAscentsQueryType, userId: string) {
       routeGradeValue: route.gradeValue,
       routeGradeRank: route.gradeRank,
       locationName: location.name,
+      locationLatitude: location.latitude,
+      locationLongitude: location.longitude,
     })
     .from(ascent)
     .leftJoin(route, eq(ascent.routeId, route.id))
@@ -118,6 +120,8 @@ export async function getAscentDetail(id: string, userId: string) {
     routeName: route.name,
     routeDiscipline: route.discipline,
     locationName: location.name,
+    locationLatitude: location.latitude,
+    locationLongitude: location.longitude,
    }).from(ascent)
    .leftJoin(route, eq(ascent.routeId, route.id))
    .leftJoin(location, eq(ascent.locationId, location.id))

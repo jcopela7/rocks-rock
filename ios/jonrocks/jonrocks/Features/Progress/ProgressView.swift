@@ -16,7 +16,12 @@ struct ProgressViewTab: View {
     ScrollView {
       VStack(alignment: .leading, spacing: 16) {
         disciplineFilterRow
-        ClimbingCalendarView(month: Date(), ascents: viewModel.ascents)
+        ClimbingCalendarView(
+          month: Date(),
+          ascents: viewModel.ascents.filter {
+            $0.routeDiscipline?.lowercased() == selectedDiscipline.lowercased()
+          }
+        )
         SendsByGradeView(viewModel: viewModel, discipline: selectedDiscipline)
         SendsByLocationView(viewModel: viewModel)
       }

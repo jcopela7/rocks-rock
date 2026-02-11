@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		563B7B312EE1F9630015539E /* Auth0 in Frameworks */ = {isa = PBXBuildFile; productRef = 563B7B302EE1F9630015539E /* Auth0 */; };
+		56F7EA512EA3E6A200CB50F3 /* MapboxMaps in Frameworks */ = {isa = PBXBuildFile; productRef = 56F7EA522EA3E6A200CB50F3 /* MapboxMaps */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +42,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				563B7B312EE1F9630015539E /* Auth0 in Frameworks */,
+				56F7EA512EA3E6A200CB50F3 /* MapboxMaps in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -84,6 +86,7 @@
 			name = jonrocks;
 			packageProductDependencies = (
 				563B7B302EE1F9630015539E /* Auth0 */,
+				56F7EA522EA3E6A200CB50F3 /* MapboxMaps */,
 			);
 			productName = jonrocks;
 			productReference = 56F7EA432EA3E69D00CB50F3 /* jonrocks.app */;
@@ -115,6 +118,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				563B7B2F2EE1F9630015539E /* XCRemoteSwiftPackageReference "Auth0" */,
+				56F7EA532EA3E6A200CB50F3 /* XCRemoteSwiftPackageReference "mapbox-maps-ios" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 56F7EA442EA3E69D00CB50F3 /* Products */;
@@ -374,6 +378,14 @@
 				minimumVersion = 2.15.1;
 			};
 		};
+		56F7EA532EA3E6A200CB50F3 /* XCRemoteSwiftPackageReference "mapbox-maps-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mapbox/mapbox-maps-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -381,6 +393,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 563B7B2F2EE1F9630015539E /* XCRemoteSwiftPackageReference "Auth0" */;
 			productName = Auth0;
+		};
+		56F7EA522EA3E6A200CB50F3 /* MapboxMaps */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56F7EA532EA3E6A200CB50F3 /* XCRemoteSwiftPackageReference "mapbox-maps-ios" */;
+			productName = MapboxMaps;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

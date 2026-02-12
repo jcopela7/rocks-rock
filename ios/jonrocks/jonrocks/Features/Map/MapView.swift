@@ -32,7 +32,7 @@ struct MapView: View {
           }
           .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
-          mapContent(viewModel: mapVM)
+          MapContentView(viewModel: mapVM, viewport: $viewport)
         }
       } else {
         LoadingListView()
@@ -89,8 +89,29 @@ struct MapView: View {
     .buttonStyle(ScaleButtonStyle())
   }
 
-  @ViewBuilder
-  private func mapContent(viewModel: MapViewModel) -> some View {
+  private func locateMeButton() -> some View {
+    Button {
+      withViewportAnimation(.easeIn(duration: 0.5)) {
+        viewport = .followPuck(zoom: 14, pitch: 0)
+      }
+    } label: {
+      Image(systemName: "location.fill")
+        .font(.title2)
+        .foregroundStyle(Color.theme.accent)
+        .padding(12)
+        .background(.white)
+        .clipShape(Circle())
+        .shadow(color: Color.theme.shadow, radius: 4, x: 0, y: 2)
+    }
+  }
+
+}
+
+private struct MapContentView: View {
+  @ObservedObject var viewModel: MapViewModel
+  @Binding var viewport: Viewport
+
+  var body: some View {
     Map(viewport: $viewport) {
       Puck2D(bearing: .heading)
         .showsAccuracyRing(true)
@@ -123,23 +144,6 @@ struct MapView: View {
     }
     .ignoresSafeArea(.all, edges: .bottom)
   }
-
-  private func locateMeButton() -> some View {
-    Button {
-      withViewportAnimation(.easeIn(duration: 0.5)) {
-        viewport = .followPuck(zoom: 14, pitch: 0)
-      }
-    } label: {
-      Image(systemName: "location.fill")
-        .font(.title2)
-        .foregroundStyle(Color.theme.accent)
-        .padding(12)
-        .background(.white)
-        .clipShape(Circle())
-        .shadow(color: Color.theme.shadow, radius: 4, x: 0, y: 2)
-    }
-  }
-
 }
 
 private struct ScaleButtonStyle: ButtonStyle {

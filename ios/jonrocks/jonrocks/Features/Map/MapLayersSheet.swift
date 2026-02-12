@@ -41,7 +41,6 @@ struct MapLayersSheet: View {
         .padding(.horizontal, 20)
         .padding(.bottom, 24)
       }
-      layerSheetFooter
     }
     .background(Color.white)
     .foregroundColor(Color.theme.textPrimary)
@@ -67,43 +66,6 @@ struct MapLayersSheet: View {
     .padding(.horizontal, 20)
     .padding(.vertical, 16)
     .background(Color.white)
-  }
-
-  private var layerSheetFooter: some View {
-    VStack(spacing: 0) {
-      HStack {
-        Spacer()
-        Button {
-          dismiss()
-        } label: {
-          Text("Done")
-            .font(.subheadline)
-            .fontWeight(.semibold)
-            .foregroundColor(.white)
-            .padding(.horizontal, 20)
-            .padding(.vertical, 12)
-            .background(Color.theme.textPrimary)
-            .cornerRadius(8)
-        }
-      }
-      .padding(.horizontal, 20)
-      .padding(.vertical, 16)
-      .background(Color.white)
-    }
-    .overlay(alignment: .top) {
-      LinearGradient(
-        colors: [
-          Color.clear,
-          Color.theme.textSecondary.opacity(0.08),
-          Color.theme.textSecondary.opacity(0.15),
-        ],
-        startPoint: .top,
-        endPoint: .bottom
-      )
-      .frame(height: 8)
-      .frame(maxWidth: .infinity)
-      .offset(y: -8)
-    }
   }
 }
 

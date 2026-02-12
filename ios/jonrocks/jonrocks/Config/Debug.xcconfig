@@ -1,3 +1,6 @@
 SLASH = /
 HTTP_SCHEME = http
 API_BASE_URL = $(HTTP_SCHEME):$(SLASH)$(SLASH)127.0.0.1:3000/api/v1
+
+// Mapbox access token - copy Config/Secrets.xcconfig.example to Config/Secrets.xcconfig and add your token
+#include "Secrets.xcconfig"

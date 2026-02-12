@@ -55,6 +55,8 @@ struct AscentDTO: Codable, Identifiable {
   let routeDiscipline: String?  // "boulder" | "sport" | "trad" | "board"
   let locationId: UUID?
   let locationName: String?
+  let locationLatitude: Double?
+  let locationLongitude: Double?
   let routeGradeValue: String?
   let routeGradeRank: Int?
   let style: String

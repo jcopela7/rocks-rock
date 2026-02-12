@@ -16,6 +16,14 @@ struct NavigationBar: View {
       }
 
       NavigationBarButton(
+        title: "Map",
+        systemImage: "map",
+        isSelected: selectedTab == 1
+      ) {
+        selectedTab = 1
+      }
+
+      NavigationBarButton(
         title: "Add",
         systemImage: "plus.circle",
         isSelected: selectedTab == addTabIndex
@@ -26,9 +34,9 @@ struct NavigationBar: View {
       NavigationBarButton(
         title: "You",
         systemImage: "person",
-        isSelected: selectedTab == 2
+        isSelected: selectedTab == 3
       ) {
-        selectedTab = 2
+        selectedTab = 3
       }
     }
     .padding(.vertical, 8)

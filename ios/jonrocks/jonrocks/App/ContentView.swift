@@ -9,13 +9,15 @@ struct ContentView: View {
   @State private var selectedClimbType: ClimbFilter?
   @State private var sheetContentHeight: CGFloat = 400
 
-  private let addTabIndex = 1
+  private let addTabIndex = 2
 
   var body: some View {
     VStack(spacing: 0) {
       Group {
         if selectedTab == 0 {
           DiscoverView()
+        } else if selectedTab == 1 {
+          MapView()
         } else if selectedTab == addTabIndex {
           AddView(initialFilter: selectedClimbType ?? .boulder)
         } else {

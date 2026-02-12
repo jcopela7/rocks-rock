@@ -10,6 +10,7 @@ struct MapView: View {
   @State private var mapVM: MapViewModel?
   @State private var viewport: Viewport = .camera(
     center: defaultCenter, zoom: defaultZoom, bearing: 0, pitch: 0)
+  @State private var showingLayerSheet = false
 
   var body: some View {
     ZStack {
@@ -45,8 +46,13 @@ struct MapView: View {
               .padding(.top, 60)
           }
           Spacer()
+          HStack {
+            Spacer()
+            layersButton()
+              .padding(.trailing, 8)
+              .padding(.bottom, 8)
+          }
         }
-        layerTogglesOverlay(viewModel: mapVM)
       }
     }
     .background(Color.raw.slate100)
@@ -60,6 +66,25 @@ struct MapView: View {
     }
     .refreshable {
       await mapVM?.loadData()
+    }
+    .sheet(isPresented: $showingLayerSheet) {
+      if let mapVM = mapVM {
+        layerTogglesSheetContent(viewModel: mapVM, isPresented: $showingLayerSheet)
+      }
+    }
+  }
+
+  private func layersButton() -> some View {
+    Button {
+      showingLayerSheet = true
+    } label: {
+      Image(systemName: "square.stack.3d.up")
+        .font(.title2)
+        .foregroundStyle(Color.theme.accent)
+        .padding(12)
+        .background(.white)
+        .clipShape(Circle())
+        .shadow(color: Color.theme.shadow, radius: 4, x: 0, y: 2)
     }
   }
 
@@ -85,7 +110,7 @@ struct MapView: View {
             MapViewAnnotation(coordinate: CLLocationCoordinate2D(latitude: lat, longitude: lon)) {
               Circle()
                 .fill(Color.theme.accent.opacity(0.8))
-                .frame(width: 12, height: 12)
+                .frame(width: 24, height: 24)
                 .overlay(
                   Circle()
                     .stroke(Color.white, lineWidth: 2)
@@ -114,13 +139,11 @@ struct MapView: View {
     }
   }
 
-  private func layerTogglesOverlay(viewModel: MapViewModel) -> some View {
-    VStack {
-      Spacer()
+  private func layerTogglesSheetContent(
+    viewModel: MapViewModel, isPresented: Binding<Bool>
+  ) -> some View {
+    NavigationStack {
       VStack(alignment: .leading, spacing: 12) {
-        Text("Layers")
-          .font(.headline)
-          .foregroundStyle(Color.theme.textPrimary)
         Toggle(
           isOn: Binding(
             get: { viewModel.showLocationsLayer },
@@ -142,14 +165,18 @@ struct MapView: View {
         }
         .tint(Color.theme.accent)
       }
-      .padding(16)
-      .background(.white)
-      .cornerRadius(12)
-      .shadow(color: Color.theme.shadow, radius: 4, x: 0, y: 2)
-      .padding(.horizontal, 16)
-      .padding(.bottom, 100)
+      .padding()
+      .navigationTitle("Layers")
+      .navigationBarTitleDisplayMode(.inline)
+      .toolbar {
+        ToolbarItem(placement: .confirmationAction) {
+          Button("Done") {
+            isPresented.wrappedValue = false
+          }
+        }
+      }
     }
-    .frame(maxWidth: .infinity, alignment: .trailing)
+    .presentationDetents([.medium])
   }
 }
 

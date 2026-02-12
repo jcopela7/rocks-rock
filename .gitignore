@@ -3,6 +3,7 @@ dist
 .env
 
 # iOS / Xcode
+ios/jonrocks/jonrocks/Config/Secrets.xcconfig
 DerivedData/
 *.xcworkspace/xcuserdata
 *.xcodeproj/xcuserdata

@@ -69,7 +69,7 @@ struct MapView: View {
     }
     .sheet(isPresented: $showingLayerSheet) {
       if let mapVM = mapVM {
-        layerTogglesSheetContent(viewModel: mapVM, isPresented: $showingLayerSheet)
+        MapLayersSheet(viewModel: mapVM)
       }
     }
   }
@@ -139,45 +139,6 @@ struct MapView: View {
     }
   }
 
-  private func layerTogglesSheetContent(
-    viewModel: MapViewModel, isPresented: Binding<Bool>
-  ) -> some View {
-    NavigationStack {
-      VStack(alignment: .leading, spacing: 12) {
-        Toggle(
-          isOn: Binding(
-            get: { viewModel.showLocationsLayer },
-            set: { viewModel.showLocationsLayer = $0 }
-          )
-        ) {
-          Label("Locations", systemImage: "mappin.circle.fill")
-            .foregroundStyle(Color.theme.textPrimary)
-        }
-        .tint(Color.theme.accent)
-        Toggle(
-          isOn: Binding(
-            get: { viewModel.showAscentsLayer },
-            set: { viewModel.showAscentsLayer = $0 }
-          )
-        ) {
-          Label("Ascents", systemImage: "circle.fill")
-            .foregroundStyle(Color.theme.textPrimary)
-        }
-        .tint(Color.theme.accent)
-      }
-      .padding()
-      .navigationTitle("Layers")
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        ToolbarItem(placement: .confirmationAction) {
-          Button("Done") {
-            isPresented.wrappedValue = false
-          }
-        }
-      }
-    }
-    .presentationDetents([.medium])
-  }
 }
 
 #Preview {

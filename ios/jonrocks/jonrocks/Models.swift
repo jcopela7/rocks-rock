@@ -24,13 +24,16 @@ struct UpdateUserRequest: Encodable {
   let firstName: String?
 }
 
-struct LocationDTO: Codable, Identifiable {
+struct LocationDTO: Codable, Identifiable, Hashable {
   let id: UUID
   let name: String
   let type: String  // "gym" | "crag"
   let description: String?
   let latitude: Double?
   let longitude: Double?
+
+  func hash(into hasher: inout Hasher) { hasher.combine(id) }
+  static func == (lhs: Self, rhs: Self) -> Bool { lhs.id == rhs.id }
 }
 
 struct RouteDTO: Codable, Identifiable {

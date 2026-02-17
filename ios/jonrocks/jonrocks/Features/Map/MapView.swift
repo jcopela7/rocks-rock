@@ -7,6 +7,7 @@ private let defaultZoom: CGFloat = 3
 
 struct MapView: View {
   @EnvironmentObject var authService: AuthenticationService
+  var onLocationSelected: ((LocationDTO) -> Void)? = nil
   @State private var mapVM: MapViewModel?
   @State private var viewport: Viewport = .camera(
     center: defaultCenter, zoom: defaultZoom, bearing: 0, pitch: 0)
@@ -32,7 +33,8 @@ struct MapView: View {
           }
           .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
-          MapContentView(viewModel: mapVM, viewport: $viewport)
+          MapContentView(
+            viewModel: mapVM, viewport: $viewport, onLocationSelected: onLocationSelected)
         }
       } else {
         LoadingListView()
@@ -108,6 +110,7 @@ struct MapView: View {
 private struct MapContentView: View {
   @ObservedObject var viewModel: MapViewModel
   @Binding var viewport: Viewport
+  var onLocationSelected: ((LocationDTO) -> Void)?
 
   var body: some View {
     Map(viewport: $viewport) {
@@ -117,9 +120,14 @@ private struct MapContentView: View {
         ForEvery(viewModel.mappableLocations, id: \.id) { location in
           if let lat = location.latitude, let lon = location.longitude {
             MapViewAnnotation(coordinate: CLLocationCoordinate2D(latitude: lat, longitude: lon)) {
-              Image(systemName: "mappin.circle.fill")
-                .font(.title2)
-                .foregroundStyle(Color.theme.accent)
+              Button {
+                onLocationSelected?(location)
+              } label: {
+                Image(systemName: "mappin.circle.fill")
+                  .font(.title2)
+                  .foregroundStyle(Color.theme.accent)
+              }
+              .buttonStyle(.plain)
             }
           }
         }

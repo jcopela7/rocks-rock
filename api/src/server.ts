@@ -9,6 +9,7 @@ import { ascentRoutes } from './routes/ascents.js';
 import { locationRoutes } from './routes/location.js';
 import { routeRoutes } from './routes/routes.js';
 import { user } from './routes/user.js';
+import { userLocationRoutes } from './routes/userLocation.js';
 dotenv.config();
 
 const app = Fastify();
@@ -21,6 +22,7 @@ app.register(ascentRoutes, { prefix: '/api/v1' });
 app.register(user, { prefix: '/api/v1' });
 app.register(locationRoutes, { prefix: '/api/v1' });
 app.register(routeRoutes, { prefix: '/api/v1' });
+app.register(userLocationRoutes, { prefix: '/api/v1' });
 app.get('/', async () => ({ ok: true, service: 'jonrocks-api' }));
 
 async function start() {
@@ -57,9 +59,16 @@ app.setErrorHandler((err, req, reply) => {
     });
   }
 
-  // If it's a DB error, expose the important parts
+  // Handle PostgreSQL unique constraint violation
   const pg: { detail?: string; code?: string; constraint?: string; message?: string } =
     err?.cause ?? err;
+  if (pg?.code === '23505') {
+    return reply.code(409).send({
+      error: 'Conflict',
+      message: 'Resource already exists',
+      constraint: pg?.constraint,
+    });
+  }
   req.log.error(pg);
   return reply.code(500).send({
     error: 'Internal Server Error',

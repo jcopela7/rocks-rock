@@ -36,6 +36,13 @@
       "when": 1770317188636,
       "tag": "0004_add_route_star_rating",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1771356564354,
+      "tag": "0005_add_user_location_unique",
+      "breakpoints": true
     }
   ]
 }

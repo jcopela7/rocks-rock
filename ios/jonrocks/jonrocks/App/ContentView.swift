@@ -8,6 +8,7 @@ struct ContentView: View {
   @State private var showClimbTypeDrawer = false
   @State private var selectedClimbType: ClimbFilter?
   @State private var sheetContentHeight: CGFloat = 400
+  @State private var locationToOpen: LocationDTO?
 
   private let addTabIndex = 2
 
@@ -15,9 +16,12 @@ struct ContentView: View {
     VStack(spacing: 0) {
       Group {
         if selectedTab == 0 {
-          DiscoverView()
+          DiscoverView(locationToOpen: $locationToOpen)
         } else if selectedTab == 1 {
-          MapView()
+          MapView(onLocationSelected: { location in
+            selectedTab = 0
+            locationToOpen = location
+          })
         } else if selectedTab == addTabIndex {
           AddView(initialFilter: selectedClimbType ?? .boulder)
         } else {

@@ -2,8 +2,14 @@ import SwiftUI
 
 struct DiscoverView: View {
   @EnvironmentObject var authService: AuthenticationService
+  @Binding var locationToOpen: LocationDTO?
+
+  init(locationToOpen: Binding<LocationDTO?> = .constant(nil)) {
+    self._locationToOpen = locationToOpen
+  }
   @State private var discoverVM: DiscoverVM?
   @State private var selected = "My Locations"
+  @State private var navigationPath = NavigationPath()
 
   private var searchTextBinding: Binding<String> {
     Binding(
@@ -13,7 +19,7 @@ struct DiscoverView: View {
   }
 
   var body: some View {
-    NavigationStack {
+    NavigationStack(path: $navigationPath) {
       VStack(spacing: 0) {
         AppHeader(title: "Discover")
           .background(Color.white)
@@ -50,6 +56,19 @@ struct DiscoverView: View {
             }
           }
         }
+        if let location = locationToOpen {
+          navigationPath.append(location)
+          locationToOpen = nil
+        }
+      }
+      .onChange(of: locationToOpen) { _, newValue in
+        if let location = newValue {
+          navigationPath.append(location)
+          locationToOpen = nil
+        }
+      }
+      .navigationDestination(for: LocationDTO.self) { location in
+        LocationDetailView(location: location, authService: authService)
       }
     }
   }
@@ -84,12 +103,7 @@ struct LocationsContentView: View {
         .padding()
       } else {
         List(discoverVM.filteredLocations) { location in
-          NavigationLink(
-            destination: LocationDetailView(
-              location: location,
-              authService: authService
-            )
-          ) {
+          NavigationLink(value: location) {
             LocationRowView(location: location)
           }
           .listRowSeparator(.visible)
@@ -103,5 +117,6 @@ struct LocationsContentView: View {
 }
 
 #Preview {
-  DiscoverView()
+  DiscoverView(locationToOpen: .constant(nil))
+    .environmentObject(AuthenticationService())
 }

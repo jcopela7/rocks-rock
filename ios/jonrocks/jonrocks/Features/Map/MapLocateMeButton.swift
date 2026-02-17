@@ -7,7 +7,7 @@ struct MapLocateMeButton: View {
   var body: some View {
     Button {
       withViewportAnimation(.easeIn(duration: 0.5)) {
-        viewport = .followPuck(zoom: 14, pitch: 0)
+        viewport = .followPuck(zoom: MapConstants.locateMeZoom, pitch: 0)
       }
     } label: {
       Image(systemName: "location.fill")

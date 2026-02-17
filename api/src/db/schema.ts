@@ -5,6 +5,7 @@ import {
   pgTable,
   text,
   timestamp,
+  unique,
   uuid
 } from 'drizzle-orm/pg-core';
 
@@ -31,6 +32,22 @@ export const location = pgTable('location', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
   deletedAt: timestamp('deleted_at', { withTimezone: true }),
 });
+
+export const userLocation = pgTable(
+  'user_location',
+  {
+    id: uuid('id').primaryKey(),
+    userId: uuid('user_id')
+      .references(() => appUser.id)
+      .notNull(),
+    locationId: uuid('location_id')
+      .references(() => location.id)
+      .notNull(),
+  },
+  (t) => [
+    unique('user_location_user_id_location_id_unique').on(t.userId, t.locationId),
+  ]
+);
 
 /** Routes / problems */
 export const route = pgTable('route', {

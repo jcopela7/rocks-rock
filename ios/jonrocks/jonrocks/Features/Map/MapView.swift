@@ -39,18 +39,15 @@ struct MapView: View {
       }
       if let mapVM = mapVM, mapVM.error == nil {
         VStack {
-          HStack {
-            Spacer()
-            locateMeButton()
-              .padding(.trailing, 16)
-              .padding(.top, 60)
-          }
           Spacer()
           HStack {
             Spacer()
-            layersButton()
-              .padding(.trailing, 8)
-              .padding(.bottom, 8)
+            VStack {
+              locateMeButton()
+              layersButton()
+            }
+            .padding(.bottom, 8)
+            .padding(.trailing, 8)
           }
         }
       }
@@ -103,6 +100,7 @@ struct MapView: View {
         .clipShape(Circle())
         .shadow(color: Color.theme.shadow, radius: 4, x: 0, y: 2)
     }
+    .buttonStyle(ScaleButtonStyle())
   }
 
 }

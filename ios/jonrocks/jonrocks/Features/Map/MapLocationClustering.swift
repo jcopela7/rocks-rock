@@ -108,8 +108,6 @@ struct MapLocationClustering {
     layer.textField = .expression(Exp(.get) { "point_count" })
     layer.textSize = .constant(14)
     layer.textColor = .constant(StyleColor(.white))
-    layer.textHaloColor = .constant(StyleColor(.darkGray))
-    layer.textHaloWidth = .constant(1)
     layer.textAllowOverlap = .constant(true)
     return layer
   }

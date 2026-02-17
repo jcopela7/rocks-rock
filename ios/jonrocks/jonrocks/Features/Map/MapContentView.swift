@@ -35,6 +35,7 @@ struct MapContentView: View {
           false
         }
       }
+      .ornamentOptions(OrnamentOptions(scaleBar: ScaleBarViewOptions(visibility: .hidden)))
       .onStyleLoaded { _ in
         guard let map = proxy.map else { return }
         let locations = viewModel.showLocationsLayer ? viewModel.mappableLocations : []

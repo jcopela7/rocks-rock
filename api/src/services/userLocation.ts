@@ -1,4 +1,4 @@
-import { and, asc, eq, getTableColumns, ilike, isNull } from 'drizzle-orm';
+import { and, asc, eq, ilike, isNull } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../db/index.js';
 import { location, userLocation } from '../db/schema.js';
@@ -36,8 +36,13 @@ export async function listMyLocations(userId: string, query?: ListLocationsQuery
 
   const rows = await db
     .select({
-      ...getTableColumns(location),
-      userLocationId: userLocation.id,
+      id: userLocation.id,
+      locationId: location.id,
+      name: location.name,
+      type: location.type,
+      description: location.description,
+      latitude: location.latitude,
+      longitude: location.longitude,
     })
     .from(location)
     .innerJoin(userLocation, eq(location.id, userLocation.locationId))
@@ -47,10 +52,7 @@ export async function listMyLocations(userId: string, query?: ListLocationsQuery
   return rows;
 }
 
-export async function deleteUserLocation(
-  id: string,
-  userId: string
-): Promise<{ id: string; userId: string; } | null> {
+export async function deleteUserLocation( id: string, userId: string) {
   const [row] = await db
     .delete(userLocation)
     .where(and(eq(userLocation.id, id), eq(userLocation.userId, userId)))

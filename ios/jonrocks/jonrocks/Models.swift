@@ -36,6 +36,22 @@ struct LocationDTO: Codable, Identifiable, Hashable {
   static func == (lhs: Self, rhs: Self) -> Bool { lhs.id == rhs.id }
 }
 
+struct UserLocationDTO: Codable, Identifiable {
+  let userLocationId: UUID
+  let id: UUID
+  let name: String
+  let type: String  // "gym" | "crag"
+  let description: String?
+  let latitude: Double?
+  let longitude: Double?
+}
+
+struct CreateUserLocationResponseDTO: Decodable {
+  let id: UUID
+  let locationId: UUID
+  let userId: UUID
+}
+
 struct RouteDTO: Codable, Identifiable {
   let id: UUID
   let locationId: UUID

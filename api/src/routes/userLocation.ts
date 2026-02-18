@@ -7,12 +7,12 @@ import { ListLocationsQuery } from '../services/locations.js';
 export async function userLocationRoutes(app: FastifyInstance) {
   app.addHook('onRequest', authenticateUser);
 
-  app.post('/user/location', async (req, reply) => {
+  app.post('/user/location/:locationId', async (req, reply) => {
     if (!req.user) {
       return reply.code(401).send({ error: 'Unauthorized' });
     }
-    const body = CreateUserLocationInput.parse(req.body);
-    const created = await createUserLocation(body, req.user.id);
+    const { locationId } = z.object({ locationId: z.string().uuid() }).parse(req.params);
+    const created = await createUserLocation({ locationId }, req.user.id);
     return reply.code(201).send(created);
   });
 

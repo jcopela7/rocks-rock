@@ -5,7 +5,6 @@ import { location, userLocation } from '../db/schema.js';
 import { ListLocationsQuery, ListLocationsQueryType } from './locations.js';
 
 export const CreateUserLocationInput = z.object({
-  id: z.string().uuid(),
   locationId: z.string().uuid(),
 });
 
@@ -16,7 +15,7 @@ export async function createUserLocation(input: CreateUserLocationInput, userId:
   const [row] = await db
     .insert(userLocation)
     .values({
-      id: data.id,
+      id: crypto.randomUUID(),
       userId,
       locationId: data.locationId,
     })

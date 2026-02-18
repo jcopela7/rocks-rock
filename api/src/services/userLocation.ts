@@ -52,7 +52,7 @@ export async function listMyLocations(userId: string, query?: ListLocationsQuery
   return rows;
 }
 
-export async function deleteUserLocation( id: string, userId: string) {
+export async function deleteUserLocation(id: string, userId: string) {
   const [row] = await db
     .delete(userLocation)
     .where(and(eq(userLocation.id, id), eq(userLocation.userId, userId)))

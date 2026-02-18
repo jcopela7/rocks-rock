@@ -128,6 +128,16 @@ final class APIClient {
     return env.data
   }
 
+  func deleteUserLocation(_ id: UUID) async throws -> DeleteUserLocationResponseDTO {
+    let env: APIListEnvelope<DeleteUserLocationResponseDTO> = try await helpers.delete(
+      "user/location/\(id.uuidString)",
+      body: nil,
+      token: try requireToken(),
+      refreshToken: getRefreshTokenCallback()
+    )
+    return env.data
+  }
+
   func getCountOfAscentsGroupByLocation(discipline: String) async throws
     -> [CountOfAscentsByLocationDTO]
   {

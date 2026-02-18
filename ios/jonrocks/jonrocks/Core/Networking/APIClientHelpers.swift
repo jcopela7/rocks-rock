@@ -89,6 +89,23 @@ final class APIClientHelpers {
     }
   }
 
+  func post<T: Decodable>(
+    _ path: String,
+    token: String,
+    refreshToken: (() async -> String?)? = nil
+  ) async throws -> T {
+    return try await performRequest(
+      path: path,
+      query: [],
+      method: "POST",
+      body: nil as String?,
+      token: token,
+      refreshToken: refreshToken
+    ) { token in
+      try await self.postWithNoBodyWithoutRefresh(path, token: token)
+    }
+  }
+
   func post<Body: Encodable, T: Decodable>(
     _ path: String,
     body: Body,
@@ -103,11 +120,28 @@ final class APIClientHelpers {
       token: token,
       refreshToken: refreshToken
     ) { token in
-      try await self.postWithoutRefresh(path, body: body, token: token)
+      try await self.postWithBodyWithoutRefresh(path, body: body, token: token)
     }
   }
 
-  private func postWithoutRefresh<Body: Encodable, T: Decodable>(
+  private func postWithNoBodyWithoutRefresh<T: Decodable>(
+    _ path: String,
+    token: String
+  ) async throws -> T {
+    let url = base.appendingPathComponent(path)
+    var req = URLRequest(url: url)
+    req.httpMethod = "POST"
+    addAuthHeader(to: &req, token: token)
+
+    let (data, resp) = try await session.data(for: req)
+    guard let http = resp as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
+      let body = String(data: data, encoding: .utf8)
+      throw APIError.badStatus((resp as? HTTPURLResponse)?.statusCode ?? -1, body)
+    }
+    do { return try dec.decode(T.self, from: data) } catch { throw APIError.decode(error) }
+  }
+
+  private func postWithBodyWithoutRefresh<Body: Encodable, T: Decodable>(
     _ path: String,
     body: Body,
     token: String

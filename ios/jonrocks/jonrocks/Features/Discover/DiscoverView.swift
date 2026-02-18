@@ -35,7 +35,11 @@ struct DiscoverView: View {
         }
         Group {
           if let discoverVM = discoverVM {
-            LocationsContentView(discoverVM: discoverVM)
+            if selected == "My Locations" {
+              MyLocationsListView(discoverVM: discoverVM)
+            } else {
+              AllLocationsListView(discoverVM: discoverVM)
+            }
           } else {
             LoadingListView()
           }
@@ -48,11 +52,13 @@ struct DiscoverView: View {
           discoverVM = DiscoverVM(authService: authService)
           Task {
             await discoverVM?.loadLocations()
+            await discoverVM?.loadMyLocations()
           }
         } else {
           if discoverVM?.locations.isEmpty == true && discoverVM?.loading == false {
             Task {
               await discoverVM?.loadLocations()
+              await discoverVM?.loadMyLocations()
             }
           }
         }
@@ -69,48 +75,6 @@ struct DiscoverView: View {
       }
       .navigationDestination(for: LocationDTO.self) { location in
         LocationDetailView(location: location, authService: authService)
-      }
-    }
-  }
-}
-
-struct LocationsContentView: View {
-  @EnvironmentObject var authService: AuthenticationService
-  @ObservedObject var discoverVM: DiscoverVM
-
-  var body: some View {
-    Group {
-      if discoverVM.loading {
-        LoadingListView()
-      } else if let error = discoverVM.error {
-        VStack(spacing: 12) {
-          Text("Error loading locations")
-            .font(.headline)
-            .foregroundColor(.red)
-          Text(error)
-            .font(.body)
-            .foregroundStyle(.secondary)
-            .multilineTextAlignment(.center)
-            .padding()
-          Button("Retry") {
-            Task {
-              await discoverVM.loadLocations()
-            }
-          }
-          .buttonStyle(.bordered)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding()
-      } else {
-        List(discoverVM.filteredLocations) { location in
-          NavigationLink(value: location) {
-            LocationRowView(location: location)
-          }
-          .listRowSeparator(.visible)
-        }
-        .listStyle(.plain)
-        .contentMargins(.horizontal, 12)
-        .background(Color.theme.card)
       }
     }
   }

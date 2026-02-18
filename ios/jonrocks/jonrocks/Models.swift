@@ -36,6 +36,28 @@ struct LocationDTO: Codable, Identifiable, Hashable {
   static func == (lhs: Self, rhs: Self) -> Bool { lhs.id == rhs.id }
 }
 
+struct UserLocationDTO: Codable, Identifiable {
+  let id: UUID
+  let locationId: UUID
+  let name: String
+  let type: String  // "gym" | "crag"
+  let description: String?
+  let latitude: Double?
+  let longitude: Double?
+}
+
+struct CreateUserLocationResponseDTO: Decodable {
+  let id: UUID
+  let locationId: UUID
+  let userId: UUID
+}
+
+struct DeleteUserLocationResponseDTO: Decodable {
+  let id: UUID
+  let locationId: UUID
+  let userId: UUID
+}
+
 struct RouteDTO: Codable, Identifiable {
   let id: UUID
   let locationId: UUID
@@ -69,6 +91,20 @@ struct AscentDTO: Codable, Identifiable {
   let climbedAt: Date
 }
 
+struct CreateAscentRequest: Encodable {
+  let routeId: UUID?
+  let locationId: UUID?
+  let style: String
+  let attempts: Int
+  let rating: Int?
+  let notes: String?
+  let climbedAt: Date
+}
+
+struct DeleteAscentRequest: Encodable {
+  let id: UUID
+}
+
 struct CountOfAscentsByLocationDTO: Codable {
   let locationName: String
   let totalAscents: Int
@@ -88,18 +124,4 @@ struct MaxGradeByDisciplineDTO: Codable {
 
 struct CountOfAscentsByDisciplineDTO: Codable {
   let totalAscents: Int
-}
-
-struct CreateAscentRequest: Encodable {
-  let routeId: UUID?
-  let locationId: UUID?
-  let style: String
-  let attempts: Int
-  let rating: Int?
-  let notes: String?
-  let climbedAt: Date
-}
-
-struct DeleteAscentRequest: Encodable {
-  let id: UUID
 }

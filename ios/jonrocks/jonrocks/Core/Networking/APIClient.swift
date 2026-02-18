@@ -105,6 +105,39 @@ final class APIClient {
     return env.data
   }
 
+  func listMyLocations(name: String? = nil) async throws -> [UserLocationDTO] {
+    var query: [URLQueryItem] = []
+    if let name = name, !name.isEmpty {
+      query.append(.init(name: "name", value: name))
+    }
+    let env: APIListEnvelope<[UserLocationDTO]> = try await helpers.get(
+      "user/location",
+      query: query,
+      token: try requireToken(),
+      refreshToken: getRefreshTokenCallback()
+    )
+    return env.data
+  }
+
+  func createUserLocation(_ locationId: UUID) async throws -> CreateUserLocationResponseDTO {
+    let env: APIListEnvelope<CreateUserLocationResponseDTO> = try await helpers.postWithNoBody(
+      "user/location/\(locationId.uuidString)",
+      token: try requireToken(),
+      refreshToken: getRefreshTokenCallback()
+    )
+    return env.data
+  }
+
+  func deleteUserLocation(_ id: UUID) async throws -> DeleteUserLocationResponseDTO {
+    let env: APIListEnvelope<DeleteUserLocationResponseDTO> = try await helpers.delete(
+      "user/location/\(id.uuidString)",
+      body: nil,
+      token: try requireToken(),
+      refreshToken: getRefreshTokenCallback()
+    )
+    return env.data
+  }
+
   func getCountOfAscentsGroupByLocation(discipline: String) async throws
     -> [CountOfAscentsByLocationDTO]
   {

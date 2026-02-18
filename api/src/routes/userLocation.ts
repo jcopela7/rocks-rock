@@ -13,7 +13,7 @@ export async function userLocationRoutes(app: FastifyInstance) {
     }
     const { locationId } = z.object({ locationId: z.string().uuid() }).parse(req.params);
     const created = await createUserLocation({ locationId }, req.user.id);
-    return reply.code(201).send(created);
+    return reply.code(201).send({ data: created });
   });
 
   app.get('/user/location', async (req, reply) => {

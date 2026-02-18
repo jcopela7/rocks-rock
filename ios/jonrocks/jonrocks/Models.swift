@@ -37,8 +37,8 @@ struct LocationDTO: Codable, Identifiable, Hashable {
 }
 
 struct UserLocationDTO: Codable, Identifiable {
-  let userLocationId: UUID
   let id: UUID
+  let locationId: UUID
   let name: String
   let type: String  // "gym" | "crag"
   let description: String?
@@ -47,6 +47,12 @@ struct UserLocationDTO: Codable, Identifiable {
 }
 
 struct CreateUserLocationResponseDTO: Decodable {
+  let id: UUID
+  let locationId: UUID
+  let userId: UUID
+}
+
+struct DeleteUserLocationResponseDTO: Decodable {
   let id: UUID
   let locationId: UUID
   let userId: UUID
@@ -85,6 +91,20 @@ struct AscentDTO: Codable, Identifiable {
   let climbedAt: Date
 }
 
+struct CreateAscentRequest: Encodable {
+  let routeId: UUID?
+  let locationId: UUID?
+  let style: String
+  let attempts: Int
+  let rating: Int?
+  let notes: String?
+  let climbedAt: Date
+}
+
+struct DeleteAscentRequest: Encodable {
+  let id: UUID
+}
+
 struct CountOfAscentsByLocationDTO: Codable {
   let locationName: String
   let totalAscents: Int
@@ -104,18 +124,4 @@ struct MaxGradeByDisciplineDTO: Codable {
 
 struct CountOfAscentsByDisciplineDTO: Codable {
   let totalAscents: Int
-}
-
-struct CreateAscentRequest: Encodable {
-  let routeId: UUID?
-  let locationId: UUID?
-  let style: String
-  let attempts: Int
-  let rating: Int?
-  let notes: String?
-  let climbedAt: Date
-}
-
-struct DeleteAscentRequest: Encodable {
-  let id: UUID
 }

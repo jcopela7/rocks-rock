@@ -48,6 +48,10 @@ struct MyLocationsListView: View {
           .listRowSeparator(.visible)
         }
         .listStyle(.plain)
+        .refreshable {
+          await discoverVM.loadMyLocations(
+            name: discoverVM.searchText.isEmpty ? nil : discoverVM.searchText)
+        }
         .contentMargins(.horizontal, 12)
         .background(Color.theme.card)
       }

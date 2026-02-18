@@ -35,6 +35,9 @@ struct AllLocationsListView: View {
           .listRowSeparator(.visible)
         }
         .listStyle(.plain)
+        .refreshable {
+          await discoverVM.loadLocations()
+        }
         .contentMargins(.horizontal, 12)
         .background(Color.theme.card)
       }

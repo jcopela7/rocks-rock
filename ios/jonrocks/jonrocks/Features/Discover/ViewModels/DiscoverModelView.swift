@@ -94,6 +94,12 @@ final class DiscoverVM: ObservableObject {
       } else {
         self.error = apiError.errorDescription
       }
+    } catch let err as URLError where err.code == .cancelled {
+      return
+    } catch let err as NSError
+      where err.domain == NSURLErrorDomain && err.code == NSURLErrorCancelled
+    {
+      return
     } catch let err {
       print("❌ Backend error in loadLocations(): \(err)")
       print("❌ Error type: \(type(of: err))")
@@ -118,6 +124,12 @@ final class DiscoverVM: ObservableObject {
       } else {
         self.error = apiError.errorDescription
       }
+    } catch let err as URLError where err.code == .cancelled {
+      return
+    } catch let err as NSError
+      where err.domain == NSURLErrorDomain && err.code == NSURLErrorCancelled
+    {
+      return
     } catch let err {
       self.error = err.localizedDescription
     }

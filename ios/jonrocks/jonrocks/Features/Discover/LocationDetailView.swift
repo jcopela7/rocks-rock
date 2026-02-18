@@ -77,9 +77,27 @@ struct LocationDetailView: View {
     .navigationBarTitleDisplayMode(.inline)
     .navigationTitle(location.name)
     .background(Color.white)
+    .toolbar {
+      ToolbarItem(placement: .navigationBarTrailing) {
+        Button {
+          Task {
+            await viewModel.toggleFavourite(locationId: location.id)
+          }
+        } label: {
+          if viewModel.favouriteLoading {
+            ProgressView()
+          } else {
+            Image(systemName: viewModel.isLocationFavourite ? "heart.fill" : "heart")
+              .foregroundColor(viewModel.isLocationFavourite ? .red : Color.theme.accent)
+          }
+        }
+        .disabled(viewModel.favouriteLoading)
+      }
+    }
     .onAppear {
       Task {
         await viewModel.loadFilteredRoutesByLocation(for: location.id)
+        await viewModel.loadFavouriteStatus(for: location.id)
       }
     }
 

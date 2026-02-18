@@ -120,7 +120,7 @@ final class APIClient {
   }
 
   func createUserLocation(_ locationId: UUID) async throws -> CreateUserLocationResponseDTO {
-    let env: APIListEnvelope<CreateUserLocationResponseDTO> = try await helpers.post(
+    let env: APIListEnvelope<CreateUserLocationResponseDTO> = try await helpers.postWithNoBody(
       "user/location/\(locationId.uuidString)",
       token: try requireToken(),
       refreshToken: getRefreshTokenCallback()

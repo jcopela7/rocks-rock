@@ -89,7 +89,7 @@ final class APIClientHelpers {
     }
   }
 
-  func post<T: Decodable>(
+  func postWithNoBody<T: Decodable>(
     _ path: String,
     token: String,
     refreshToken: (() async -> String?)? = nil

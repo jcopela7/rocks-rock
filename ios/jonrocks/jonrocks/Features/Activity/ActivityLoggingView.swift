@@ -33,6 +33,11 @@ struct ActivityLoggingView: View {
               .padding(6)
               .background(Color.white)
               .clipShape(RoundedRectangle(cornerRadius: 10))
+              .shadow(color: Color.theme.shadow, radius: 4, x: 0, y: 2)
+              .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                  .stroke(Color.theme.border, lineWidth: 1)
+              )
           }
         }
         .padding(.horizontal, 16)

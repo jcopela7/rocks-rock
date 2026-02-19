@@ -25,5 +25,10 @@ struct SearchBar: View {
     .padding(.vertical, 8)
     .background(Color(.white))
     .cornerRadius(10)
+    .shadow(color: Color.theme.shadow, radius: 4, x: 0, y: 2)
+    .overlay(
+      RoundedRectangle(cornerRadius: 10)
+        .stroke(Color.theme.border, lineWidth: 1)
+    )
   }
 }

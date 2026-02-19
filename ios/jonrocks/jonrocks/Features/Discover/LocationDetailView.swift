@@ -5,6 +5,19 @@ import SwiftUI
 struct LocationDetailView: View {
   let location: LocationDTO
   @StateObject private var viewModel: DiscoverVM
+  @State private var routeSearchText = ""
+
+  private var filteredRoutes: [RouteDTO] {
+    if routeSearchText.isEmpty {
+      return viewModel.routes
+    }
+    let query = routeSearchText.lowercased()
+    return viewModel.routes.filter { route in
+      let name = (route.name ?? "Unnamed").lowercased()
+      let grade = route.gradeValue.lowercased()
+      return name.contains(query) || grade.contains(query)
+    }
+  }
 
   init(location: LocationDTO, authService: AuthenticationService) {
     self.location = location
@@ -38,6 +51,9 @@ struct LocationDetailView: View {
             .font(.title2)
             .fontWeight(.bold)
             .padding(.horizontal, 16)
+            .padding(.top, 16)
+          SearchBar(text: $routeSearchText, placeholder: "Search routes...")
+            .padding(.horizontal, 16)
             .padding(.vertical, 8)
           if viewModel.loading {
             LoadingListView()
@@ -60,8 +76,16 @@ struct LocationDetailView: View {
             }
             .frame(maxWidth: .infinity)
             .padding()
+          } else if filteredRoutes.isEmpty {
+            VStack {
+              Text("No routes found")
+                .font(.body)
+                .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity)
+            .padding()
           } else {
-            ForEach(viewModel.routes) { route in
+            ForEach(filteredRoutes) { route in
               NavigationLink(destination: RouteDetailView(route: route)) {
                 RouteRowView(route: route)
               }

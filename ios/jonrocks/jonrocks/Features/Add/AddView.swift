@@ -30,7 +30,7 @@ struct AddView: View {
       }
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-    .background(Color.theme.background)
+    .background(Color.white)
     .onAppear {
       if discoverVM == nil {
         discoverVM = DiscoverVM(authService: authService)

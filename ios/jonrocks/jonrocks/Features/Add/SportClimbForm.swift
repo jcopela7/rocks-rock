@@ -24,87 +24,96 @@ struct SportClimbForm: View {
 
   var body: some View {
     NavigationStack {
-      Form {
-        Section("Location") {
-          Button(action: {
+      ScrollView {
+        VStack(alignment: .leading, spacing: 18) {
+          sectionHeader("Location")
+          selectionField(
+            icon: "mappin.and.ellipse",
+            text: selectedLocationName,
+            isPlaceholder: selectedLocationId == nil
+          ) {
             showingSearchModal = true
-          }) {
-            HStack {
-              Text(selectedLocationName)
-                .foregroundColor(selectedLocationId == nil ? .secondary : .primary)
-              Spacer()
-              Image(systemName: "chevron.right")
-                .foregroundColor(.secondary)
-                .font(.caption)
-            }
           }
           .onChange(of: selectedLocationId) {
             selectedRouteId = nil
           }
-        }
 
-        Section("Route") {
-          Button(action: {
+          sectionHeader("Route")
+          selectionField(
+            icon: "figure.climbing",
+            text: selectedRouteName,
+            isPlaceholder: selectedRouteId == nil
+          ) {
             showingSearchModal = true
-          }) {
-            HStack {
-              Text(selectedRouteName)
-                .foregroundColor(selectedRouteId == nil ? .secondary : .primary)
-              Spacer()
-              Image(systemName: "chevron.right")
-                .foregroundColor(.secondary)
-                .font(.caption)
-            }
           }
           .disabled(selectedLocationId == nil)
-        }
 
-        Section("Notes") {
-          TextEditor(text: $notes)
-            .frame(minHeight: 80)
-        }
-
-        Section("Attempts") {
-          Stepper("Attempts: \(attempts)", value: $attempts, in: 1...100)
-        }
-
-        Section("Stars") {
-          Stepper("Stars: \(stars)", value: $stars, in: 0...5)
-        }
-
-        Section("Date Climbed") {
-          DatePicker("Date Climbed", selection: $dateClimbed, displayedComponents: [.date])
-        }
-
-        if let error = error {
-          Section {
-            Text(error)
-              .foregroundColor(.red)
+          sectionHeader("Notes")
+          VStack(alignment: .leading, spacing: 8) {
+            Label("Private notes", systemImage: "note.text")
+              .font(.subheadline)
+              .foregroundColor(Color.theme.textSecondary)
+            TextEditor(text: $notes)
+              .frame(minHeight: 88)
+              .scrollContentBackground(.hidden)
           }
-        }
+          .padding(12)
+          .formFieldCard()
 
-        Section {
+          sectionHeader("Attempts")
+          HStack(spacing: 10) {
+            Image(systemName: "number")
+              .foregroundColor(Color.theme.textSecondary)
+            Stepper("Attempts: \(attempts)", value: $attempts, in: 1...100)
+          }
+          .padding(.horizontal, 14)
+          .padding(.vertical, 14)
+          .formFieldCard()
+
+          sectionHeader("Stars")
+          HStack(spacing: 10) {
+            Image(systemName: "star")
+              .foregroundColor(Color.theme.textSecondary)
+            Stepper("Stars: \(stars)", value: $stars, in: 0...5)
+          }
+          .padding(.horizontal, 14)
+          .padding(.vertical, 14)
+          .formFieldCard()
+
+          sectionHeader("Date Climbed")
+          DatePicker(selection: $dateClimbed, displayedComponents: [.date]) {
+            Label("Date Climbed", systemImage: "calendar")
+          }
+          .padding(.horizontal, 14)
+          .padding(.vertical, 14)
+          .formFieldCard()
+
+          if let error = error {
+            Text(error)
+              .font(.footnote)
+              .foregroundColor(Color.theme.danger)
+              .padding(.horizontal, 4)
+          }
+
           Button(action: {
             Task { await submitForm() }
           }) {
-            Text("Save")
+            Text(isSubmitting ? "Saving..." : "Save")
               .frame(maxWidth: .infinity)
-              .padding(.vertical, 12)
+              .padding(.vertical, 14)
               .background(Color.theme.accent)
               .foregroundColor(.white)
               .font(.headline)
-              .cornerRadius(4)
+              .clipShape(RoundedRectangle(cornerRadius: 10))
               .contentShape(Rectangle())
           }
           .disabled(isSubmitting || selectedLocationId == nil)
+          .opacity((isSubmitting || selectedLocationId == nil) ? 0.6 : 1)
         }
-        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-        .listRowBackground(Color.clear)
+        .padding(16)
       }
-      .scrollContentBackground(.hidden)
-      .background(Color.raw.slate100)
+      .background(Color.white)
       .foregroundColor(Color.theme.textPrimary)
-      .listStyle(.plain)
       .sheet(isPresented: $showingSearchModal) {
         LocationRouteSearchModal(
           discoverVM: discoverVM,
@@ -122,6 +131,38 @@ struct SportClimbForm: View {
         }
       }
     }
+  }
+
+  private func sectionHeader(_ text: String) -> some View {
+    Text(text)
+      .font(.subheadline)
+      .fontWeight(.semibold)
+      .foregroundColor(Color.theme.textPrimary)
+      .padding(.horizontal, 4)
+  }
+
+  private func selectionField(
+    icon: String,
+    text: String,
+    isPlaceholder: Bool,
+    action: @escaping () -> Void
+  ) -> some View {
+    Button(action: action) {
+      HStack {
+        Image(systemName: icon)
+          .foregroundColor(Color.theme.textSecondary)
+        Text(text)
+          .foregroundColor(isPlaceholder ? Color.theme.textSecondary : Color.theme.textPrimary)
+        Spacer()
+        Image(systemName: "chevron.down")
+          .font(.system(size: 13, weight: .semibold))
+          .foregroundColor(Color.theme.textSecondary)
+      }
+      .padding(.horizontal, 14)
+      .padding(.vertical, 14)
+      .formFieldCard()
+    }
+    .buttonStyle(.plain)
   }
 
   private var selectedLocationName: String {

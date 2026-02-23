@@ -12,7 +12,7 @@ struct AddView: View {
 
   var body: some View {
     VStack(spacing: 0) {
-      AppHeader(title: "Add Activity")
+      AppHeader(title: "Add Activity", titleAlignment: .centered)
         .background(Color.theme.accent)
         .foregroundColor(Color.white)
 

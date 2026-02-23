@@ -1,16 +1,12 @@
-import Combine
-import Foundation
-import PhotosUI
 import SwiftUI
 
 struct ContentView: View {
   @State private var selectedTab = 0
   @State private var showClimbTypeDrawer = false
   @State private var selectedClimbType: ClimbFilter?
+  @State private var showClimbForm = false
   @State private var sheetContentHeight: CGFloat = 400
   @State private var locationToOpen: LocationDTO?
-
-  private let addTabIndex = 2
 
   var body: some View {
     VStack(spacing: 0) {
@@ -22,8 +18,6 @@ struct ContentView: View {
             selectedTab = 0
             locationToOpen = location
           })
-        } else if selectedTab == addTabIndex {
-          AddView(initialFilter: selectedClimbType ?? .boulder)
         } else {
           YouView()
         }
@@ -32,7 +26,6 @@ struct ContentView: View {
 
       NavigationBar(
         selectedTab: $selectedTab,
-        addTabIndex: addTabIndex,
         onAddTap: { showClimbTypeDrawer = true }
       )
     }
@@ -40,14 +33,26 @@ struct ContentView: View {
     .sheet(isPresented: $showClimbTypeDrawer) {
       ClimbTypeDrawer { climbType in
         selectedClimbType = climbType
-        selectedTab = addTabIndex
         showClimbTypeDrawer = false
+        showClimbForm = true
       }
       .onPreferenceChange(SheetHeightPreferenceKey.self) { height in
         if height > 0 { sheetContentHeight = height + 34 }  // + bottom safe area
       }
       .presentationDetents([.height(sheetContentHeight)])
       .presentationDragIndicator(.visible)
+    }
+    .fullScreenCover(
+      isPresented: $showClimbForm,
+      onDismiss: {
+        selectedClimbType = nil
+        selectedTab = 0
+      }
+    ) {
+      AddView(
+        initialFilter: selectedClimbType ?? .boulder,
+        onClose: { showClimbForm = false }
+      )
     }
   }
 }

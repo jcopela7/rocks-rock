@@ -4,6 +4,8 @@ struct BoulderingClimbForm: View {
   @ObservedObject var discoverVM: DiscoverVM
   @ObservedObject var ascentsVM: AscentsVM
 
+  var onClose: (() -> Void)?
+
   @State private var selectedLocationId: UUID? = nil
   @State private var selectedRouteId: UUID? = nil
   @State private var notes: String = ""
@@ -292,6 +294,7 @@ struct BoulderingClimbForm: View {
         ascentsVM.ascents.insert(created, at: 0)
         ascentsVM.error = nil
         clearForm()
+        onClose?()
       }
     } catch let err {
       await MainActor.run {

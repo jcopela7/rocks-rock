@@ -2,7 +2,6 @@ import SwiftUI
 
 struct NavigationBar: View {
   @Binding var selectedTab: Int
-  let addTabIndex: Int
   let onAddTap: () -> Void
 
   var body: some View {
@@ -26,7 +25,7 @@ struct NavigationBar: View {
       NavigationBarButton(
         title: "Add",
         systemImage: "plus.circle",
-        isSelected: selectedTab == addTabIndex
+        isSelected: false
       ) {
         onAddTap()
       }

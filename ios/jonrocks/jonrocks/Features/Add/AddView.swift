@@ -12,9 +12,17 @@ struct AddView: View {
 
   var body: some View {
     VStack(spacing: 0) {
-      AppHeader(title: "Add Activity", titleAlignment: .centered)
-        .background(Color.theme.accent)
-        .foregroundColor(Color.white)
+      HStack(alignment: .center) {
+        Text("Add Activity")
+          .font(.title2)
+          .fontWeight(.bold)
+        Spacer()
+      }
+      .padding(.horizontal, 16)
+      .padding(.vertical, 8)
+      .frame(maxWidth: .infinity)
+      .background(Color.theme.accent)
+      .foregroundColor(Color.white)
 
       if selectedFilter == .boulder, let ascentsVM = ascentsVM, let discoverVM = discoverVM {
         BoulderingClimbForm(

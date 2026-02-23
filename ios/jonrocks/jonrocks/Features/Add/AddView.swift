@@ -13,7 +13,8 @@ struct AddView: View {
   var body: some View {
     VStack(spacing: 0) {
       AppHeader(title: "Log a \(String(describing: selectedFilter).capitalized) Climb")
-        .background(Color.white)
+        .background(Color.theme.accent)
+        .foregroundColor(Color.white)
 
       if selectedFilter == .boulder, let ascentsVM = ascentsVM, let discoverVM = discoverVM {
         BoulderingClimbForm(
@@ -30,7 +31,7 @@ struct AddView: View {
       }
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-    .background(Color.theme.background)
+    .background(Color.white)
     .onAppear {
       if discoverVM == nil {
         discoverVM = DiscoverVM(authService: authService)

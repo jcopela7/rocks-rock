@@ -12,42 +12,83 @@ struct AddActivityFormView: View {
 
   var body: some View {
     NavigationStack {
-      Form {
-        Section("Route") {
-          Picker("Route", selection: $formData.routeId) {
-            Text("None").tag(UUID?.none)
-            ForEach(discoverVM.routes, id: \.id) { route in
-              Text(routeName(for: route)).tag(UUID?.some(route.id))
+      ScrollView {
+        VStack(alignment: .leading, spacing: 18) {
+          sectionHeader("Route")
+          HStack(spacing: 10) {
+            Image(systemName: "figure.climbing")
+              .foregroundColor(Color.theme.textSecondary)
+            Picker("Route", selection: $formData.routeId) {
+              Text("None").tag(UUID?.none)
+              ForEach(discoverVM.routes, id: \.id) { route in
+                Text(routeName(for: route)).tag(UUID?.some(route.id))
+              }
             }
+            .pickerStyle(.menu)
           }
-        }
+          .padding(.horizontal, 14)
+          .padding(.vertical, 14)
+          .formFieldCard()
 
-        Section("Climb Details") {
-          Picker("Style", selection: $formData.style) {
-            ForEach(styleOptions, id: \.self) { style in
-              Text(style.capitalized).tag(style)
+          sectionHeader("Style")
+          HStack(spacing: 10) {
+            Image(systemName: "arrow.triangle.branch")
+              .foregroundColor(Color.theme.textSecondary)
+            Picker("Style", selection: $formData.style) {
+              ForEach(styleOptions, id: \.self) { style in
+                Text(style.capitalized).tag(style)
+              }
             }
+            .pickerStyle(.menu)
           }
+          .padding(.horizontal, 14)
+          .padding(.vertical, 14)
+          .formFieldCard()
 
-          Stepper("Attempts: \(formData.attempts)", value: $formData.attempts, in: 1...20)
-        }
+          sectionHeader("Attempts")
+          HStack(spacing: 10) {
+            Image(systemName: "number")
+              .foregroundColor(Color.theme.textSecondary)
+            Stepper("Attempts: \(formData.attempts)", value: $formData.attempts, in: 1...20)
+          }
+          .padding(.horizontal, 14)
+          .padding(.vertical, 14)
+          .formFieldCard()
 
-        Section("Rating") {
-          TextField("Grade (e.g., 5.10a, V4)", text: $formData.rating)
-            .textInputAutocapitalization(.never)
-        }
+          sectionHeader("Rating")
+          HStack(spacing: 10) {
+            Image(systemName: "chart.bar")
+              .foregroundColor(Color.theme.textSecondary)
+            TextField("Grade (e.g., 5.10a, V4)", text: $formData.rating)
+              .textInputAutocapitalization(.never)
+          }
+          .padding(.horizontal, 14)
+          .padding(.vertical, 14)
+          .formFieldCard()
 
-        Section("Notes") {
-          TextEditor(text: $formData.notes)
-            .frame(minHeight: 80)
-        }
+          sectionHeader("Notes")
+          VStack(alignment: .leading, spacing: 8) {
+            Label("Private notes", systemImage: "note.text")
+              .font(.subheadline)
+              .foregroundColor(Color.theme.textSecondary)
+            TextEditor(text: $formData.notes)
+              .frame(minHeight: 88)
+              .scrollContentBackground(.hidden)
+          }
+          .padding(12)
+          .formFieldCard()
 
-        Section("Date") {
-          DatePicker(
-            "Climb Date", selection: $formData.climbedAt,
-            displayedComponents: [.date, .hourAndMinute])
+          sectionHeader("Date")
+          DatePicker(selection: $formData.climbedAt, displayedComponents: [.date, .hourAndMinute]) {
+            Label("Climb Date", systemImage: "calendar")
+          }
+          .padding(.horizontal, 14)
+          .padding(.vertical, 14)
+          .formFieldCard()
         }
+        .padding(16)
       }
+      .background(Color.white)
       .navigationTitle("Add Ascent")
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
@@ -69,6 +110,14 @@ struct AddActivityFormView: View {
     .task {
       await discoverVM.loadRoutes()
     }
+  }
+
+  private func sectionHeader(_ text: String) -> some View {
+    Text(text)
+      .font(.subheadline)
+      .fontWeight(.semibold)
+      .foregroundColor(Color.theme.textPrimary)
+      .padding(.horizontal, 4)
   }
 
   private func routeName(for route: RouteDTO) -> String {

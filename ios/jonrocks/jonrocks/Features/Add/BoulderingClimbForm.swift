@@ -13,6 +13,8 @@ struct BoulderingClimbForm: View {
   @State private var isSubmitting = false
   @State private var error: String? = nil
   @State private var showingSearchModal = false
+  private let attemptsRange = 1...100
+  private let starsRange = 0...5
 
   var filteredRoutes: [RouteDTO] {
     let boulderRoutes = discoverVM.routes.filter { $0.discipline == "boulder" }
@@ -26,7 +28,7 @@ struct BoulderingClimbForm: View {
     NavigationStack {
       ScrollView {
         VStack(alignment: .leading, spacing: 18) {
-          sectionHeader("Location")
+          sectionHeader("Climb Details")
           selectionField(
             icon: "mappin.and.ellipse",
             text: selectedLocationName,
@@ -38,7 +40,6 @@ struct BoulderingClimbForm: View {
             selectedRouteId = nil
           }
 
-          sectionHeader("Route")
           selectionField(
             icon: "figure.climbing",
             text: selectedRouteName,
@@ -47,8 +48,9 @@ struct BoulderingClimbForm: View {
             showingSearchModal = true
           }
           .disabled(selectedLocationId == nil)
+          Divider()
 
-          sectionHeader("Notes")
+          sectionHeader("Metadata")
           VStack(alignment: .leading, spacing: 8) {
             Label("Notes", systemImage: "note.text")
               .font(.subheadline)
@@ -60,27 +62,74 @@ struct BoulderingClimbForm: View {
           .padding(12)
           .formFieldCard()
 
-          sectionHeader("Attempts")
+          Divider()
+
+          sectionHeader("Activity Details")
           HStack(spacing: 10) {
             Image(systemName: "number")
               .foregroundColor(Color.theme.textSecondary)
-            Stepper("Attempts: \(attempts)", value: $attempts, in: 1...100)
+            Text("Attempts: \(attempts)")
+              .font(.subheadline)
+              .foregroundColor(Color.theme.textPrimary)
+            Spacer()
+            HStack(spacing: 8) {
+              StepperAdjustButton(
+                symbol: "minus",
+                action: { attempts = max(attemptsRange.lowerBound, attempts - 1) },
+                isDisabled: attempts <= attemptsRange.lowerBound
+              )
+              StepperAdjustButton(
+                symbol: "plus",
+                action: { attempts = min(attemptsRange.upperBound, attempts + 1) },
+                isDisabled: attempts >= attemptsRange.upperBound
+              )
+            }
+            .buttonStyle(.plain)
           }
           .padding(.horizontal, 14)
           .padding(.vertical, 14)
           .formFieldCard()
 
-          sectionHeader("Stars")
-          HStack(spacing: 10) {
-            Image(systemName: "star")
-              .foregroundColor(Color.theme.textSecondary)
-            Stepper("Stars: \(stars)", value: $stars, in: 0...5)
+          VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 10) {
+              Image(systemName: "star")
+                .foregroundColor(Color.theme.textSecondary)
+              Text("Stars: ")
+                .font(.subheadline)
+                .foregroundColor(Color.theme.textPrimary)
+              if stars > 0 {
+                HStack(spacing: 2) {
+                  ForEach(0..<stars, id: \.self) { _ in
+                    Image(systemName: "star.fill")
+                      .foregroundColor(.yellow)
+                  }
+                }
+              } else {
+                Text("No stars")
+                  .font(.footnote)
+                  .foregroundColor(Color.theme.textSecondary)
+              }
+              Spacer()
+              HStack(spacing: 8) {
+                StepperAdjustButton(
+                  symbol: "minus",
+                  action: { stars = max(starsRange.lowerBound, stars - 1) },
+                  isDisabled: stars <= starsRange.lowerBound
+                )
+                StepperAdjustButton(
+                  symbol: "plus",
+                  action: { stars = min(starsRange.upperBound, stars + 1) },
+                  isDisabled: stars >= starsRange.upperBound
+                )
+              }
+              .buttonStyle(.plain)
+            }
+
           }
           .padding(.horizontal, 14)
           .padding(.vertical, 14)
           .formFieldCard()
 
-          sectionHeader("Date Climbed")
           DatePicker(selection: $dateClimbed, displayedComponents: [.date]) {
             Label("Date Climbed", systemImage: "calendar")
           }

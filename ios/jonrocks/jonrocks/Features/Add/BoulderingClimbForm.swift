@@ -28,6 +28,24 @@ struct BoulderingClimbForm: View {
     NavigationStack {
       ScrollView {
         VStack(alignment: .leading, spacing: 18) {
+          sectionHeader("Activity Type")
+          HStack(spacing: 10) {
+            Image("crashpadIcon")
+              .resizable()
+              .scaledToFit()
+              .frame(width: 24, height: 24)
+              .foregroundColor(Color.theme.textSecondary)
+            Text("Boulder")
+              .font(.subheadline)
+              .foregroundColor(Color.theme.textPrimary)
+            Spacer()
+          }
+          .padding(.horizontal, 14)
+          .padding(.vertical, 14)
+          .formFieldCard()
+
+          Divider()
+
           sectionHeader("Climb Details")
           selectionField(
             icon: "mappin.and.ellipse",
@@ -89,7 +107,6 @@ struct BoulderingClimbForm: View {
           .padding(.horizontal, 14)
           .padding(.vertical, 14)
           .formFieldCard()
-
           VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 10) {
               Image(systemName: "star")

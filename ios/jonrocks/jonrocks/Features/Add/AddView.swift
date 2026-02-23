@@ -12,7 +12,7 @@ struct AddView: View {
 
   var body: some View {
     VStack(spacing: 0) {
-      AppHeader(title: "Log a \(String(describing: selectedFilter).capitalized) Climb")
+      AppHeader(title: "Add Activity")
         .background(Color.theme.accent)
         .foregroundColor(Color.white)
 

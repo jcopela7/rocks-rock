@@ -28,6 +28,24 @@ struct SportClimbForm: View {
     NavigationStack {
       ScrollView {
         VStack(alignment: .leading, spacing: 18) {
+          sectionHeader("Activity Type")
+          HStack(spacing: 10) {
+            Image("quickdrawIcon")
+              .resizable()
+              .scaledToFit()
+              .frame(width: 24, height: 24)
+              .foregroundColor(Color.theme.textSecondary)
+            Text("Sport Climbing")
+              .font(.subheadline)
+              .foregroundColor(Color.theme.textPrimary)
+            Spacer()
+          }
+          .padding(.horizontal, 14)
+          .padding(.vertical, 14)
+          .formFieldCard()
+
+          Divider()
+
           sectionHeader("Climb Details")
           selectionField(
             icon: "mappin.and.ellipse",

@@ -28,141 +28,149 @@ struct BoulderingClimbForm: View {
 
   var body: some View {
     NavigationStack {
-      ScrollView {
-        VStack(alignment: .leading, spacing: 18) {
-          sectionHeader("Activity Type")
-          HStack(spacing: 10) {
-            Image("crashpadIcon")
-              .resizable()
-              .scaledToFit()
-              .frame(width: 24, height: 24)
-              .foregroundColor(Color.theme.textSecondary)
-            Text("Boulder")
-              .font(.subheadline)
-              .foregroundColor(Color.theme.textPrimary)
-            Spacer()
-          }
-          .padding(.horizontal, 14)
-          .padding(.vertical, 14)
-          .formFieldCard()
-
-          Divider()
-
-          sectionHeader("Climb Details")
-          selectionField(
-            icon: "mappin.and.ellipse",
-            text: selectedLocationName,
-            isPlaceholder: selectedLocationId == nil
-          ) {
-            showingSearchModal = true
-          }
-          .onChange(of: selectedLocationId) {
-            selectedRouteId = nil
-          }
-
-          selectionField(
-            icon: "figure.climbing",
-            text: selectedRouteName,
-            isPlaceholder: selectedRouteId == nil
-          ) {
-            showingSearchModal = true
-          }
-          .disabled(selectedLocationId == nil)
-          Divider()
-
-          sectionHeader("Metadata")
-          VStack(alignment: .leading, spacing: 8) {
-            Label("Notes", systemImage: "note.text")
-              .font(.subheadline)
-              .foregroundColor(Color.theme.textSecondary)
-            TextEditor(text: $notes)
-              .frame(minHeight: 88)
-              .scrollContentBackground(.hidden)
-          }
-          .padding(12)
-          .formFieldCard()
-
-          Divider()
-
-          sectionHeader("Activity Details")
-          HStack(spacing: 10) {
-            Image(systemName: "number")
-              .foregroundColor(Color.theme.textSecondary)
-            Text("Attempts: \(attempts)")
-              .font(.subheadline)
-              .foregroundColor(Color.theme.textPrimary)
-            Spacer()
-            HStack(spacing: 8) {
-              StepperAdjustButton(
-                symbol: "minus",
-                action: { attempts = max(attemptsRange.lowerBound, attempts - 1) },
-                isDisabled: attempts <= attemptsRange.lowerBound
-              )
-              StepperAdjustButton(
-                symbol: "plus",
-                action: { attempts = min(attemptsRange.upperBound, attempts + 1) },
-                isDisabled: attempts >= attemptsRange.upperBound
-              )
-            }
-            .buttonStyle(.plain)
-          }
-          .padding(.horizontal, 14)
-          .padding(.vertical, 14)
-          .formFieldCard()
-          VStack(alignment: .leading, spacing: 10) {
+      VStack(spacing: 0) {
+        ScrollView {
+          VStack(alignment: .leading, spacing: 18) {
+            sectionHeader("Activity Type")
             HStack(spacing: 10) {
-              Image(systemName: "star")
+              Image("crashpadIcon")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 24, height: 24)
                 .foregroundColor(Color.theme.textSecondary)
-              Text("Stars: ")
+              Text("Boulder")
                 .font(.subheadline)
                 .foregroundColor(Color.theme.textPrimary)
-              if stars > 0 {
-                HStack(spacing: 2) {
-                  ForEach(0..<stars, id: \.self) { _ in
-                    Image(systemName: "star.fill")
-                      .foregroundColor(.yellow)
-                  }
-                }
-              } else {
-                Text("No stars")
-                  .font(.footnote)
-                  .foregroundColor(Color.theme.textSecondary)
-              }
+              Spacer()
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 14)
+            .formFieldCard()
+
+            Divider()
+
+            sectionHeader("Climb Details")
+            selectionField(
+              icon: "mappin.and.ellipse",
+              text: selectedLocationName,
+              isPlaceholder: selectedLocationId == nil
+            ) {
+              showingSearchModal = true
+            }
+            .onChange(of: selectedLocationId) {
+              selectedRouteId = nil
+            }
+
+            selectionField(
+              icon: "figure.climbing",
+              text: selectedRouteName,
+              isPlaceholder: selectedRouteId == nil
+            ) {
+              showingSearchModal = true
+            }
+            .disabled(selectedLocationId == nil)
+            Divider()
+
+            sectionHeader("Metadata")
+            VStack(alignment: .leading, spacing: 8) {
+              Label("Notes", systemImage: "note.text")
+                .font(.subheadline)
+                .foregroundColor(Color.theme.textSecondary)
+              TextEditor(text: $notes)
+                .frame(minHeight: 88)
+                .scrollContentBackground(.hidden)
+            }
+            .padding(12)
+            .formFieldCard()
+
+            Divider()
+
+            sectionHeader("Activity Details")
+            HStack(spacing: 10) {
+              Image(systemName: "number")
+                .foregroundColor(Color.theme.textSecondary)
+              Text("Attempts: \(attempts)")
+                .font(.subheadline)
+                .foregroundColor(Color.theme.textPrimary)
               Spacer()
               HStack(spacing: 8) {
                 StepperAdjustButton(
                   symbol: "minus",
-                  action: { stars = max(starsRange.lowerBound, stars - 1) },
-                  isDisabled: stars <= starsRange.lowerBound
+                  action: { attempts = max(attemptsRange.lowerBound, attempts - 1) },
+                  isDisabled: attempts <= attemptsRange.lowerBound
                 )
                 StepperAdjustButton(
                   symbol: "plus",
-                  action: { stars = min(starsRange.upperBound, stars + 1) },
-                  isDisabled: stars >= starsRange.upperBound
+                  action: { attempts = min(attemptsRange.upperBound, attempts + 1) },
+                  isDisabled: attempts >= attemptsRange.upperBound
                 )
               }
               .buttonStyle(.plain)
             }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 14)
+            .formFieldCard()
+            VStack(alignment: .leading, spacing: 10) {
+              HStack(spacing: 10) {
+                Image(systemName: "star")
+                  .foregroundColor(Color.theme.textSecondary)
+                Text("Stars: ")
+                  .font(.subheadline)
+                  .foregroundColor(Color.theme.textPrimary)
+                if stars > 0 {
+                  HStack(spacing: 2) {
+                    ForEach(0..<stars, id: \.self) { _ in
+                      Image(systemName: "star.fill")
+                        .foregroundColor(.yellow)
+                    }
+                  }
+                } else {
+                  Text("No stars")
+                    .font(.footnote)
+                    .foregroundColor(Color.theme.textSecondary)
+                }
+                Spacer()
+                HStack(spacing: 8) {
+                  StepperAdjustButton(
+                    symbol: "minus",
+                    action: { stars = max(starsRange.lowerBound, stars - 1) },
+                    isDisabled: stars <= starsRange.lowerBound
+                  )
+                  StepperAdjustButton(
+                    symbol: "plus",
+                    action: { stars = min(starsRange.upperBound, stars + 1) },
+                    isDisabled: stars >= starsRange.upperBound
+                  )
+                }
+                .buttonStyle(.plain)
+              }
 
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 14)
+            .formFieldCard()
+
+            DatePicker(selection: $dateClimbed, displayedComponents: [.date]) {
+              Label("Date Climbed", systemImage: "calendar")
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 14)
+            .formFieldCard()
+
+            if let error = error {
+              Text(error)
+                .font(.footnote)
+                .foregroundColor(Color.theme.danger)
+                .padding(.horizontal, 4)
+            }
           }
-          .padding(.horizontal, 14)
-          .padding(.vertical, 14)
-          .formFieldCard()
+          .padding(16)
+        }
+        .background(Color.white)
 
-          DatePicker(selection: $dateClimbed, displayedComponents: [.date]) {
-            Label("Date Climbed", systemImage: "calendar")
-          }
-          .padding(.horizontal, 14)
-          .padding(.vertical, 14)
-          .formFieldCard()
-
-          if let error = error {
-            Text(error)
-              .font(.footnote)
-              .foregroundColor(Color.theme.danger)
-              .padding(.horizontal, 4)
-          }
-
+        let isDisabled = isSubmitting || selectedLocationId == nil
+        VStack(spacing: 0) {
+          Divider()
           Button(action: {
             Task { await submitForm() }
           }) {
@@ -170,16 +178,29 @@ struct BoulderingClimbForm: View {
               .frame(maxWidth: .infinity)
               .padding(.vertical, 14)
               .font(.headline)
-              .foregroundColor(.white)
-              .background(Color.theme.accent)
+              .foregroundColor(isDisabled ? Color(UIColor.darkGray) : .white)
+              .background(isDisabled ? Color(UIColor.systemGray4) : Color.theme.accent)
               .clipShape(RoundedRectangle(cornerRadius: 10))
           }
-          .disabled(isSubmitting || selectedLocationId == nil)
-          .opacity((isSubmitting || selectedLocationId == nil) ? 0.6 : 1)
+          .disabled(isDisabled)
+          .padding(16)
         }
-        .padding(16)
+        .overlay(alignment: .top) {
+          LinearGradient(
+            colors: [
+              Color.clear,
+              Color.theme.textSecondary.opacity(0.08),
+              Color.theme.textSecondary.opacity(0.15),
+            ],
+            startPoint: .top,
+            endPoint: .bottom
+          )
+          .frame(height: 8)
+          .frame(maxWidth: .infinity)
+          .offset(y: -8)
+        }
+        .background(Color.white)
       }
-      .background(Color.white)
       .foregroundColor(Color.theme.textPrimary)
       .sheet(isPresented: $showingSearchModal) {
         LocationRouteSearchModal(

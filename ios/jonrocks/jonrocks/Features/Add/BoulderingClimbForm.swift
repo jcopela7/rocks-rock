@@ -185,20 +185,7 @@ struct BoulderingClimbForm: View {
           .disabled(isDisabled)
           .padding(16)
         }
-        .overlay(alignment: .top) {
-          LinearGradient(
-            colors: [
-              Color.clear,
-              Color.theme.textSecondary.opacity(0.08),
-              Color.theme.textSecondary.opacity(0.15),
-            ],
-            startPoint: .top,
-            endPoint: .bottom
-          )
-          .frame(height: 8)
-          .frame(maxWidth: .infinity)
-          .offset(y: -8)
-        }
+        .footerShadow()
         .background(Color.white)
       }
       .foregroundColor(Color.theme.textPrimary)

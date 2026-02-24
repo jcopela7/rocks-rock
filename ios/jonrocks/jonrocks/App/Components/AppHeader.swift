@@ -16,19 +16,21 @@ struct AppHeader: View {
   }
 
   var body: some View {
-    HStack {
-      Text(title)
-        .font(.largeTitle)
-        .fontWeight(.bold)
-      Spacer()
-      HStack(spacing: 12) {
-        if showSettingsButton ?? false, let onSettingsTap = onSettingsTap {
-          Button(action: onSettingsTap) {
-            Image(systemName: "gearshape")
-              .fontWeight(.semibold)
-              .frame(width: 24, height: 24)
-              .clipShape(Circle())
-              .foregroundColor(Color.theme.textPrimary)
+    ZStack {
+      HStack {
+        Text(title)
+          .font(.largeTitle)
+          .fontWeight(.bold)
+        Spacer()
+        HStack(spacing: 12) {
+          if showSettingsButton ?? false, let onSettingsTap = onSettingsTap {
+            Button(action: onSettingsTap) {
+              Image(systemName: "gearshape")
+                .fontWeight(.semibold)
+                .frame(width: 24, height: 24)
+                .clipShape(Circle())
+                .foregroundColor(Color.theme.textPrimary)
+            }
           }
         }
       }

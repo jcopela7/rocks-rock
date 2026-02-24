@@ -47,6 +47,12 @@ struct AddView: View {
           ascentsVM: ascentsVM,
           onClose: onClose
         )
+      } else if selectedFilter == .trad, let ascentsVM = ascentsVM, let discoverVM = discoverVM {
+        TradClimbForm(
+          discoverVM: discoverVM,
+          ascentsVM: ascentsVM,
+          onClose: onClose
+        )
       } else {
         Spacer()
       }

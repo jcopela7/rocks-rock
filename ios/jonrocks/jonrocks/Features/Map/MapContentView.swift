@@ -51,7 +51,7 @@ struct MapContentView: View {
         let locations = show ? viewModel.mappableLocations : []
         MapLocationClustering.updateSource(map: map, locations: locations)
       }
-      .ignoresSafeArea(.all, edges: .bottom)
+      .ignoresSafeArea()
     }
   }
 

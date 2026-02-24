@@ -53,6 +53,10 @@ struct ActivityRowView: View {
       return "crashpadIcon"
     case "sport":
       return "quickdrawIcon"
+    case "trad":
+      return "camIcon"
+    case "board":
+      return "boardIcon"
     default:
       return "quickdrawIcon"
     }

@@ -24,7 +24,7 @@ export async function getLocations(): Promise<LocationType[]> {
 export type CreateLocationInput = {
   id: string;
   name: string;
-  type: "gym" | "crag";
+  type: "gym" | "crag" | "board";
   latitude?: number | null;
   longitude?: number | null;
   createdBy: string;
@@ -47,7 +47,7 @@ export async function createLocation(
 
 export type UpdateLocationInput = {
   name?: string;
-  type?: "gym" | "crag";
+  type?: "gym" | "crag" | "board";
   description?: string | null;
   latitude?: number | null;
   longitude?: number | null;

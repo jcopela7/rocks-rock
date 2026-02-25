@@ -19,7 +19,7 @@ export default function EditLocationForm({
   const { updateLocation, loading, error } = useUpdateLocation();
   const [formData, setFormData] = useState<{
     name: string;
-    type: "gym" | "crag";
+    type: "gym" | "crag" | "board";
     description: string;
     latitude: string;
     longitude: string;
@@ -35,7 +35,7 @@ export default function EditLocationForm({
     if (location) {
       setFormData({
         name: location.name ?? "",
-        type: (location.type as "gym" | "crag") ?? "gym",
+        type: (location.type as "gym" | "crag" | "board") ?? "gym",
         description: location.description ?? "",
         latitude: location.latitude != null ? String(location.latitude) : "",
         longitude:
@@ -103,6 +103,7 @@ export default function EditLocationForm({
           >
             <Select.Option value="gym">Gym</Select.Option>
             <Select.Option value="crag">Crag</Select.Option>
+            <Select.Option value="board">Board</Select.Option>
           </Select>
           {/* @ts-expect-error Geist Input typing is overly strict here */}
           <Input

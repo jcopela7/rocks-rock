@@ -14,15 +14,9 @@ struct MapContentView: View {
         Puck2D(bearing: .heading)
           .showsAccuracyRing(true)
 
-        // Location clustering - tap handlers (always registered; layers empty when hidden)
+        // All-locations layer tap handlers
         TapInteraction(.layer(LocationClusterId.clusterCircle)) { _, context in
-          if let map = proxy.map {
-            let newZoom = min(
-              map.cameraState.zoom + MapConstants.clusterZoomIncrement, MapConstants.maxZoom)
-            withViewportAnimation(.easeIn(duration: 0.3)) {
-              viewport = .camera(center: context.coordinate, zoom: newZoom, bearing: 0, pitch: 0)
-            }
-          }
+          zoomIntoCluster(proxy: proxy, coordinate: context.coordinate)
           return true
         }
         TapInteraction(.layer(LocationClusterId.unclusteredPoint)) { feature, _ in
@@ -31,6 +25,19 @@ struct MapContentView: View {
           }
           return true
         }
+
+        // My-locations layer tap handlers
+        TapInteraction(.layer(MyLocationClusterId.clusterCircle)) { _, context in
+          zoomIntoCluster(proxy: proxy, coordinate: context.coordinate)
+          return true
+        }
+        TapInteraction(.layer(MyLocationClusterId.unclusteredPoint)) { feature, _ in
+          if let location = locationFromFeature(feature) {
+            onLocationSelected?(location)
+          }
+          return true
+        }
+
         TapInteraction { _ in
           false
         }
@@ -38,25 +45,48 @@ struct MapContentView: View {
       .ornamentOptions(OrnamentOptions(scaleBar: ScaleBarViewOptions(visibility: .hidden)))
       .onStyleLoaded { _ in
         guard let map = proxy.map else { return }
-        let locations = viewModel.showLocationsLayer ? viewModel.mappableLocations : []
-        MapLocationClustering.setup(map: map, locations: locations)
+        let allLocations = viewModel.showAllLocationsLayer ? viewModel.mappableLocations : []
+        let myLocations = viewModel.showMyLocationsLayer ? viewModel.mappableMyLocations : []
+        MapLocationClustering.setup(map: map, locations: allLocations)
+        MapLocationClustering.setup(map: map, myLocations: myLocations)
         styleLoaded = true
       }
       .onChange(of: viewModel.mappableLocations) { _, locations in
         guard styleLoaded, let map = proxy.map else { return }
-        MapLocationClustering.updateSource(map: map, locations: locations)
+        let visible = viewModel.showAllLocationsLayer ? locations : []
+        MapLocationClustering.updateSource(map: map, locations: visible)
       }
-      .onChange(of: viewModel.showLocationsLayer) { _, show in
+      .onChange(of: viewModel.showAllLocationsLayer) { _, show in
         guard styleLoaded, let map = proxy.map else { return }
         let locations = show ? viewModel.mappableLocations : []
         MapLocationClustering.updateSource(map: map, locations: locations)
       }
-      .ignoresSafeArea(.all, edges: .bottom)
+      .onChange(of: viewModel.mappableMyLocations) { _, myLocations in
+        guard styleLoaded, let map = proxy.map else { return }
+        let visible = viewModel.showMyLocationsLayer ? myLocations : []
+        MapLocationClustering.updateSource(map: map, myLocations: visible)
+      }
+      .onChange(of: viewModel.showMyLocationsLayer) { _, show in
+        guard styleLoaded, let map = proxy.map else { return }
+        let myLocations = show ? viewModel.mappableMyLocations : []
+        MapLocationClustering.updateSource(map: map, myLocations: myLocations)
+      }
+      .ignoresSafeArea()
+    }
+  }
+
+  private func zoomIntoCluster(proxy: MapProxy, coordinate: CLLocationCoordinate2D) {
+    if let map = proxy.map {
+      let newZoom = min(
+        map.cameraState.zoom + MapConstants.clusterZoomIncrement, MapConstants.maxZoom)
+      withViewportAnimation(.easeIn(duration: 0.3)) {
+        viewport = .camera(center: coordinate, zoom: newZoom, bearing: 0, pitch: 0)
+      }
     }
   }
 
   private func locationFromFeature(_ feature: FeaturesetFeature) -> LocationDTO? {
     guard let id = MapLocationClustering.locationId(from: feature) else { return nil }
-    return viewModel.locations.first { $0.id == id }
+    return viewModel.allLocations.first { $0.id == id }
   }
 }

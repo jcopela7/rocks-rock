@@ -10,35 +10,33 @@ struct MapLayersSheet: View {
       ScrollView {
         VStack(alignment: .leading, spacing: 24) {
           VStack(alignment: .leading, spacing: 12) {
-            Text("Map Layers")
+            Text("Location Layers")
               .font(.subheadline)
               .fontWeight(.semibold)
               .foregroundColor(Color.theme.textPrimary)
 
-            Toggle(
-              isOn: Binding(
-                get: { viewModel.showLocationsLayer },
-                set: { viewModel.showLocationsLayer = $0 }
-              )
-            ) {
-              Label("Locations", systemImage: "mappin.circle.fill")
-                .foregroundColor(Color.theme.textPrimary)
+            HStack(spacing: 24) {
+              MapLayerImageButton(
+                imageName: "allLocations",
+                label: "All Locations",
+                isSelected: viewModel.showAllLocationsLayer
+              ) {
+                viewModel.showAllLocationsLayer.toggle()
+              }
+
+              MapLayerImageButton(
+                imageName: "myLocations",
+                label: "My Locations",
+                isSelected: viewModel.showMyLocationsLayer
+              ) {
+                viewModel.showMyLocationsLayer.toggle()
+              }
+              Spacer()
             }
-            .tint(Color.theme.accent)
-            Toggle(
-              isOn: Binding(
-                get: { viewModel.showAscentsLayer },
-                set: { viewModel.showAscentsLayer = $0 }
-              )
-            ) {
-              Label("Ascents", systemImage: "circle.fill")
-                .foregroundColor(Color.theme.textPrimary)
-            }
-            .tint(Color.theme.accent)
           }
           .padding(.top, 8)
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, 24)
         .padding(.bottom, 24)
       }
     }
@@ -63,9 +61,39 @@ struct MapLayersSheet: View {
           .frame(width: 32, height: 32)
       }
     }
-    .padding(.horizontal, 20)
+    .padding(.horizontal, 24)
     .padding(.vertical, 16)
     .background(Color.white)
+  }
+}
+
+struct MapLayerImageButton: View {
+  let imageName: String
+  let label: String
+  let isSelected: Bool
+  let action: () -> Void
+
+  var body: some View {
+    Button(action: action) {
+      VStack(spacing: 8) {
+        Image(imageName)
+          .resizable()
+          .aspectRatio(contentMode: .fill)
+          .frame(width: 64, height: 64)
+          .clipShape(RoundedRectangle(cornerRadius: 14))
+          .overlay(
+            RoundedRectangle(cornerRadius: 14)
+              .stroke(isSelected ? Color.theme.accent : Color.clear, lineWidth: 3)
+          )
+
+        Text(label)
+          .font(.caption)
+          .fontWeight(isSelected ? .semibold : .regular)
+          .foregroundColor(isSelected ? Color.theme.accent : Color.theme.textPrimary)
+      }
+    }
+    .buttonStyle(.plain)
+    .animation(.easeInOut(duration: 0.15), value: isSelected)
   }
 }
 

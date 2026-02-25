@@ -23,7 +23,7 @@ export const appUser = pgTable('app_user', {
 export const location = pgTable('location', {
   id: uuid('id').primaryKey(),
   name: text('name').notNull(),
-  type: text('type').notNull(), // 'gym' | 'crag'
+  type: text('type').notNull(), // 'gym' | 'crag' | 'board'
   description: text('description'),
   latitude: doublePrecision('latitude'),
   longitude: doublePrecision('longitude'),
@@ -87,6 +87,12 @@ export const ascent = pgTable('ascent', {
   attempts: integer('attempts').default(1),
   rating: integer('rating'),
   notes: text('notes'),
+
+  // For ad-hoc climbs (boards, gym problems) where no route record exists
+  customClimbName: text('custom_climb_name'),
+  customGradeValue: text('custom_grade_value'),
+  customGradeRank: integer('custom_grade_rank'),
+  customDiscipline: text('custom_discipline'),
 
   // When the climb happened (use this for timeline & filters)
   climbedAt: timestamp('climbed_at', { withTimezone: true }).notNull(),

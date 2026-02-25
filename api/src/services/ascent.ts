@@ -1,5 +1,5 @@
 // src/services/ascents.ts
-import { and, count, desc, eq, getTableColumns, gte, inArray, isNull, lte, max, or } from 'drizzle-orm';
+import { and, count, desc, eq, getTableColumns, gte, inArray, isNull, lte, max, or, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../db/index.js';
 import { ascent, location, route } from '../db/schema.js';
@@ -15,15 +15,16 @@ export const CreateAscentInput = z
     rating: z.number().int().min(1).max(5).optional(),
     notes: z.string().max(10_000).optional(),
     climbedAt: z.coerce.date(),
+    customClimbName: z.string().max(500).optional(),
+    customGradeValue: z.string().optional(),
+    customGradeRank: z.number().int().optional(),
+    customDiscipline: z.string().optional(),
   });
 
 export type CreateAscentInputType = z.infer<typeof CreateAscentInput>;
 
 export async function createAscent(input: CreateAscentInputType, userId: string) {
   const data = CreateAscentInput.parse(input);
-
-  // If both provided, we accept it (route + location). If only routeId is given,
-  // location can still be derived later via a join.
 
   const [row] = await db
     .insert(ascent)
@@ -37,6 +38,10 @@ export async function createAscent(input: CreateAscentInputType, userId: string)
       rating: data.rating ?? null,
       notes: data.notes ?? null,
       climbedAt: data.climbedAt,
+      customClimbName: data.customClimbName ?? null,
+      customGradeValue: data.customGradeValue ?? null,
+      customGradeRank: data.customGradeRank ?? null,
+      customDiscipline: data.customDiscipline ?? null,
     })
     .returning();
 
@@ -89,10 +94,10 @@ export async function listAscents(body: ListAscentsQueryType, userId: string) {
   const query = db
     .select({
       ...getTableColumns(ascent),
-      routeName: route.name,
-      routeDiscipline: route.discipline,
-      routeGradeValue: route.gradeValue,
-      routeGradeRank: route.gradeRank,
+      routeName: sql<string | null>`COALESCE(${route.name}, ${ascent.customClimbName})`,
+      routeDiscipline: sql<string | null>`COALESCE(${route.discipline}, ${ascent.customDiscipline})`,
+      routeGradeValue: sql<string | null>`COALESCE(${route.gradeValue}, ${ascent.customGradeValue})`,
+      routeGradeRank: sql<number | null>`COALESCE(${route.gradeRank}, ${ascent.customGradeRank})`,
       locationName: location.name,
       locationLatitude: location.latitude,
       locationLongitude: location.longitude,
@@ -102,9 +107,6 @@ export async function listAscents(body: ListAscentsQueryType, userId: string) {
     .leftJoin(location, eq(ascent.locationId, location.id))
     .where(and(
       ...conditions,
-      // Only include ascents from active (non-deleted) locations
-      // If locationId is null, this condition is ignored (left join)
-      // If locationId exists, ensure the location is not deleted
       or(isNull(ascent.locationId), isNull(location.deletedAt))
     ))
     .orderBy(desc(ascent.climbedAt))
@@ -117,8 +119,8 @@ export async function getAscentDetail(id: string, userId: string) {
   const query = db
    .select({
     ...getTableColumns(ascent),
-    routeName: route.name,
-    routeDiscipline: route.discipline,
+    routeName: sql<string | null>`COALESCE(${route.name}, ${ascent.customClimbName})`,
+    routeDiscipline: sql<string | null>`COALESCE(${route.discipline}, ${ascent.customDiscipline})`,
     locationName: location.name,
     locationLatitude: location.latitude,
     locationLongitude: location.longitude,
@@ -128,7 +130,6 @@ export async function getAscentDetail(id: string, userId: string) {
    .where(and(
      eq(ascent.id, id!),
      eq(ascent.userId, userId),
-     // Only include ascents from active (non-deleted) locations
      or(isNull(ascent.locationId), isNull(location.deletedAt))
    ))
    .orderBy(desc(ascent.climbedAt));
@@ -151,9 +152,10 @@ export async function getCountOfAscentsGroupByLocation(body: GetCountOfAscentsBy
   .leftJoin(location, eq(ascent.locationId, location.id))
   .where(and(
     eq(ascent.userId, userId),
-    // Only count ascents matching discipline (via route)
-    eq(route.discipline, body.discipline),
-    // Only count ascents from active (non-deleted) locations
+    or(
+      eq(route.discipline, body.discipline),
+      eq(ascent.customDiscipline, body.discipline)
+    ),
     or(isNull(ascent.locationId), isNull(location.deletedAt))
   ))
   .groupBy(location.name)
@@ -171,15 +173,27 @@ export type GetCountOfAscentsByGradeQueryType = z.infer<typeof GetCountOfAscents
 export async function getCountOfAscentsByGrade(body: GetCountOfAscentsByGradeQueryType, userId: string) {
   const query = db
   .select({
-    routeDiscipline: route.discipline,
-    gradeSystem: route.gradeSystem,
-    gradeValue: route.gradeValue,
-    gradeRank: route.gradeRank,
+    routeDiscipline: sql<string>`COALESCE(${route.discipline}, ${ascent.customDiscipline})`,
+    gradeSystem: sql<string>`COALESCE(${route.gradeSystem}, 'V')`,
+    gradeValue: sql<string>`COALESCE(${route.gradeValue}, ${ascent.customGradeValue})`,
+    gradeRank: sql<number>`COALESCE(${route.gradeRank}, ${ascent.customGradeRank})`,
     totalAscents: count(ascent.id),
   }).from(ascent)
   .leftJoin(route, eq(ascent.routeId, route.id))
-  .where(and(eq(ascent.userId, userId), eq(route.discipline, body.discipline)))
-  .groupBy(route.discipline, route.gradeSystem, route.gradeValue, route.gradeRank);
+  .leftJoin(location, eq(ascent.locationId, location.id))
+  .where(and(
+    eq(ascent.userId, userId),
+    or(
+      eq(route.discipline, body.discipline),
+      eq(ascent.customDiscipline, body.discipline)
+    )
+  ))
+  .groupBy(
+    sql`COALESCE(${route.discipline}, ${ascent.customDiscipline})`,
+    sql`COALESCE(${route.gradeSystem}, 'V')`,
+    sql`COALESCE(${route.gradeValue}, ${ascent.customGradeValue})`,
+    sql`COALESCE(${route.gradeRank}, ${ascent.customGradeRank})`
+  );
 
   const rows = await query;
   return rows || [];
@@ -193,11 +207,18 @@ export type GetMaxGradeByDisciplineQueryType = z.infer<typeof GetMaxGradeByDisci
 export async function getMaxGradeByDiscipline(body: GetMaxGradeByDisciplineQueryType, userId: string) {
   const query = db
   .select({
-    maxGrade: max(route.gradeRank),
+    maxGrade: max(sql<number>`COALESCE(${route.gradeRank}, ${ascent.customGradeRank})`),
   }).from(ascent)
   .leftJoin(route, eq(ascent.routeId, route.id))
-  .where(and(eq(ascent.userId, userId), eq(route.discipline, body.discipline)))
-  .orderBy(desc(max(route.gradeRank)));
+  .leftJoin(location, eq(ascent.locationId, location.id))
+  .where(and(
+    eq(ascent.userId, userId),
+    or(
+      eq(route.discipline, body.discipline),
+      eq(ascent.customDiscipline, body.discipline)
+    )
+  ))
+  .orderBy(desc(max(sql<number>`COALESCE(${route.gradeRank}, ${ascent.customGradeRank})`)));
   const rows = await query;
   return rows[0] || null;
 }
@@ -213,8 +234,14 @@ export async function getCountOfAscentsByDiscipline(body: GetCountOfAscentsByDis
     totalAscents: count(ascent.id),
   }).from(ascent)
   .leftJoin(route, eq(ascent.routeId, route.id))
-  .where(and(eq(ascent.userId, userId), eq(route.discipline, body.discipline)))
-  .groupBy(route.discipline);
+  .leftJoin(location, eq(ascent.locationId, location.id))
+  .where(and(
+    eq(ascent.userId, userId),
+    or(
+      eq(route.discipline, body.discipline),
+      eq(ascent.customDiscipline, body.discipline)
+    )
+  ));
   const rows = await query;
   return rows[0] || null;
 }

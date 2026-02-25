@@ -102,6 +102,10 @@ struct CreateAscentRequest: Encodable {
   let rating: Int?
   let notes: String?
   let climbedAt: Date
+  var customClimbName: String? = nil
+  var customGradeValue: String? = nil
+  var customGradeRank: Int? = nil
+  var customDiscipline: String? = nil
 }
 
 struct DeleteAscentRequest: Encodable {

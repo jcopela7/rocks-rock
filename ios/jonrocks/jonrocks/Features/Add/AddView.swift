@@ -53,6 +53,11 @@ struct AddView: View {
           ascentsVM: ascentsVM,
           onClose: onClose
         )
+      } else if selectedFilter == .board, let ascentsVM = ascentsVM {
+        BoardClimbForm(
+          ascentsVM: ascentsVM,
+          onClose: onClose
+        )
       } else {
         Spacer()
       }

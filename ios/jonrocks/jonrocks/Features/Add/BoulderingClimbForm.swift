@@ -193,6 +193,7 @@ struct BoulderingClimbForm: View {
         LocationRouteSearchModal(
           discoverVM: discoverVM,
           selectedLocationId: $selectedLocationId,
+          type: "crag",
           selectedRouteId: $selectedRouteId,
           isPresented: $showingSearchModal,
           filteredRoutes: filteredRoutes,

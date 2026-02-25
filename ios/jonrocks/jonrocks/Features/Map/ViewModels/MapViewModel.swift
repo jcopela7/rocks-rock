@@ -5,9 +5,11 @@ import SwiftUI
 
 @MainActor
 final class MapViewModel: ObservableObject {
-  @Published var locations: [LocationDTO] = []
+  @Published var myLocations: [UserLocationDTO] = []
+  @Published var allLocations: [LocationDTO] = []
   @Published var ascents: [AscentDTO] = []
-  @Published var showLocationsLayer: Bool = true
+  @Published var showMyLocationsLayer: Bool = true
+  @Published var showAllLocationsLayer: Bool = true
   @Published var showAscentsLayer: Bool = true
   @Published var loading: Bool = false
   @Published var error: String? = nil
@@ -21,7 +23,11 @@ final class MapViewModel: ObservableObject {
   }
 
   var mappableLocations: [LocationDTO] {
-    locations.filter { $0.latitude != nil && $0.longitude != nil }
+    allLocations.filter { $0.latitude != nil && $0.longitude != nil }
+  }
+
+  var mappableMyLocations: [UserLocationDTO] {
+    myLocations.filter { $0.latitude != nil && $0.longitude != nil }
   }
 
   var mappableAscents: [AscentDTO] {
@@ -35,11 +41,15 @@ final class MapViewModel: ObservableObject {
     defer { loading = false }
 
     do {
-      async let locationsTask = api.listLocations()
+      async let myLocationsTask = api.listMyLocations()
+      async let allLocationsTask = api.listLocations()
       async let ascentsTask = api.listAscents(limit: 100)
 
-      let (loadedLocations, loadedAscents) = try await (locationsTask, ascentsTask)
-      locations = loadedLocations
+      let (loadedMyLocations, loadedAllLocations, loadedAscents) = try await (
+        myLocationsTask, allLocationsTask, ascentsTask
+      )
+      myLocations = loadedMyLocations
+      allLocations = loadedAllLocations
       ascents = loadedAscents
       error = nil
     } catch let apiError as APIError {

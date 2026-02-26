@@ -16,9 +16,12 @@ struct ActivityRowView: View {
         ascentLocation
         ascentMetadata
       }
-      Spacer()
-      ascentDetails
-      Spacer()
+      if let notes = ascent.notes, !notes.isEmpty {
+        ascentDetails
+          .padding(.vertical, 16)
+      } else {
+        Spacer()
+      }
       HStack(alignment: .center, spacing: 32) {
         ascentMetric(label: "Grade", value: ascent.routeGradeValue ?? "")
         ascentMetric(label: "Attempts", value: String(ascent.attempts))

@@ -29,17 +29,7 @@ struct MyLocationsListView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
       } else if discoverVM.filteredMyLocations.isEmpty {
-        VStack(spacing: 12) {
-          Text("No saved locations")
-            .font(.headline)
-            .foregroundColor(Color.theme.accent)
-          Text("Save locations from All Locations to see them here")
-            .font(.body)
-            .foregroundStyle(.secondary)
-            .multilineTextAlignment(.center)
-            .padding(.horizontal)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        LoadingListView()
       } else {
         List(discoverVM.filteredMyLocations) { location in
           NavigationLink(value: location) {

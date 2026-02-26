@@ -7,7 +7,7 @@ import { location } from '../db/schema.js';
 export const CreateLocationInput = z.object({
   id: z.string(),
   name: z.string(),
-  type: z.enum(['gym', 'crag']),
+  type: z.enum(['gym', 'crag', 'board']),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
   createdBy: z.string(),
@@ -37,7 +37,7 @@ export async function createLocation(input: CreateLocationInput) {
 
 export const updateLocationInput = z.object({
   name: z.string().optional(),
-  type: z.enum(['gym', 'crag']).optional(),
+  type: z.enum(['gym', 'crag', 'board']).optional(),
   description: z.string().optional(),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
@@ -60,7 +60,7 @@ export async function updateLocation(id: string, input: updateLocationInput) {
 
 export const ListLocationsQuery = z.object({
   name: z.string().optional(),
-  type: z.enum(['gym', 'crag']).optional(),
+  type: z.enum(['gym', 'crag', 'board']).optional(),
 });
 
 export type ListLocationsQueryType = z.infer<typeof ListLocationsQuery>;

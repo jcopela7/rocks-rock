@@ -1,30 +1,31 @@
 import SwiftUI
 
-struct TradClimbForm: View {
-  @ObservedObject var discoverVM: DiscoverVM
+private let vGrades: [(value: String, rank: Int)] = [
+  ("VB", 0), ("V0", 1), ("V1", 2), ("V2", 3), ("V3", 4),
+  ("V4", 5), ("V5", 6), ("V6", 7), ("V7", 8), ("V8", 9),
+  ("V9", 10), ("V10", 11), ("V11", 12), ("V12", 13), ("V13", 14),
+  ("V14", 15), ("V15", 16), ("V16", 17), ("V17", 18),
+]
+
+struct BoardClimbForm: View {
   @ObservedObject var ascentsVM: AscentsVM
 
   var onClose: (() -> Void)?
 
+  @State private var boardLocations: [LocationDTO] = []
   @State private var selectedLocationId: UUID? = nil
-  @State private var selectedRouteId: UUID? = nil
+  @State private var climbName: String = ""
+  @State private var selectedGradeIndex: Int = 0
   @State private var notes: String = ""
   @State private var attempts: Int = 1
   @State private var stars: Int = 0
   @State private var dateClimbed: Date = .init()
   @State private var isSubmitting = false
+  @State private var isLoadingLocations = false
   @State private var error: String? = nil
-  @State private var showingSearchModal = false
+
   private let attemptsRange = 1...100
   private let starsRange = 0...5
-
-  var filteredRoutes: [RouteDTO] {
-    let tradRoutes = discoverVM.routes.filter { $0.discipline == "trad" }
-    guard let locationId = selectedLocationId else {
-      return tradRoutes
-    }
-    return tradRoutes.filter { $0.locationId == locationId }
-  }
 
   var body: some View {
     NavigationStack {
@@ -33,12 +34,12 @@ struct TradClimbForm: View {
           VStack(alignment: .leading, spacing: 18) {
             sectionHeader("Activity Type")
             HStack(spacing: 10) {
-              Image("camIcon")
+              Image("boardIcon")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 24, height: 24)
                 .foregroundColor(Color.theme.textSecondary)
-              Text("Trad Climbing")
+              Text("Board")
                 .font(.subheadline)
                 .foregroundColor(Color.theme.textPrimary)
               Spacer()
@@ -50,24 +51,25 @@ struct TradClimbForm: View {
             Divider()
 
             sectionHeader("Climb Details")
-            selectionField(
-              icon: "mappin.and.ellipse",
-              text: selectedLocationName,
-              isPlaceholder: selectedLocationId == nil
-            ) {
-              showingSearchModal = true
+
+            boardPicker
+
+            HStack {
+              Label("Climb", systemImage: "pencil")
+                .font(.subheadline)
+                .foregroundColor(Color.theme.textSecondary)
+              Spacer()
+              TextField("e.g. The Pinch", text: $climbName)
+                .font(.subheadline)
+                .foregroundColor(Color.theme.textPrimary)
+                .multilineTextAlignment(.trailing)
+                .frame(maxWidth: .infinity, alignment: .trailing)
+                .padding(.trailing, 12)
             }
-            .onChange(of: selectedLocationId) {
-              selectedRouteId = nil
-            }
-            selectionField(
-              icon: "figure.climbing",
-              text: selectedRouteName,
-              isPlaceholder: selectedRouteId == nil
-            ) {
-              showingSearchModal = true
-            }
-            .disabled(selectedLocationId == nil)
+            .padding(12)
+            .formFieldCard()
+
+            gradePicker
 
             Divider()
 
@@ -110,6 +112,7 @@ struct TradClimbForm: View {
             .padding(.horizontal, 14)
             .padding(.vertical, 14)
             .formFieldCard()
+
             VStack(alignment: .leading, spacing: 10) {
               HStack(spacing: 10) {
                 Image(systemName: "star")
@@ -188,24 +191,59 @@ struct TradClimbForm: View {
         .background(Color.white)
       }
       .foregroundColor(Color.theme.textPrimary)
-      .sheet(isPresented: $showingSearchModal) {
-        LocationRouteSearchModal(
-          discoverVM: discoverVM,
-          selectedLocationId: $selectedLocationId,
-          type: "crag",
-          selectedRouteId: $selectedRouteId,
-          isPresented: $showingSearchModal,
-          filteredRoutes: filteredRoutes,
-          routeNameFormatter: routeName(for:)
-        )
-      }
       .onAppear {
-        Task {
-          await discoverVM.loadLocations()
-          await discoverVM.loadRoutes()
-        }
+        Task { await loadBoardLocations() }
       }
     }
+  }
+
+  // MARK: Subviews
+
+  private var boardPicker: some View {
+
+    HStack {
+      Label("Board", systemImage: "mappin.and.ellipse")
+        .font(.subheadline)
+        .foregroundColor(Color.theme.textSecondary)
+      Spacer()
+
+      if isLoadingLocations {
+        ProgressView()
+          .frame(maxWidth: .infinity, alignment: .center)
+          .padding(.vertical, 8)
+      } else {
+        Picker("Board", selection: $selectedLocationId) {
+          Text("Select a board").tag(UUID?(nil))
+          ForEach(boardLocations) { loc in
+            Text(loc.name).tag(Optional(loc.id))
+          }
+        }
+        .pickerStyle(.menu)
+        .frame(maxWidth: .infinity, alignment: .trailing)
+        .multilineTextAlignment(.trailing)
+      }
+    }
+    .padding(.horizontal, 12)
+    .padding(.vertical, 8)
+    .formFieldCard()
+  }
+
+  private var gradePicker: some View {
+    VStack(alignment: .leading, spacing: 8) {
+      Label("Grade", systemImage: "chart.bar.fill")
+        .font(.subheadline)
+        .foregroundColor(Color.theme.textSecondary)
+      Picker("Grade", selection: $selectedGradeIndex) {
+        ForEach(vGrades.indices, id: \.self) { i in
+          Text(vGrades[i].value).tag(i)
+        }
+      }
+      .pickerStyle(.wheel)
+      .frame(height: 150)
+      .clipped()
+    }
+    .padding(12)
+    .formFieldCard()
   }
 
   private func sectionHeader(_ text: String) -> some View {
@@ -216,58 +254,22 @@ struct TradClimbForm: View {
       .padding(.horizontal, 4)
   }
 
-  private func selectionField(
-    icon: String,
-    text: String,
-    isPlaceholder: Bool,
-    action: @escaping () -> Void
-  ) -> some View {
-    Button(action: action) {
-      HStack {
-        Image(systemName: icon)
-          .foregroundColor(Color.theme.textSecondary)
-        Text(text)
-          .foregroundColor(isPlaceholder ? Color.theme.textSecondary : Color.theme.textPrimary)
-        Spacer()
-        Image(systemName: "chevron.down")
-          .font(.system(size: 13, weight: .semibold))
-          .foregroundColor(Color.theme.textSecondary)
-      }
-      .padding(.horizontal, 14)
-      .padding(.vertical, 14)
-      .formFieldCard()
-    }
-    .buttonStyle(.plain)
-  }
+  // MARK: Actions
 
-  private var selectedLocationName: String {
-    guard let locationId = selectedLocationId,
-      let location = discoverVM.locations.first(where: { $0.id == locationId })
-    else {
-      return "Select a location"
+  private func loadBoardLocations() async {
+    isLoadingLocations = true
+    defer { isLoadingLocations = false }
+    do {
+      boardLocations = try await ascentsVM.api.listLocations(type: "board")
+    } catch {
+      self.error = "Failed to load boards: \(error.localizedDescription)"
     }
-    return location.name
-  }
-
-  private var selectedRouteName: String {
-    guard let routeId = selectedRouteId,
-      let route = filteredRoutes.first(where: { $0.id == routeId })
-    else {
-      return "Select a route"
-    }
-    return routeName(for: route)
-  }
-
-  private func routeName(for route: RouteDTO) -> String {
-    if let name = route.name, !name.isEmpty {
-      return "\(name) (\(route.gradeValue))"
-    }
-    return route.gradeValue
   }
 
   private func clearForm() {
     selectedLocationId = nil
-    selectedRouteId = nil
+    climbName = ""
+    selectedGradeIndex = 0
     notes = ""
     attempts = 1
     stars = 0
@@ -282,13 +284,15 @@ struct TradClimbForm: View {
     error = nil
 
     guard let locationId = selectedLocationId else {
-      error = "Please select a location"
+      error = "Please select a board"
       return
     }
 
+    let grade = vGrades[selectedGradeIndex]
+
     do {
-      let request = CreateAscentRequest(
-        routeId: selectedRouteId,
+      var request = CreateAscentRequest(
+        routeId: nil,
         locationId: locationId,
         style: "attempt",
         attempts: attempts,
@@ -296,6 +300,10 @@ struct TradClimbForm: View {
         notes: notes.isEmpty ? nil : notes,
         climbedAt: dateClimbed
       )
+      request.customClimbName = climbName.isEmpty ? nil : climbName
+      request.customGradeValue = grade.value
+      request.customGradeRank = grade.rank
+      request.customDiscipline = "board"
 
       let created = try await ascentsVM.api.createAscent(request)
       await MainActor.run {
@@ -310,4 +318,8 @@ struct TradClimbForm: View {
       }
     }
   }
+}
+
+#Preview {
+  BoardClimbForm(ascentsVM: AscentsVM(authService: AuthenticationService()))
 }

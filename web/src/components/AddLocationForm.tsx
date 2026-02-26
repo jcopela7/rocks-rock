@@ -28,7 +28,7 @@ export default function AddLocationForm({ open, setOpen, onSuccess }: Props) {
     const locationData: CreateLocationInput = {
       id: crypto.randomUUID(), // Generate UUID on client side
       name: formData.name,
-      type: formData.type as "gym" | "crag",
+      type: formData.type as "gym" | "crag" | "board",
       latitude: formData.latitude ? formData.latitude : undefined,
       longitude: formData.longitude ? formData.longitude : undefined,
       createdBy: "00000000-0000-0000-0000-000000000001", // TODO: Replace with actual user ID
@@ -88,6 +88,7 @@ export default function AddLocationForm({ open, setOpen, onSuccess }: Props) {
           >
             <Select.Option value="gym">Gym</Select.Option>
             <Select.Option value="crag">Crag</Select.Option>
+            <Select.Option value="board">Board</Select.Option>
           </Select>
         </form>
       </Modal.Content>

@@ -7,6 +7,7 @@ enum SearchMode {
 
 struct LocationRouteSearchModal: View {
   @ObservedObject var discoverVM: DiscoverVM
+  let type: String
   @Binding var selectedLocationId: UUID?
   @Binding var selectedRouteId: UUID?
   @Binding var isPresented: Bool
@@ -21,6 +22,7 @@ struct LocationRouteSearchModal: View {
   init(
     discoverVM: DiscoverVM,
     selectedLocationId: Binding<UUID?>,
+    type: String,
     selectedRouteId: Binding<UUID?>,
     isPresented: Binding<Bool>,
     filteredRoutes: [RouteDTO],
@@ -28,6 +30,7 @@ struct LocationRouteSearchModal: View {
   ) {
     self.discoverVM = discoverVM
     self._selectedLocationId = selectedLocationId
+    self.type = type
     self._selectedRouteId = selectedRouteId
     self._isPresented = isPresented
     self.filteredRoutes = filteredRoutes
@@ -40,7 +43,7 @@ struct LocationRouteSearchModal: View {
 
   var filteredLocations: [LocationDTO] {
     if searchText.isEmpty {
-      return discoverVM.locations
+      return discoverVM.locations.filter { $0.type == type }
     }
     return discoverVM.locations.filter { location in
       location.name.localizedCaseInsensitiveContains(searchText)

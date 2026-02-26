@@ -54,13 +54,17 @@ struct BoardClimbForm: View {
 
             boardPicker
 
-            VStack(alignment: .leading, spacing: 8) {
-              Label("Climb Name (optional)", systemImage: "pencil")
+            HStack {
+              Label("Climb", systemImage: "pencil")
                 .font(.subheadline)
                 .foregroundColor(Color.theme.textSecondary)
+              Spacer()
               TextField("e.g. The Pinch", text: $climbName)
                 .font(.subheadline)
                 .foregroundColor(Color.theme.textPrimary)
+                .multilineTextAlignment(.trailing)
+                .frame(maxWidth: .infinity, alignment: .trailing)
+                .padding(.trailing, 12)
             }
             .padding(12)
             .formFieldCard()
@@ -196,10 +200,13 @@ struct BoardClimbForm: View {
   // MARK: Subviews
 
   private var boardPicker: some View {
-    VStack(alignment: .leading, spacing: 8) {
+
+    HStack {
       Label("Board", systemImage: "mappin.and.ellipse")
         .font(.subheadline)
         .foregroundColor(Color.theme.textSecondary)
+      Spacer()
+
       if isLoadingLocations {
         ProgressView()
           .frame(maxWidth: .infinity, alignment: .center)
@@ -212,10 +219,12 @@ struct BoardClimbForm: View {
           }
         }
         .pickerStyle(.menu)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity, alignment: .trailing)
+        .multilineTextAlignment(.trailing)
       }
     }
-    .padding(12)
+    .padding(.horizontal, 12)
+    .padding(.vertical, 8)
     .formFieldCard()
   }
 

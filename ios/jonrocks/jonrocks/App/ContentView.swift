@@ -1,10 +1,14 @@
 import SwiftUI
 
+private struct ClimbTypeToAdd: Identifiable {
+  let id = UUID()
+  let filter: ClimbFilter
+}
+
 struct ContentView: View {
   @State private var selectedTab = 0
   @State private var showClimbTypeDrawer = false
-  @State private var selectedClimbType: ClimbFilter?
-  @State private var showClimbForm = false
+  @State private var climbTypeToAdd: ClimbTypeToAdd?
   @State private var sheetContentHeight: CGFloat = 400
   @State private var locationToOpen: LocationDTO?
 
@@ -32,9 +36,8 @@ struct ContentView: View {
     .ignoresSafeArea(.keyboard)
     .sheet(isPresented: $showClimbTypeDrawer) {
       ClimbTypeDrawer { climbType in
-        selectedClimbType = climbType
+        climbTypeToAdd = ClimbTypeToAdd(filter: climbType)
         showClimbTypeDrawer = false
-        showClimbForm = true
       }
       .onPreferenceChange(SheetHeightPreferenceKey.self) { height in
         if height > 0 { sheetContentHeight = height + 34 }  // + bottom safe area
@@ -42,16 +45,10 @@ struct ContentView: View {
       .presentationDetents([.height(sheetContentHeight)])
       .presentationDragIndicator(.visible)
     }
-    .fullScreenCover(
-      isPresented: $showClimbForm,
-      onDismiss: {
-        selectedClimbType = nil
-        selectedTab = 0
-      }
-    ) {
+    .fullScreenCover(item: $climbTypeToAdd, onDismiss: { selectedTab = 0 }) { item in
       AddView(
-        initialFilter: selectedClimbType ?? .boulder,
-        onClose: { showClimbForm = false }
+        initialFilter: item.filter,
+        onClose: { climbTypeToAdd = nil }
       )
     }
   }

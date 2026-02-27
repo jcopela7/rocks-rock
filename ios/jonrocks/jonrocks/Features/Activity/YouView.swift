@@ -38,7 +38,7 @@ struct YouView: View {
             if selected == "Progress" {
               ProgressViewTab(viewModel: ascentsVM)
             } else {
-              ActivityLoggingView(ascentsVM: ascentsVM)
+              ActivityListView(ascentsVM: ascentsVM)
             }
           } else {
             LoadingListView()

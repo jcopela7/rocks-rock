@@ -7,7 +7,7 @@
 import PhotosUI
 import SwiftUI
 
-struct ActivityLoggingView: View {
+struct ActivityListView: View {
   @ObservedObject var ascentsVM: AscentsVM
 
   @State private var ascentToDelete: AscentDTO?
@@ -43,15 +43,18 @@ struct ActivityLoggingView: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 8)
         ForEach(ascentsVM.filteredAscents) { ascent in
-          ActivityRowView(
-            ascent: ascent,
-            viewModel: ascentsVM,
-            selectedItem: $selectedItem,
-            pickingForAscent: $pickingForAscent,
-            ascentToDelete: $ascentToDelete,
-            showingDeleteAlert: $showingDeleteAlert
-          )
-          .padding(.bottom, 4)
+          NavigationLink(destination: ActivityDetailView(ascent: ascent)) {
+            ActivityRowView(
+              ascent: ascent,
+              viewModel: ascentsVM,
+              selectedItem: $selectedItem,
+              pickingForAscent: $pickingForAscent,
+              ascentToDelete: $ascentToDelete,
+              showingDeleteAlert: $showingDeleteAlert
+            )
+            .padding(.bottom, 4)
+          }
+          .buttonStyle(.plain)
         }
       }
     }
@@ -62,11 +65,6 @@ struct ActivityLoggingView: View {
     .task { await ascentsVM.loadAscents() }
     .sheet(isPresented: $showingFilterSheet) {
       ActivityFilterSheet(ascentsVM: ascentsVM)
-    }
-    .alert("Delete Ascent", isPresented: $showingDeleteAlert) {
-      deleteAlertContent
-    } message: {
-      deleteAlertMessage
     }
   }
 
@@ -95,26 +93,6 @@ struct ActivityLoggingView: View {
       if let e = ascentsVM.error {
         Text(e).foregroundStyle(.red).padding()
       }
-    }
-  }
-
-  @ViewBuilder
-  private var deleteAlertContent: some View {
-    Button("Cancel", role: .cancel) { ascentToDelete = nil }
-    Button("Delete", role: .destructive) {
-      if let ascent = ascentToDelete {
-        Task { await ascentsVM.deleteAscent(ascent) }
-      }
-      ascentToDelete = nil
-    }
-  }
-
-  @ViewBuilder
-  private var deleteAlertMessage: some View {
-    if let ascent = ascentToDelete {
-      Text(
-        "Are you sure you want to delete this \(ascent.style) ascent? This action cannot be undone."
-      )
     }
   }
 }

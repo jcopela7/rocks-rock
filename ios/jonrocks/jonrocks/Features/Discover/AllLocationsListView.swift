@@ -20,7 +20,7 @@ struct AllLocationsListView: View {
             .padding()
           Button("Retry") {
             Task {
-              await discoverVM.loadLocations()
+              await discoverVM.loadLocations(type: "crag")
             }
           }
           .buttonStyle(.bordered)
@@ -28,7 +28,7 @@ struct AllLocationsListView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
       } else {
-        List(discoverVM.filteredLocations) { location in
+        List(discoverVM.locations) { location in
           NavigationLink(value: location) {
             LocationRowView(location: location)
           }
@@ -36,7 +36,7 @@ struct AllLocationsListView: View {
         }
         .listStyle(.plain)
         .refreshable {
-          await discoverVM.loadLocations()
+          await discoverVM.loadLocations(type: "crag")
         }
         .contentMargins(.horizontal, 12)
         .background(Color.theme.card)

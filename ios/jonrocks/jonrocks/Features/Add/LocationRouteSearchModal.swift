@@ -47,6 +47,7 @@ struct LocationRouteSearchModal: View {
     }
     return discoverVM.locations.filter { location in
       location.name.localizedCaseInsensitiveContains(searchText)
+        && location.type == type
     }
   }
 

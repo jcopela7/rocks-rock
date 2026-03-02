@@ -201,7 +201,7 @@ struct TradClimbForm: View {
       }
       .onAppear {
         Task {
-          await discoverVM.loadLocations()
+          await discoverVM.loadLocations(type: "crag")
           await discoverVM.loadRoutes()
         }
       }

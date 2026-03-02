@@ -11,7 +11,7 @@ final class DiscoverVM: ObservableObject {
   @Published var loading: Bool = false
   @Published var myLocationsLoading: Bool = false
   @Published var error: String? = nil
-  @Published var selectedFilterType: String? = nil  // nil = all, "gym" or "crag"
+
   @Published var searchText: String = ""
   @Published var isLocationFavourite: Bool = false
   @Published var userLocationIdForFavourite: UUID? = nil
@@ -31,21 +31,11 @@ final class DiscoverVM: ObservableObject {
       .sink { [weak self] searchText in
         Task { @MainActor [weak self] in
           guard let self else { return }
-          await self.loadLocations()
+          await self.loadLocations(name: searchText.isEmpty ? nil : searchText, type: "crag")
           await self.loadMyLocations(name: searchText.isEmpty ? nil : searchText)
         }
       }
       .store(in: &cancellables)
-  }
-
-  var filteredLocations: [LocationDTO] {
-    let result: [LocationDTO]
-    if let filterType = selectedFilterType {
-      result = locations.filter { $0.type == filterType }
-    } else {
-      result = locations
-    }
-    return result
   }
 
   /// User's saved locations as LocationDTO for display/navigation
@@ -78,14 +68,14 @@ final class DiscoverVM: ObservableObject {
     }
   }
 
-  func loadLocations() async {
+  func loadLocations(name: String? = nil, type: String? = nil) async {
     loading = true
     defer { loading = false }
 
     do {
       // Use searchText for backend filtering by name
-      let nameFilter = searchText.isEmpty ? nil : searchText
-      let loadedLocations = try await api.listLocations(name: nameFilter)
+      let nameFilter = name.flatMap { $0.isEmpty ? nil : $0 }
+      let loadedLocations = try await api.listLocations(name: nameFilter, type: type)
       locations = loadedLocations
       self.error = nil
     } catch let apiError as APIError {
@@ -102,11 +92,6 @@ final class DiscoverVM: ObservableObject {
       return
     } catch let err {
       print("❌ Backend error in loadLocations(): \(err)")
-      print("❌ Error type: \(type(of: err))")
-      print("❌ Error details: \(String(describing: err))")
-      if let apiError = err as? APIError {
-        print("❌ API Error: \(apiError.errorDescription ?? "unknown")")
-      }
       locations = []  // Clear locations on error
       self.error = err.localizedDescription
     }

@@ -51,13 +51,13 @@ struct DiscoverView: View {
         if discoverVM == nil {
           discoverVM = DiscoverVM(authService: authService)
           Task {
-            await discoverVM?.loadLocations()
+            await discoverVM?.loadLocations(type: "crag")
             await discoverVM?.loadMyLocations()
           }
         } else {
           if discoverVM?.locations.isEmpty == true && discoverVM?.loading == false {
             Task {
-              await discoverVM?.loadLocations()
+              await discoverVM?.loadLocations(type: "crag")
               await discoverVM?.loadMyLocations()
             }
           }

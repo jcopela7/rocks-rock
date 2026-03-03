@@ -31,7 +31,7 @@ struct SportClimbForm: View {
       VStack(spacing: 0) {
         ScrollView {
           VStack(alignment: .leading, spacing: 18) {
-            sectionHeader("Activity Type")
+            sectionHeader("Type")
             HStack(spacing: 10) {
               Image("quickdrawIcon")
                 .resizable()
@@ -85,7 +85,7 @@ struct SportClimbForm: View {
 
             Divider()
 
-            sectionHeader("Activity Details")
+            sectionHeader("Details")
             HStack(spacing: 10) {
               Image(systemName: "number")
                 .foregroundColor(Color.theme.textSecondary)
@@ -150,8 +150,16 @@ struct SportClimbForm: View {
             .formFieldCard()
 
             DatePicker(selection: $dateClimbed, displayedComponents: [.date]) {
-              Label("Date Climbed", systemImage: "calendar")
+              HStack(spacing: 10) {
+                Image(systemName: "calendar")
+                  .foregroundColor(Color.theme.textSecondary)
+                Text("Date Climbed")
+                  .font(.subheadline)
+                  .foregroundColor(Color.theme.textPrimary)
+              }
             }
+            .font(.subheadline)
+            .foregroundColor(Color.theme.textPrimary)
             .padding(.horizontal, 14)
             .padding(.vertical, 14)
             .formFieldCard()

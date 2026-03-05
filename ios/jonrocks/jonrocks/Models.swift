@@ -126,7 +126,7 @@ struct CountOfAscentsByGradeDTO: Codable {
 }
 
 struct MaxGradeByDisciplineDTO: Codable {
-  let maxGrade: Int
+  let maxGrade: String
 }
 
 struct CountOfAscentsByDisciplineDTO: Codable {

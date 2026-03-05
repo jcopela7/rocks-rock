@@ -23,7 +23,7 @@ struct SendsByGradeView: View {
       .padding(.top, 16)
       HStack(alignment: .center, spacing: 32) {
         ascentMetric(
-          label: "Highest Grade", value: "\(viewModel.maxGradeByDiscipline?.maxGrade ?? 0)")
+          label: "Highest Grade", value: "\(viewModel.maxGradeByDiscipline?.maxGrade ?? "N/A")")
         ascentMetric(
           label: "Total Sends",
           value: "\(viewModel.totalCountOfAscentsByDiscipline?.totalAscents ?? 0)")

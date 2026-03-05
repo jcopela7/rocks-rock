@@ -1,5 +1,5 @@
 // src/services/locations.ts
-import { and, desc, eq, ilike, isNull } from 'drizzle-orm';
+import { and, asc, eq, ilike, isNull } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../db/index.js';
 import { location } from '../db/schema.js';
@@ -80,7 +80,7 @@ export async function listLocations(query?: ListLocationsQueryType) {
     .select()
     .from(location)
     .where(and(...conditions))
-    .orderBy(desc(location.createdAt));
+    .orderBy(asc(location.name));
 
   return rows;
 }
